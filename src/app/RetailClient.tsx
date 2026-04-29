@@ -398,7 +398,6 @@ export default function RetailClient({ products, customerSession }: Props) {
                       <p className="specs" style={{ flex: 1 }}>{p.specs || "Chính hãng, bảo hành 12 năm"}</p>
                       <div className="product-price" style={{ marginTop: 'auto' }}>
                         <span className="price">{new Intl.NumberFormat('vi-VN').format(p.price)}đ</span>
-                        <span className="product-btn">Xem chi tiết</span>
                       </div>
                     </div>
                   </Link>
