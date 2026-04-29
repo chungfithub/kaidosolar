@@ -1,0 +1,16 @@
+model MarketingLead {
+  id            Int      @id @default(autoincrement())
+  postContent   String
+  postUrl       String?
+  authorName    String?
+  platform      String   @default("facebook")
+  groupName     String?
+  aiScore       Int?
+  aiAnalysis    String?
+  aiSuggest     String?
+  status        String   @default("new")
+  assignedTo    String?
+  saleNote      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

@@ -1,0 +1,285 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  category  String
+  brand     String?
+  capacity  String?
+  warranty  String?
+  price     Int
+  stock     Int      @default(0)
+  specs     String?
+  images    String   // Store JSON array of image URLs
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  supplierPrices SupplierPrice[]
+  projectItems   ProjectItem[]
+  stockImports   StockImport[]
+  saleItems      SaleItem[]
+  orderItems     OrderItem[]
+}
+
+model Supplier {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  address   String?
+  regions   String?
+  facebook  String?
+  zalo      String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  supplierPrices SupplierPrice[]
+  stockImports   StockImport[]
+}
+
+model SupplierPrice {
+  id          Int      @id @default(autoincrement())
+  importPrice Int
+  productId   Int
+  supplierId  Int
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, supplierId])
+}
+
+model Installer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  regions   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects  ProjectInstaller[]
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects  Project[]
+  orders    Order[]
+  account   CustomerAccount?
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  customerId  Int
+  status      String   @default("draft") // draft, quoted, in_progress, completed
+  totalCost   Int      @default(0)
+  notes       String?
+  // Thông tin tư vấn
+  monthlyBill Int?     // Tiền điện hàng tháng (VNĐ)
+  usageTime   String?  // Thời gian sử dụng: "day" | "night" | "both"
+  systemType  String?  // Loại hệ thống: Hộ gia đình, Doanh nghiệp...
+  roofArea    String?  // Diện tích mái
+  budget      String?  // Ngân sách dự kiến
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items      ProjectItem[]
+  installers ProjectInstaller[]
+}
+
+model ProjectInstaller {
+  id         Int      @id @default(autoincrement())
+  projectId  Int
+  installerId Int
+  assignedAt DateTime @default(now())
+  status     String   @default("assigned") // assigned, working, completed
+
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  installer  Installer @relation(fields: [installerId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, installerId])
+}
+
+model ProjectItem {
+  id         Int      @id @default(autoincrement())
+  projectId  Int
+  productId  Int
+  supplierId Int?
+  quantity   Int
+  price      Int
+
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  orderCode  String      @unique
+  customerId Int
+  total      Int         @default(0)
+  status     String      @default("pending") // pending, processing, completed, cancelled
+  notes      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id           Int       @id @default(autoincrement())
+  orderId      Int
+  productId    Int
+  quantity     Int
+  unitPrice    Int
+  warrantyNote String?   // e.g. "12 năm"
+  warrantyUntil DateTime? // computed expiry
+
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product @relation(fields: [productId], references: [id])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  name         String?
+  role         String   @default("STAFF") // ADMIN, STAFF
+  status       String   @default("active") // active, inactive
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CustomerAccount {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  customerId   Int?      @unique
+  status       String    @default("active")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  customer     Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+}
+
+model StockImport {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  supplierId  Int?
+  quantity    Int
+  importPrice Int      @default(0)
+  note        String?
+  createdAt   DateTime @default(now())
+
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier    Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+}
+
+model ShippingCarrier {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String?
+  routes    String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sale {
+  id           Int        @id @default(autoincrement())
+  customerName String
+  customerPhone String?
+  status       String     @default("pending")
+  totalAmount  Int        @default(0)
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  items        SaleItem[]
+}
+
+model SaleItem {
+  id        Int     @id @default(autoincrement())
+  saleId    Int
+  productId Int
+  quantity  Int
+  unitPrice Int
+
+  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+// AI persistent memory - stores successful interactions for few-shot learning
+model AiMemory {
+  id         Int      @id @default(autoincrement())
+  topic      String
+  userInput  String
+  aiResponse String
+  rating     Int      @default(1)
+  usedCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model AiChatSession {
+  id        Int             @id @default(autoincrement())
+  title     String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  messages  AiChatMessage[]
+}
+
+model AiChatMessage {
+  id        Int           @id @default(autoincrement())
+  sessionId Int
+  role      String
+  text      String
+  image     String?
+  createdAt DateTime      @default(now())
+  session   AiChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model MarketingGroup {
+  id           Int      @id @default(autoincrement())
+  name         String
+  platform     String   // facebook, zalo, other
+  url          String?
+  membersCount Int?
+  description  String?
+  status       String   @default("active") // active, inactive
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+ 
+model MarketingLead {
+  id            Int      @id @default(autoincrement())
+  postContent   String
+  postUrl       String?
+  authorName    String?
+  platform      String   @default("facebook")
+  groupName     String?
+  aiScore       Int?
+  aiAnalysis    String?
+  aiSuggest     String?
+  status        String   @default("new")
+  assignedTo    String?
+  saleNote      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
