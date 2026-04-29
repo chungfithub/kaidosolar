@@ -18,10 +18,10 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
   return (
     <>
       {/* Top Navbar */}
-      <nav className="navbar scrolled">
+      <nav className="navbar scrolled" style={{ position: "relative", zIndex: 1100 }}>
         <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button className="hamburger" onClick={() => setIsMenuOpen(true)} style={{ display: "block", background: "none", border: "none", color: "var(--text)", fontSize: "1.5rem", cursor: "pointer", padding: 0 }}>
+            <button className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ display: "block", background: "none", border: "none", color: "var(--text)", fontSize: "1.5rem", cursor: "pointer", padding: 0, position: "relative", zIndex: 1100 }}>
               <span className="hide-on-desktop">☰</span>
             </button>
             <Link href="/" className="nav-logo" style={{ position: "static", transform: "none", display: "flex" }}>Kaido <span style={{ marginLeft: "4px" }}>Solar</span></Link>
@@ -45,8 +45,7 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
       <div style={{ minHeight: "100vh", paddingTop: "80px", display: "flex" }}>
         {/* Sidebar */}
         <aside className={`dashboard-sidebar ${isMenuOpen ? "open" : ""}`} style={{ width: "240px", flexShrink: 0, background: "var(--dark-surface)", borderRight: "1px solid rgba(16,185,129,0.1)", padding: "32px 16px", position: "sticky", top: "80px", height: "calc(100vh - 80px)", overflowY: "auto" }}>
-          
-          <button className="mobile-menu-close nav-close-btn" onClick={() => setIsMenuOpen(false)}>✕</button>
+
 
           <div style={{ marginBottom: "28px", paddingLeft: "12px", marginTop: "24px" }}>
             <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Tài khoản của</div>
