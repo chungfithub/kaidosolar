@@ -85,12 +85,7 @@ export default function DangNhapPage() {
             <LoginForm />
           </Suspense>
 
-          <div style={{ marginTop: "24px", padding: "16px", background: "rgba(16,185,129,0.06)", borderRadius: "12px", border: "1px solid rgba(16,185,129,0.15)", textAlign: "center" }}>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-              ☀️ Đây là cổng khách hàng Kaido Solar<br />
-              <span style={{ fontSize: "0.8rem" }}>Admin? <Link href="/admin/login" style={{ color: "var(--primary)" }}>Đăng nhập tại đây</Link></span>
-            </p>
-          </div>
+
         </div>
       </div>
     </>
