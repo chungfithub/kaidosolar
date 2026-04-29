@@ -778,6 +778,8 @@ img { max-width:100%; display:block; }
 }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
+.hide-on-desktop { display: none !important; }
+
 /* ===== SCROLL REVEAL ===== */
 .reveal { opacity:0; transform:translateY(30px); transition:all .7s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
@@ -850,6 +852,7 @@ img { max-width:100%; display:block; }
   .nav-auth-buttons a { padding: 4px 8px !important; font-size: 0.8rem !important; }
   /* Helper to hide text on mobile */
   .hide-on-mobile { display: none !important; }
+  .hide-on-desktop { display: inline-block !important; }
 
   /* Premium styling for auth buttons inside the mobile menu */
   .nav-mobile-auth { 
@@ -877,6 +880,24 @@ img { max-width:100%; display:block; }
   .nav-mobile-auth:last-child a {
     background: rgba(16,185,129,0.08);
     color: var(--primary) !important;
+  }
+
+  /* Dashboard mobile layout */
+  .dashboard-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px;
+    height: 100vh !important;
+    width: 280px !important;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    padding-top: 80px !important;
+  }
+  .dashboard-sidebar.open {
+    left: 0;
+  }
+  .dashboard-main {
+    padding: 20px !important;
   }
 }
 @media (max-width:600px) {
