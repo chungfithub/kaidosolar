@@ -21,6 +21,9 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
       <nav className="navbar scrolled" style={{ position: "relative", zIndex: 1100 }}>
         <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ display: "block", background: "none", border: "none", color: "var(--text)", fontSize: "1.5rem", cursor: "pointer", padding: 0, position: "relative", zIndex: 1100 }}>
+              <span className="hide-on-desktop">☰</span>
+            </button>
             <Link href="/" className="nav-logo" style={{ position: "static", transform: "none", display: "flex" }}>Kaido <span style={{ marginLeft: "4px" }}>Solar</span></Link>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -32,9 +35,6 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
                 Đăng xuất
               </button>
             </form>
-            <button className="hamburger hide-on-desktop" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ display: "block", background: "none", border: "none", color: "var(--text)", fontSize: "1.5rem", cursor: "pointer", padding: 0, position: "relative", zIndex: 1100 }}>
-              ☰
-            </button>
           </div>
         </div>
       </nav>

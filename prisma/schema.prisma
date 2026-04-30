@@ -283,3 +283,15 @@ model MarketingLead {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+model MarketingProspect {
+  id           Int      @id @default(autoincrement())
+  name         String
+  platform     String   // facebook, zalo, other
+  url          String?
+  phone        String?
+  notes        String?
+  status       String   @default("new") // new, contacted, interested, rejected
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
