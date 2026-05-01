@@ -91,14 +91,14 @@ export default function MarketingProspectsPage() {
         <span>/</span>
         <span style={{ color: "#64748b" }}>Marketing</span>
         <span>/</span>
-        <span style={{ color: "#0f172a", fontWeight: 600 }}>Liên hệ Đối thủ / CTV</span>
+        <span style={{ color: "#0f172a", fontWeight: 600 }}>Data Khách Hàng</span>
       </div>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>👤 Danh sách Liên hệ / Đối thủ</h1>
-          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Lưu trữ link Facebook/Zalo của những người bán NLMT để sale chào hàng</p>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>👤 Data Khách Hàng</h1>
+          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Lưu trữ link Facebook/Zalo của khách hàng tiềm năng hoặc cộng tác viên</p>
         </div>
         <button onClick={openAdd} style={{ background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
           ➕ Thêm Liên hệ
@@ -170,7 +170,7 @@ export default function MarketingProspectsPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={e => { if (e.target === e.currentTarget) setShowForm(false); }}>
           <div style={{ background: "white", borderRadius: 20, padding: 28, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>
-              {editingProspect ? "✏️ Chỉnh sửa Liên hệ" : "➕ Thêm Liên hệ Marketing"}
+              {editingProspect ? "✏️ Chỉnh sửa Data" : "➕ Thêm Data Khách Hàng"}
             </h2>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

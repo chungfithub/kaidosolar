@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       children: [
         { name: "Group Facebook / Zalo", path: "/admin/marketing/groups" },
         { name: "🎯 Lead Scanner AI", path: "/admin/marketing/leads" },
-        { name: "👤 Liên hệ Đối thủ / CTV", path: "/admin/marketing/prospects" },
+        { name: "👤 Data Khách Hàng", path: "/admin/marketing/prospects" },
       ]
     },
   ];
