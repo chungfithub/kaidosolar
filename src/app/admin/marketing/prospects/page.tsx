@@ -37,10 +37,25 @@ export default function MarketingProspectsPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [form, setForm] = useState({ name: "", platform: "facebook", url: "", phone: "", notes: "", status: "new" });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProspects = async () => {
-    const r = await fetch("/api/marketing-prospects");
-    setProspects(await r.json());
+    try {
+      setError(null);
+      const r = await fetch("/api/marketing-prospects");
+      const data = await r.json();
+      if (Array.isArray(data)) {
+        setProspects(data);
+      } else if (data.error) {
+        setError(data.error);
+        setProspects([]);
+      } else {
+        setProspects([]);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setProspects([]);
+    }
     setLoading(false);
   };
 
@@ -104,6 +119,14 @@ export default function MarketingProspectsPage() {
           ➕ Thêm Liên hệ
         </button>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div style={{ background: "#fef2f2", color: "#dc2626", padding: "12px 16px", borderRadius: 10, marginBottom: 20, fontSize: 14, border: "1px solid #fecaca", display: "flex", alignItems: "center", gap: 10 }}>
+          <span>⚠️ Lỗi:</span> {error}
+          <button onClick={fetchProspects} style={{ marginLeft: "auto", background: "white", border: "1px solid #fecaca", borderRadius: 6, padding: "2px 8px", fontSize: 12, cursor: "pointer" }}>Thử lại</button>
+        </div>
+      )}
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
