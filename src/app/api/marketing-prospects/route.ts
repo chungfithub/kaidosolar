@@ -23,12 +23,13 @@ export async function POST(req: NextRequest) {
     
     // Dùng executeRaw để insert trực tiếp
     await (prisma as any).$executeRawUnsafe(
-      `INSERT INTO MarketingProspect (name, platform, url, phone, notes, status, createdAt, updatedAt) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO MarketingProspect (name, platform, url, phone, region, notes, status, createdAt, updatedAt) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       body.name, 
       body.platform, 
       body.url || null, 
       body.phone || null, 
+      body.region || null, 
       body.notes || null, 
       body.status || 'new',
       now,

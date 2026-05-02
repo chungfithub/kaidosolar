@@ -290,6 +290,7 @@ model MarketingProspect {
   platform     String   // facebook, zalo, other
   url          String?
   phone        String?
+  region       String?
   notes        String?
   status       String   @default("new") // new, contacted, interested, rejected
   createdAt    DateTime @default(now())
