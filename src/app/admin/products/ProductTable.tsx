@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
+import { deleteProduct } from "@/app/actions/product";
 
 export default function ProductTable({ initialProducts }: { initialProducts: any[] }) {
   const [products, setProducts] = useState(initialProducts);
@@ -65,8 +66,12 @@ export default function ProductTable({ initialProducts }: { initialProducts: any
 
   const handleDelete = async (id: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-      // In a real app, call API to delete
-      setProducts(products.filter(p => p.id !== id));
+      try {
+        await deleteProduct(id);
+        setProducts(products.filter(p => p.id !== id));
+      } catch (error) {
+        alert("Lỗi khi xóa sản phẩm. Có thể sản phẩm này đang nằm trong đơn hàng.");
+      }
     }
   };
 

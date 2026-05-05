@@ -38,12 +38,18 @@ export default async function InstallersPage() {
                 <td style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{i.notes || "Không có ghi chú"}</td>
                 <td>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn btn-action" style={{ background: 'rgba(52,211,153,0.1)', color: 'var(--primary-light)' }}>
+                    <Link href={`/admin/installers/${i.id}/edit`} className="btn btn-action" style={{ background: 'rgba(52,211,153,0.1)', color: 'var(--primary-light)' }}>
                       <Edit size={16} />
-                    </button>
-                    <button className="btn btn-action btn-danger">
-                      <Trash2 size={16} />
-                    </button>
+                    </Link>
+                    <form action={async () => {
+                      "use server";
+                      const { deleteInstaller } = await import("@/app/actions/installer");
+                      await deleteInstaller(i.id);
+                    }}>
+                      <button type="submit" className="btn btn-action btn-danger">
+                        <Trash2 size={16} />
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>

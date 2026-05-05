@@ -123,3 +123,10 @@ export async function saveBulkProducts(formData: FormData) {
   revalidatePath("/admin/products");
   return { success: true };
 }
+
+export async function deleteProduct(id: number) {
+  await prisma.product.delete({
+    where: { id }
+  });
+  revalidatePath("/admin/products");
+}

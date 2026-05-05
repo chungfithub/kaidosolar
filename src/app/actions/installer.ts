@@ -24,3 +24,30 @@ export async function saveInstaller(formData: FormData) {
   revalidatePath("/admin/installers");
   redirect("/admin/installers");
 }
+
+export async function updateInstaller(id: number, formData: FormData) {
+  const name = formData.get("name") as string;
+  const phone = formData.get("phone") as string;
+  const regions = formData.get("regions") as string;
+  const notes = formData.get("notes") as string;
+
+  await prisma.installer.update({
+    where: { id },
+    data: {
+      name,
+      phone,
+      regions,
+      notes,
+    }
+  });
+
+  revalidatePath("/admin/installers");
+  redirect("/admin/installers");
+}
+
+export async function deleteInstaller(id: number) {
+  await prisma.installer.delete({
+    where: { id }
+  });
+  revalidatePath("/admin/installers");
+}

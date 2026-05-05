@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import { Truck, Edit, MapPin, Phone, FileText } from "lucide-react";
+import { Truck, Edit, MapPin, Phone, FileText, Trash2 } from "lucide-react";
 import ShippingSearch from "./ShippingSearch";
 
 const prisma = new PrismaClient();
@@ -75,6 +75,15 @@ export default async function ShippingPage() {
                     <Link href={`/admin/shipping/${c.id}/edit`} className="btn btn-action" style={{ background: 'rgba(52,211,153,0.1)', color: 'var(--primary-light)' }}>
                       <Edit size={16} />
                     </Link>
+                    <form action={async () => {
+                      "use server";
+                      const { deleteCarrier } = await import("@/app/actions/shipping");
+                      await deleteCarrier(c.id);
+                    }}>
+                      <button type="submit" className="btn btn-action btn-danger">
+                        <Trash2 size={16} />
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>
