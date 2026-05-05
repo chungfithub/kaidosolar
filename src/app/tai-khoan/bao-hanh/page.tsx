@@ -159,7 +159,7 @@ export default async function BaoHanhPage() {
       <div style={{ marginTop: "32px", padding: "16px 20px", background: "rgba(16,185,129,0.05)", borderRadius: "12px", border: "1px solid rgba(16,185,129,0.15)" }}>
         <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
           💡 <strong style={{ color: "var(--primary)" }}>Thông tin:</strong> Thời hạn bảo hành được tính từ ngày đặt hàng.
-          Nếu có vấn đề về bảo hành, hãy liên hệ <a href="tel:19001234" style={{ color: "var(--primary)" }}>1900 1234</a>.
+          Nếu có vấn đề về bảo hành, hãy liên hệ <a href="tel:0789968888" style={{ color: "var(--primary)" }}>0789.96.8888 - 0901.096.096</a>.
         </p>
       </div>
     </div>

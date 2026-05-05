@@ -32,16 +32,10 @@ export default function SanPhamClient({ products, initialCategory, customerSessi
   const { addToCart, totalItems } = useCart();
   const [filter, setFilter] = useState(initialCategory);
   const [addedId, setAddedId] = useState<number | null>(null);
-  const [scrolled, setScrolled] = useState(true);
+  const scrolled = true; // products page has no hero — navbar is always in light mode
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Sync filter with URL
   const setCategory = (cat: string) => {
@@ -242,7 +236,7 @@ export default function SanPhamClient({ products, initialCategory, customerSessi
           <div className="support-box" style={{ marginTop: "28px", padding: "16px", background: "rgba(16,185,129,0.06)", borderRadius: "12px", border: "1px solid rgba(16,185,129,0.15)" }}>
             <p style={{ color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", marginBottom: "6px" }}>💡 Cần tư vấn?</p>
             <p style={{ color: "var(--text-muted)", fontSize: "0.82rem", lineHeight: 1.5 }}>Gọi ngay để được tư vấn miễn phí từ chuyên gia</p>
-            <a href="tel:19001234" style={{ display: "block", marginTop: "10px", color: "var(--accent)", fontWeight: 700, textDecoration: "none", fontSize: "1rem" }}>📞 1900 1234</a>
+            <a href="tel:0789968888" style={{ display: "block", marginTop: "10px", color: "var(--accent)", fontWeight: 700, textDecoration: "none", fontSize: "1rem" }}>📞 0789.96.8888 - 0901.096.096</a>
           </div>
         </aside>
 
@@ -317,7 +311,7 @@ export default function SanPhamClient({ products, initialCategory, customerSessi
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
             <Link href="/" className="nav-logo" style={{ fontSize: "1.4rem" }}>Kaido <span>Solar</span></Link>
             <div style={{ display: "flex", gap: "24px", color: "var(--text-muted)", fontSize: "0.9rem" }}>
-              <a href="tel:19001234" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📞 1900 1234</a>
+              <a href="tel:0789968888" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📞 0789.96.8888 - 0901.096.096</a>
               <a href="mailto:info@kaidosolar.vn" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📧 info@kaidosolar.vn</a>
             </div>
           </div>

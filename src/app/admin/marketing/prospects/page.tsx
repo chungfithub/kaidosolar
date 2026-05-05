@@ -184,9 +184,34 @@ export default function MarketingProspectsPage() {
                         {p.phone && <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>📞 {p.phone}</div>}
                       </td>
                       <td style={{ padding: "16px" }}>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                          {meta.icon} {meta.label}
-                        </span>
+                        {p.url ? (
+                          <a 
+                            href={p.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            style={{ 
+                              display: "inline-flex", 
+                              alignItems: "center", 
+                              gap: 6, 
+                              background: meta.bg, 
+                              color: meta.color, 
+                              padding: "4px 10px", 
+                              borderRadius: 20, 
+                              fontSize: 12, 
+                              fontWeight: 700,
+                              textDecoration: "none",
+                              transition: "transform 0.2s"
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                          >
+                            {meta.icon} {meta.label}
+                          </a>
+                        ) : (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: meta.bg, color: meta.color, padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                            {meta.icon} {meta.label}
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: "16px", color: "#334155" }}>
                         {p.region ? (

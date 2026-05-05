@@ -17,10 +17,13 @@ export default function RetailClient({ products, customerSession }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [addedId, setAddedId] = useState<number | null>(null);
 
-  // Calculator state
+  // Form state
   const [bill, setBill] = useState(1500000);
-  const [roofArea, setRoofArea] = useState(30);
-  const [calcResult, setCalcResult] = useState<any>(null);
+  const [usageTime, setUsageTime] = useState<'day' | 'night' | 'both'>('day');
+  const [phone, setPhone] = useState('');
+  const [province, setProvince] = useState('');
+  const [ward, setWard] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,26 +96,7 @@ export default function RetailClient({ products, customerSession }: Props) {
 
   const filteredProducts = filter === "all" ? products : products.filter(p => p.category === filter);
 
-  const calculateSolar = () => {
-    let systemSize = 0;
-    if (bill <= 1000000) systemSize = 3;
-    else if (bill <= 2000000) systemSize = 5;
-    else if (bill <= 3000000) systemSize = 8;
-    else if (bill <= 5000000) systemSize = 10;
-    else systemSize = 15;
 
-    const maxByRoof = Math.floor(roofArea / 5);
-    if (systemSize > maxByRoof) systemSize = maxByRoof;
-
-    const estimatedCost = systemSize * 14000000;
-    const monthlySave = systemSize * 120 * 2500;
-
-    setCalcResult({
-      size: systemSize,
-      cost: estimatedCost,
-      save: monthlySave
-    });
-  };
 
   return (
     <>
@@ -458,51 +442,149 @@ export default function RetailClient({ products, customerSession }: Props) {
         <div className="container">
           <div className="section-header reveal">
             <div className="accent-line"></div>
-            <h2>Công Cụ Tính Toán Tiết Kiệm</h2>
-            <p>Dự toán chi phí và sản lượng điện mặt trời cho mái nhà của bạn</p>
+            <h2>Nhận Báo Giá Miễn Phí</h2>
+            <p>Điền thông tin để nhận tư vấn và báo giá lắp đặt điện mặt trời tại nhà bạn</p>
           </div>
-          <div className="calculator reveal">
-            <form action={async (formData) => {
-              const res = await submitQuoteRequest(formData);
-              if (res.success) alert(res.message);
-            }}>
-              <div className="form-group">
-                <label>Tiền điện trung bình hàng tháng (VNĐ)</label>
-                <input type="number" name="bill" value={bill} onChange={e => setBill(Number(e.target.value))} required />
+          <div className="calculator reveal" style={{ maxWidth: '560px' }}>
+            {submitted ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>✅</div>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '10px' }}>Đã nhận thông tin!</h3>
+                <p style={{ color: 'var(--text-muted)' }}>Chúng tôi sẽ liên hệ với bạn trong vòng 30 phút để tư vấn và báo giá chi tiết.</p>
+                <button
+                  className="btn btn-primary"
+                  style={{ marginTop: '24px', padding: '12px 32px' }}
+                  onClick={() => { setSubmitted(false); setPhone(''); setProvince(''); setWard(''); }}
+                >
+                  Gửi yêu cầu mới
+                </button>
               </div>
-              <div className="form-group">
-                <label>Diện tích mái nhà khả dụng (m2)</label>
-                <input type="number" name="roofArea" value={roofArea} onChange={e => setRoofArea(Number(e.target.value))} required />
-              </div>
-              <button type="button" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: '24px' }} onClick={calculateSolar}>
-                🧮 Tính Toán Ngay
-              </button>
-              
-              {calcResult && (
-                <div className="calc-result" style={{ display: 'block' }}>
-                  <h3>Cấu hình đề xuất: Hệ {calcResult.size} kWp</h3>
-                  <p>Tiết kiệm dự kiến: <strong>{new Intl.NumberFormat('en-US').format(calcResult.save)}đ / tháng</strong></p>
-                  <p>Chi phí đầu tư ước tính:</p>
-                  <div className="result-price">{new Intl.NumberFormat('en-US').format(calcResult.cost)} VNĐ</div>
-                  <hr style={{ margin: '20px 0', borderColor: 'rgba(16,185,129,0.2)' }} />
-                  <div className="form-group" style={{ textAlign: 'left' }}>
-                    <label>Họ và Tên *</label>
-                    <input type="text" name="name" required />
+            ) : (
+              <form action={async (formData) => {
+                const res = await submitQuoteRequest(formData);
+                if (res.success) { setSubmitted(true); }
+                else alert('Có lỗi xảy ra, vui lòng thử lại.');
+              }}>
+
+                {/* Bill Slider */}
+                <div className="form-group">
+                  <label className="quote-bill-label">
+                    <span>💡 Tiền điện hàng tháng</span>
+                    <span style={{
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
+                      color: '#fff',
+                      padding: '4px 14px',
+                      borderRadius: '20px',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      letterSpacing: '0.3px',
+                    }}>
+                      {new Intl.NumberFormat('vi-VN').format(bill)}đ
+                    </span>
+                  </label>
+                  <input
+                    type="range"
+                    name="bill"
+                    min={200000}
+                    max={10000000}
+                    step={100000}
+                    value={bill}
+                    onChange={e => setBill(Number(e.target.value))}
+                    style={{
+                      width: '100%',
+                      marginTop: '12px',
+                      accentColor: 'var(--primary)',
+                      height: '6px',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    <span>200k</span>
+                    <span>2.5 triệu</span>
+                    <span>5 triệu</span>
+                    <span>10 triệu+</span>
                   </div>
-                  <div className="form-group" style={{ textAlign: 'left' }}>
-                    <label>Số điện thoại *</label>
-                    <input type="tel" name="phone" required />
-                  </div>
-                  <div className="form-group" style={{ textAlign: 'left' }}>
-                    <label>Khu vực lắp đặt</label>
-                    <input type="text" name="address" />
-                  </div>
-                  <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                    Gửi Yêu Cầu Báo Giá Chính Xác
-                  </button>
                 </div>
-              )}
-            </form>
+
+                {/* Day/Night Usage */}
+                <div className="form-group">
+                  <label>⏰ Thói quen dùng điện</label>
+                  <div className="quote-usage-grid">
+                    {([
+                      { value: 'day',   icon: '☀️', label: 'Ban ngày nhiều', desc: 'Tối ưu nhất' },
+                      { value: 'both',  icon: '🌤️', label: 'Cả ngày lẫn đêm', desc: 'Phổ biến' },
+                      { value: 'night', icon: '🌙', label: 'Ban đêm nhiều', desc: 'Cần pin lưu trữ' },
+                    ] as const).map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`quote-usage-btn ${usageTime === opt.value ? 'active' : ''}`}
+                        onClick={() => setUsageTime(opt.value)}
+                      >
+                        <div className="quote-usage-icon">{opt.icon}</div>
+                        <div>
+                          <div className="quote-usage-label">{opt.label}</div>
+                          <div className="quote-usage-desc">{opt.desc}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <input type="hidden" name="usageTime" value={usageTime} />
+                </div>
+
+                {/* Name */}
+                <div className="form-group">
+                  <label>👤 Họ và Tên *</label>
+                  <input type="text" name="name" placeholder="Nhập họ và tên của bạn" required />
+                </div>
+
+                {/* Phone */}
+                <div className="form-group">
+                  <label>📱 Số điện thoại *</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="Nhập số điện thoại để nhận tư vấn"
+                    required
+                  />
+                </div>
+
+                {/* Province + Ward */}
+                <div className="quote-location-grid">
+                  <div className="form-group">
+                    <label>🗺️ Tỉnh / Thành phố</label>
+                    <input
+                      type="text"
+                      name="province"
+                      value={province}
+                      onChange={e => setProvince(e.target.value)}
+                      placeholder="VD: TP. Hồ Chí Minh"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>🏘️ Phường / Xã</label>
+                    <input
+                      type="text"
+                      name="ward"
+                      value={ward}
+                      onChange={e => setWard(e.target.value)}
+                      placeholder="VD: Phường Bến Nghé"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  📩 Gửi Yêu Cầu Tư Vấn Miễn Phí
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -535,7 +617,7 @@ export default function RetailClient({ products, customerSession }: Props) {
             <div>
               <h4>Liên Hệ</h4>
               <ul className="footer-links">
-                <li><span style={{ color: 'var(--primary)' }}>📞</span> 1900 1234</li>
+                <li><span style={{ color: 'var(--primary)' }}>📞</span> 0789.96.8888 - 0901.096.096</li>
                 <li><span style={{ color: 'var(--primary)' }}>📧</span> info@kaidosolar.vn</li>
                 <li><span style={{ color: 'var(--primary)' }}>📍</span> 123 Đường Điện Biên Phủ, Hà Nội</li>
               </ul>
