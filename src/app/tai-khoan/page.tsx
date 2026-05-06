@@ -74,23 +74,23 @@ export default async function TaiKhoanPage() {
                 <span style={{ fontSize: "1.2rem" }}>👤</span>
                 <strong style={{ color: "var(--text)", fontSize: "1.05rem" }}>Thông tin tài khoản</strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
-                <span style={{ color: "var(--text-muted)" }}>Họ tên:</span>
-                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.name}</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Họ tên:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, wordBreak: "break-word" }}>{customer.name}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
-                <span style={{ color: "var(--text-muted)" }}>Email:</span>
-                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.account?.email || customer.email || "N/A"}</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Email:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, wordBreak: "break-word" }}>{customer.account?.email || customer.email || "N/A"}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
-                <span style={{ color: "var(--text-muted)" }}>SĐT:</span>
-                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.phone}</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>SĐT:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500 }}>{customer.phone}</span>
               </div>
               <Link href="/tai-khoan/cai-dat" style={{ color: "var(--primary)", fontSize: "0.85rem", textDecoration: "none", marginTop: "auto", alignSelf: "flex-end", fontWeight: 600, paddingTop: "8px" }}>Cập nhật →</Link>
             </div>
 
-            {/* Default Shipping Info Card */}
-            <div style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: "12px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", flex: 1, minWidth: "260px", maxWidth: "320px" }}>
+            {/* Default Shipping Info Card - HIDDEN AS REQUESTED */}
+            {/* <div style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: "12px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", flex: 1, minWidth: "260px", maxWidth: "320px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
                 <span style={{ fontSize: "1.2rem" }}>🏠</span>
                 <strong style={{ color: "var(--text)", fontSize: "1.05rem" }}>Địa chỉ nhận hàng</strong>
@@ -108,7 +108,7 @@ export default async function TaiKhoanPage() {
                 <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right", wordBreak: "break-word" }}>{customer.shippingAddress || "Chưa thiết lập"}</span>
               </div>
               <Link href="/tai-khoan/cai-dat" style={{ color: "#f59e0b", fontSize: "0.85rem", textDecoration: "none", marginTop: "auto", alignSelf: "flex-end", fontWeight: 600, paddingTop: "8px" }}>Thay đổi →</Link>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

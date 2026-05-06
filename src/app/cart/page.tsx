@@ -60,7 +60,7 @@ export default function CartPage() {
             🛒 Giỏ hàng của bạn
           </h1>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "32px", alignItems: "start" }}>
+          <div className="cart-layout">
             {/* Cart Items */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               {items.map((item) => {
@@ -68,13 +68,11 @@ export default function CartPage() {
                 return (
                   <div
                     key={item.id}
+                    className="cart-item-row"
                     style={{
                       background: "var(--dark-surface)",
                       borderRadius: "16px",
                       padding: "20px",
-                      display: "flex",
-                      gap: "20px",
-                      alignItems: "center",
                       border: "1px solid rgba(16,185,129,0.1)",
                       opacity: removed === item.id ? 0 : 1,
                       transition: "opacity 0.3s ease",

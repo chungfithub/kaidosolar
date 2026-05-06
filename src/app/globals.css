@@ -1358,5 +1358,71 @@ button, a, [role="button"], label {
   }
 }
 
+/* ============================================================
+   PURCHASING FLOW RESPONSIVE LAYOUT (CART & CHECKOUT)
+   ============================================================ */
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+.cart-item-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cart-item-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .cart-item-row > div:nth-child(2) {
+    /* Name and price */
+    flex: 1 1 100%;
+    order: 1; /* Move name below image */
+  }
+  .cart-item-row > div:nth-child(1) {
+    /* Image */
+    order: 0;
+  }
+  .cart-item-row > div:nth-child(3) {
+    /* Quantity Control */
+    order: 2;
+  }
+  .cart-item-row > div:nth-child(4) {
+    /* Subtotal */
+    order: 3;
+    flex: 1;
+    text-align: right;
+  }
+  .cart-item-row > button {
+    /* Remove button */
+    order: 4;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
 
 

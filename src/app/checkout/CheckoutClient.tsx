@@ -138,7 +138,7 @@ export default function CheckoutClient({ prefill, isLoggedIn }: Props) {
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }}>
+          <div className="checkout-layout">
             {/* Customer Form */}
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ background: "var(--dark-surface)", borderRadius: "16px", padding: "28px", border: "1px solid rgba(16,185,129,0.15)" }}>

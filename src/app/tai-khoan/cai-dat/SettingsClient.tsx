@@ -76,7 +76,7 @@ export default function SettingsClient({ customer, accountId }: { customer: any,
         )}
 
         <form action={handleUpdateProfile}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px", maxWidth: "820px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "24px", maxWidth: "400px" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.9rem", fontWeight: 600, color: "var(--text-muted)", marginBottom: "8px" }}>Họ và tên</label>
               <input type="text" name="name" defaultValue={customer.name} required readOnly={!isEditingProfile} style={{ width: "100%", padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", outline: "none", fontSize: "1rem", background: isEditingProfile ? "white" : "rgba(0,0,0,0.02)", color: isEditingProfile ? "var(--text)" : "var(--text-muted)", cursor: isEditingProfile ? "text" : "not-allowed" }} />
@@ -128,7 +128,7 @@ export default function SettingsClient({ customer, accountId }: { customer: any,
         )}
 
         <form action={handleUpdateShipping}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px", maxWidth: "820px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "20px", maxWidth: "400px" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.9rem", fontWeight: 600, color: "var(--text-muted)", marginBottom: "8px" }}>Tên người nhận</label>
               <input type="text" name="shippingName" defaultValue={customer.shippingName || ""} placeholder="VD: Nguyễn Văn B" required readOnly={!isEditingShipping} style={{ width: "100%", padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", outline: "none", fontSize: "1rem", background: isEditingShipping ? "white" : "rgba(0,0,0,0.02)", color: isEditingShipping ? "var(--text)" : "var(--text-muted)", cursor: isEditingShipping ? "text" : "not-allowed" }} />
