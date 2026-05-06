@@ -49,14 +49,68 @@ export default async function TaiKhoanPage() {
     { icon: "🛡️", label: "Sản phẩm bảo hành", value: warrantyItems.length, href: "/tai-khoan/bao-hanh", color: "#10b981" },
   ];
 
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    include: { account: true }
+  });
+
   return (
     <div>
       {/* Welcome */}
-      <div style={{ marginBottom: "40px" }}>
-        <h1 style={{ color: "var(--accent)", fontSize: "1.8rem", marginBottom: "8px" }}>
-          Xin chào, {session.name}! 👋
-        </h1>
-        <p style={{ color: "var(--text-muted)" }}>Theo dõi đơn hàng, dự án và bảo hành sản phẩm của bạn tại đây.</p>
+      <div style={{ marginBottom: "32px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "20px" }}>
+        <div>
+          <h1 style={{ color: "var(--accent)", fontSize: "1.8rem", marginBottom: "8px" }}>
+            Xin chào, {session.name}! 👋
+          </h1>
+          <p style={{ color: "var(--text-muted)" }}>Theo dõi đơn hàng, dự án và bảo hành sản phẩm của bạn tại đây.</p>
+        </div>
+        
+        {/* Info Cards */}
+        {customer && (
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", flex: 1, justifyContent: "flex-end" }}>
+            {/* Quick Account Info Card */}
+            <div style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "12px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", flex: 1, minWidth: "260px", maxWidth: "320px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <span style={{ fontSize: "1.2rem" }}>👤</span>
+                <strong style={{ color: "var(--text)", fontSize: "1.05rem" }}>Thông tin tài khoản</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>Họ tên:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.name}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>Email:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.account?.email || customer.email || "N/A"}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>SĐT:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.phone}</span>
+              </div>
+              <Link href="/tai-khoan/cai-dat" style={{ color: "var(--primary)", fontSize: "0.85rem", textDecoration: "none", marginTop: "auto", alignSelf: "flex-end", fontWeight: 600, paddingTop: "8px" }}>Cập nhật →</Link>
+            </div>
+
+            {/* Default Shipping Info Card */}
+            <div style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: "12px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", flex: 1, minWidth: "260px", maxWidth: "320px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <span style={{ fontSize: "1.2rem" }}>🏠</span>
+                <strong style={{ color: "var(--text)", fontSize: "1.05rem" }}>Địa chỉ nhận hàng</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>Người nhận:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.shippingName || "Chưa thiết lập"}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>SĐT:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right" }}>{customer.shippingPhone || "Chưa thiết lập"}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", gap: "16px" }}>
+                <span style={{ color: "var(--text-muted)" }}>Địa chỉ:</span>
+                <span style={{ color: "var(--text)", fontWeight: 500, textAlign: "right", wordBreak: "break-word" }}>{customer.shippingAddress || "Chưa thiết lập"}</span>
+              </div>
+              <Link href="/tai-khoan/cai-dat" style={{ color: "#f59e0b", fontSize: "0.85rem", textDecoration: "none", marginTop: "auto", alignSelf: "flex-end", fontWeight: 600, paddingTop: "8px" }}>Thay đổi →</Link>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}

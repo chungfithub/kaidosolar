@@ -13,6 +13,7 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
     { href: "/tai-khoan/don-hang", label: "📦 Đơn hàng" },
     { href: "/tai-khoan/du-an", label: "🏗️ Dự án" },
     { href: "/tai-khoan/bao-hanh", label: "🛡️ Bảo hành" },
+    { href: "/tai-khoan/cai-dat", label: "⚙️ Cài đặt" },
   ];
 
   return (
