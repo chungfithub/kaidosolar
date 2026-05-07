@@ -161,7 +161,7 @@ export default function NewSalePage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '28px', alignItems: 'start' }}>
+        <div className="admin-sales-grid">
 
           {/* Left Column: Products */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -228,12 +228,11 @@ export default function NewSalePage() {
                 
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {cart.map((item, index) => (
-                    <div key={item.product.id} style={{
-                      display: 'grid', gridTemplateColumns: '1fr 100px 140px auto',
-                      gap: '16px', alignItems: 'center', padding: '20px 24px',
+                    <div key={item.product.id} className="admin-sales-item-grid hover-bg-slate" style={{
+                      padding: '20px 24px',
                       borderBottom: index < cart.length - 1 ? '1px solid #e2e8f0' : 'none',
                       transition: 'background 0.2s'
-                    }} className="hover-bg-slate">
+                    }}>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a', marginBottom: '4px' }}>{item.product.name}</div>
                         <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Còn lại trong kho: {item.product.stock}</div>

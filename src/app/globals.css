@@ -1359,6 +1359,44 @@ button, a, [role="button"], label {
 }
 
 /* ============================================================
+   ADMIN SALES ORDER RESPONSIVE LAYOUT
+   ============================================================ */
+.admin-sales-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 28px;
+  align-items: start;
+}
+
+.admin-sales-item-grid {
+  display: grid;
+  grid-template-columns: 1fr 100px 140px auto;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .admin-sales-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sales-item-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .admin-sales-item-grid > div:nth-child(2) { /* SỐ LƯỢNG */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .admin-sales-item-grid > div:nth-child(2) label {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* ============================================================
    PURCHASING FLOW RESPONSIVE LAYOUT (CART & CHECKOUT)
    ============================================================ */
 .cart-layout {
