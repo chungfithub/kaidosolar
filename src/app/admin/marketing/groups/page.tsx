@@ -3,12 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface Group {
   id: number;
   name: string;
   platform: string;
   url?: string;
-  category?: string;
+  categoryId?: number;
+  category?: Category;
   membersCount?: number;
   description?: string;
   privacy: string;
@@ -30,16 +36,20 @@ export default function MarketingGroupsPage() {
   const [search, setSearch] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
-  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", category: "" });
+  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
 
   const [showBulk, setShowBulk] = useState(false);
   const [bulkText, setBulkText] = useState("");
-  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkCategoryId, setBulkCategoryId] = useState("");
   const [bulkProgress, setBulkProgress] = useState<{ url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
@@ -47,23 +57,46 @@ export default function MarketingGroupsPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchGroups(); }, []);
+  const fetchCategories = async () => {
+    const r = await fetch("/api/marketing-categories");
+    setCategories(await r.json());
+  };
+
+  useEffect(() => { fetchGroups(); fetchCategories(); }, []);
 
   const openAdd = () => {
     setEditingGroup(null);
-    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", category: "" });
+    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "" });
     setShowForm(true);
   };
 
   const openEdit = (g: Group) => {
     setEditingGroup(g);
-    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, category: g.category || "" });
+    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, categoryId: g.categoryId ? String(g.categoryId) : "" });
     setShowForm(true);
+  };
+
+  const addCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    await fetch("/api/marketing-categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newCategoryName }) });
+    setNewCategoryName("");
+    fetchCategories();
+  };
+
+  const removeCategory = async (id: number) => {
+    if (!confirm("Xóa danh mục này?")) return;
+    await fetch(`/api/marketing-categories/${id}`, { method: "DELETE" });
+    fetchCategories();
+    fetchGroups();
   };
 
   const save = async () => {
     setSaving(true);
-    const body = { ...form, membersCount: form.membersCount ? parseInt(form.membersCount) : null };
+    const body = { 
+      ...form, 
+      membersCount: form.membersCount ? parseInt(form.membersCount) : null,
+      categoryId: form.categoryId ? parseInt(form.categoryId) : null
+    };
     if (editingGroup) {
       await fetch(`/api/marketing-groups/${editingGroup.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     } else {
@@ -147,7 +180,7 @@ export default function MarketingGroupsPage() {
           description: meta.description || "",
           privacy: meta.privacy || "public",
           status: "active",
-          category: bulkCategory || undefined
+          categoryId: bulkCategoryId ? parseInt(bulkCategoryId) : null
         };
 
         const postRes = await fetch("/api/marketing-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -190,13 +223,11 @@ export default function MarketingGroupsPage() {
     return <span style={{ marginLeft: 4, color: "#10b981" }}>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>;
   };
 
-  const uniqueCategories = Array.from(new Set(groups.map(g => g.category).filter(Boolean))) as string[];
-
   const filtered = groups
     .filter(g => {
       const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase());
       const matchPlatform = filterPlatform === "all" || g.platform === filterPlatform;
-      const matchCategory = filterCategory === "all" || g.category === filterCategory;
+      const matchCategory = filterCategory === "all" || g.categoryId === parseInt(filterCategory);
       return matchSearch && matchPlatform && matchCategory;
     })
     .sort((a: any, b: any) => {
@@ -239,6 +270,9 @@ export default function MarketingGroupsPage() {
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý các Group Facebook, Zalo về NLMT để tiếp cận khách hàng</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setShowCategoryModal(true)} style={{ background: "white", color: "#334155", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+            🗂️ Quản Lý Danh Mục
+          </button>
           <button onClick={() => setShowBulk(true)} style={{ background: "white", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             ⚡ Thêm Hàng Loạt
           </button>
@@ -268,12 +302,10 @@ export default function MarketingGroupsPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Tìm kiếm group..." style={{ flex: 1, minWidth: 200, border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc" }} />
         
-        {uniqueCategories.length > 0 && (
-          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc", cursor: "pointer" }}>
-            <option value="all">Tất cả danh mục</option>
-            {uniqueCategories.map(c => <option key={c} value={c}>📁 {c}</option>)}
-          </select>
-        )}
+        <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc", cursor: "pointer" }}>
+          <option value="all">Tất cả danh mục</option>
+          {categories.map(c => <option key={c.id} value={c.id}>📁 {c.name}</option>)}
+        </select>
 
         <select value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)} style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc", cursor: "pointer" }}>
           <option value="all">Tất cả nền tảng</option>
@@ -332,7 +364,7 @@ export default function MarketingGroupsPage() {
                         {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
-                        {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
+                        {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category.name}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
@@ -400,10 +432,10 @@ export default function MarketingGroupsPage() {
 
               <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Danh mục (Không bắt buộc)</label>
-                <input list="category-list" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="VD: Khách sỉ, Thợ lắp đặt..." style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
-                <datalist id="category-list">
-                  {uniqueCategories.map(c => <option key={c} value={c} />)}
-                </datalist>
+                <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                  <option value="">-- Chưa phân loại --</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
               </div>
 
               <div>
@@ -490,7 +522,10 @@ export default function MarketingGroupsPage() {
 
                 <div style={{ marginTop: 16 }}>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Gán Danh Mục Chung (Không bắt buộc)</label>
-                  <input list="category-list" value={bulkCategory} onChange={e => setBulkCategory(e.target.value)} placeholder="Tất cả link trên sẽ được gán vào danh mục này..." style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                  <select value={bulkCategoryId} onChange={e => setBulkCategoryId(e.target.value)} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                    <option value="">-- Chưa phân loại --</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
                 </div>
 
                 <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
@@ -534,6 +569,40 @@ export default function MarketingGroupsPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* Modal Category Management */}
+      {showCategoryModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={e => { if (e.target === e.currentTarget) setShowCategoryModal(false); }}>
+          <div style={{ background: "white", borderRadius: 20, padding: 28, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>🗂️ Quản Lý Danh Mục Group</h2>
+            
+            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+              <input value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="Tên danh mục mới..." style={{ flex: 1, border: "1px solid #e2e8f0", borderRadius: 8, padding: "10px 12px", fontSize: 13, outline: "none" }} />
+              <button onClick={addCategory} disabled={!newCategoryName.trim()} style={{ background: "#3b82f6", color: "white", border: "none", borderRadius: 8, padding: "0 16px", cursor: "pointer", fontWeight: 600 }}>Thêm</button>
+            </div>
+
+            <div style={{ maxHeight: 300, overflowY: "auto" }}>
+              {categories.length === 0 ? <div style={{ color: "#94a3b8", fontSize: 13, textAlign: "center", padding: 20 }}>Chưa có danh mục nào.</div> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <tbody>
+                    {categories.map(c => (
+                      <tr key={c.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                        <td style={{ padding: "12px 0", fontSize: 14, color: "#334155", fontWeight: 600 }}>📁 {c.name}</td>
+                        <td style={{ padding: "12px 0", textAlign: "right" }}>
+                          <button onClick={() => removeCategory(c.id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12 }}>Xóa</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div style={{ marginTop: 20, textAlign: "right" }}>
+              <button onClick={() => setShowCategoryModal(false)} style={{ background: "#f1f5f9", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600, color: "#334155" }}>Đóng</button>
+            </div>
           </div>
         </div>
       )}

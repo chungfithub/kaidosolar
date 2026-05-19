@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   const groups = await (prisma as any).marketingGroup.findMany({
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
+    include: { category: true }
   });
   return NextResponse.json(groups);
 }
