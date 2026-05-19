@@ -10,6 +10,7 @@ interface Group {
   url?: string;
   membersCount?: number;
   description?: string;
+  privacy: string;
   status: string;
   createdAt: string;
 }
@@ -27,8 +28,9 @@ export default function MarketingGroupsPage() {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [search, setSearch] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("all");
-  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", status: "active" });
+  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active" });
   const [saving, setSaving] = useState(false);
+  const [fetchingMeta, setFetchingMeta] = useState(false);
 
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
@@ -40,13 +42,13 @@ export default function MarketingGroupsPage() {
 
   const openAdd = () => {
     setEditingGroup(null);
-    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", status: "active" });
+    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active" });
     setShowForm(true);
   };
 
   const openEdit = (g: Group) => {
     setEditingGroup(g);
-    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", status: g.status });
+    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status });
     setShowForm(true);
   };
 
@@ -61,6 +63,29 @@ export default function MarketingGroupsPage() {
     await fetchGroups();
     setShowForm(false);
     setSaving(false);
+  };
+
+  const handleUrlBlur = async () => {
+    if (!form.url || (!form.url.includes("facebook.com") && !form.url.includes("zalo.me"))) return;
+    if (form.name && form.membersCount) return; // Không ghi đè nếu đã nhập tay
+
+    setFetchingMeta(true);
+    try {
+      const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(form.url)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setForm(prev => ({
+          ...prev,
+          name: prev.name || data.title || "",
+          membersCount: prev.membersCount || (data.membersCount ? String(data.membersCount) : ""),
+          privacy: data.privacy || prev.privacy
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch meta", e);
+    } finally {
+      setFetchingMeta(false);
+    }
   };
 
   const remove = async (id: number) => {
@@ -149,7 +174,12 @@ export default function MarketingGroupsPage() {
               <div key={g.id} style={{ background: "white", borderRadius: 14, border: "1px solid #e2e8f0", padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "box-shadow 0.2s", display: "flex", flexDirection: "column", gap: 12 }} onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.1)"} onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"}>
                 {/* Platform badge + status */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
+                    <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
+                      {g.privacy === "private" ? "🔒 Nhóm kín" : "🌍 Công khai"}
+                    </span>
+                  </div>
                   <span style={{ background: g.status === "active" ? "#ecfdf5" : "#fef2f2", color: g.status === "active" ? "#059669" : "#dc2626", fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20 }}>{g.status === "active" ? "✅ Hoạt động" : "⏸️ Tạm dừng"}</span>
                 </div>
 
@@ -219,8 +249,17 @@ export default function MarketingGroupsPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Link Group</label>
-                <input value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://www.facebook.com/groups/..." style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span>Link Group</span>
+                  {fetchingMeta && <span style={{ color: "#10b981", fontSize: 11 }}>Đang tự động tải...</span>}
+                </label>
+                <input 
+                  value={form.url} 
+                  onChange={e => setForm(f => ({ ...f, url: e.target.value }))} 
+                  onBlur={handleUrlBlur}
+                  placeholder="https://www.facebook.com/groups/..." 
+                  style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} 
+                />
               </div>
 
               <div>
@@ -231,6 +270,19 @@ export default function MarketingGroupsPage() {
               <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Mô tả</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Ghi chú về group này, nội dung chào hàng, đối tượng khách hàng..." rows={3} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f8fafc", padding: "12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <input 
+                  type="checkbox" 
+                  id="privacy-checkbox" 
+                  checked={form.privacy === "private"} 
+                  onChange={e => setForm(f => ({ ...f, privacy: e.target.checked ? "private" : "public" }))} 
+                  style={{ width: 16, height: 16, cursor: "pointer" }} 
+                />
+                <label htmlFor="privacy-checkbox" style={{ fontSize: 13, fontWeight: 600, color: "#334155", cursor: "pointer", userSelect: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                  {form.privacy === "private" ? "🔒 Nhóm Kín (Private)" : "🌍 Nhóm Công Khai (Public)"}
+                </label>
               </div>
             </div>
 

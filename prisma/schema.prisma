@@ -265,6 +265,7 @@ model MarketingGroup {
   url          String?
   membersCount Int?
   description  String?
+  privacy      String   @default("public") // public, private
   status       String   @default("active") // active, inactive
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
