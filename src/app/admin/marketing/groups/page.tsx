@@ -33,6 +33,11 @@ export default function MarketingGroupsPage() {
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
 
+  const [showBulk, setShowBulk] = useState(false);
+  const [bulkText, setBulkText] = useState("");
+  const [bulkProgress, setBulkProgress] = useState<{ url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
     setGroups(await r.json());
@@ -95,6 +100,79 @@ export default function MarketingGroupsPage() {
     setGroups(prev => prev.filter(g => g.id !== id));
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) setBulkText(prev => prev + (prev ? "\n" : "") + text);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const startBulkAdd = async () => {
+    const urls = bulkText.split('\n').map(l => l.trim()).filter(l => l.startsWith("http"));
+    if (urls.length === 0) return alert("Không tìm thấy link hợp lệ nào!");
+    
+    const queue = urls.map(url => ({ url, status: "pending" as const }));
+    setBulkProgress(queue);
+    setIsProcessingBulk(true);
+
+    for (let i = 0; i < queue.length; i++) {
+      const item = queue[i];
+      setBulkProgress(prev => {
+        const n = [...prev];
+        n[i].status = "processing";
+        return n;
+      });
+
+      try {
+        const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(item.url)}`);
+        const meta = res.ok ? await res.json() : {};
+        
+        let platform = "other";
+        if (item.url.includes("facebook.com")) platform = "facebook";
+        else if (item.url.includes("zalo.me")) platform = "zalo";
+
+        const body = {
+          name: meta.title || "Group Mới " + Math.floor(Math.random() * 10000),
+          platform,
+          url: item.url,
+          membersCount: meta.membersCount || null,
+          description: meta.description || "",
+          privacy: meta.privacy || "public",
+          status: "active"
+        };
+
+        const postRes = await fetch("/api/marketing-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        if (!postRes.ok) throw new Error("Lỗi lưu DB");
+
+        setBulkProgress(prev => {
+          const n = [...prev];
+          n[i].status = "success";
+          n[i].msg = meta.title ? "Thành công" : "Đã lưu (Thiếu tên)";
+          return n;
+        });
+
+      } catch (e: any) {
+        setBulkProgress(prev => {
+          const n = [...prev];
+          n[i].status = "error";
+          n[i].msg = e.message || "Lỗi không xác định";
+          return n;
+        });
+      }
+      
+      // Delay to avoid rate limiting
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    setIsProcessingBulk(false);
+    fetchGroups();
+  };
+
   const handleSort = (key: string) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -153,9 +231,14 @@ export default function MarketingGroupsPage() {
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>📣 Group Marketing</h1>
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý các Group Facebook, Zalo về NLMT để tiếp cận khách hàng</p>
         </div>
-        <button onClick={openAdd} style={{ background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
-          ➕ Thêm Group
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setShowBulk(true)} style={{ background: "white", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+            ⚡ Thêm Hàng Loạt
+          </button>
+          <button onClick={openAdd} style={{ background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
+            ➕ Thêm Group
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -348,6 +431,75 @@ export default function MarketingGroupsPage() {
                 {saving ? "Đang lưu..." : editingGroup ? "💾 Cập nhật" : "✅ Thêm Group"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Bulk Add */}
+      {showBulk && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={e => { if (e.target === e.currentTarget && !isProcessingBulk) setShowBulk(false); }}>
+          <div style={{ background: "white", borderRadius: 20, padding: 28, width: "100%", maxWidth: 600, boxShadow: "0 20px 60px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
+            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>⚡ Thêm Hàng Loạt Group</h2>
+
+            {!isProcessingBulk && bulkProgress.length === 0 && (
+              <>
+                <p style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>Dán danh sách link (mỗi link 1 dòng) hoặc tải lên file .txt.</p>
+                <textarea 
+                  value={bulkText} 
+                  onChange={e => setBulkText(e.target.value)} 
+                  placeholder="https://facebook.com/groups/abc&#10;https://zalo.me/g/xyz" 
+                  rows={8} 
+                  style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "12px", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "monospace" }} 
+                />
+                
+                <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 12 }}>
+                  <label style={{ cursor: "pointer", display: "inline-block", background: "#f1f5f9", color: "#475569", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600 }}>
+                    📁 Tải file .txt lên
+                    <input type="file" accept=".txt" onChange={handleFileUpload} style={{ display: "none" }} />
+                  </label>
+                  <span style={{ fontSize: 12, color: "#94a3b8" }}>Hệ thống tự động nối dữ liệu vào ô trên.</span>
+                </div>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+                  <button onClick={() => setShowBulk(false)} style={{ flex: 1, background: "#f1f5f9", border: "none", borderRadius: 10, padding: 12, fontSize: 14, cursor: "pointer", fontWeight: 600, color: "#334155" }}>Hủy</button>
+                  <button onClick={startBulkAdd} disabled={!bulkText.trim()} style={{ flex: 2, background: bulkText.trim() ? "linear-gradient(135deg,#3b82f6,#2563eb)" : "#e2e8f0", color: bulkText.trim() ? "white" : "#94a3b8", border: "none", borderRadius: 10, padding: 12, fontSize: 14, cursor: bulkText.trim() ? "pointer" : "not-allowed", fontWeight: 700 }}>
+                    ▶️ Bắt đầu xử lý
+                  </button>
+                </div>
+              </>
+            )}
+
+            {(isProcessingBulk || bulkProgress.length > 0) && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 15, margin: 0, color: "#0f172a" }}>⏳ Tiến độ xử lý</h3>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: isProcessingBulk ? "#eab308" : "#10b981" }}>
+                    {bulkProgress.filter(p => p.status === "success" || p.status === "error").length} / {bulkProgress.length}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 300, overflowY: "auto", paddingRight: 4 }}>
+                  {bulkProgress.map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc", padding: "10px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: 13, color: "#334155", maxWidth: "70%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.url}>{item.url}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, display: "flex", gap: 6, alignItems: "center" }}>
+                        {item.status === "pending" && <span style={{ color: "#94a3b8" }}>Chờ...</span>}
+                        {item.status === "processing" && <span style={{ color: "#eab308" }}>Đang quét...</span>}
+                        {item.status === "success" && <span style={{ color: "#10b981" }}>✅ {item.msg}</span>}
+                        {item.status === "error" && <span style={{ color: "#ef4444" }}>❌ {item.msg}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {!isProcessingBulk && (
+                  <div style={{ marginTop: 24, textAlign: "right" }}>
+                    <button onClick={() => { setShowBulk(false); setBulkProgress([]); setBulkText(""); }} style={{ background: "#f1f5f9", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, cursor: "pointer", fontWeight: 600, color: "#334155" }}>
+                      Đóng
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
