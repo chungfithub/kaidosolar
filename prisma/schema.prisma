@@ -284,6 +284,7 @@ model MarketingGroup {
 
   category       MarketingCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   history        MarketingGroupHistory[]
+  campaigns      MarketingCampaignGroup[]
 }
 
 model MarketingGroupHistory {
@@ -293,6 +294,27 @@ model MarketingGroupHistory {
   recordedAt   DateTime @default(now())
 
   group        MarketingGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model MarketingCampaign {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  groups      MarketingCampaignGroup[]
+}
+
+model MarketingCampaignGroup {
+  campaignId  Int
+  groupId     Int
+  
+  campaign    MarketingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  group       MarketingGroup    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  @@id([campaignId, groupId])
 }
  
 model MarketingLead {
