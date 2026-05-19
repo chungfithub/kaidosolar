@@ -51,6 +51,12 @@ export default function MarketingGroupsPage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
+  const [reloadingIds, setReloadingIds] = useState<number[]>([]);
+  const [showReloadBulk, setShowReloadBulk] = useState(false);
+  const [reloadScope, setReloadScope] = useState<"all" | number>("all");
+  const [reloadProgress, setReloadProgress] = useState<{ id: number; name: string; url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
+  const [isProcessingReload, setIsProcessingReload] = useState(false);
+
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
     setGroups(await r.json());
@@ -136,6 +142,28 @@ export default function MarketingGroupsPage() {
     setGroups(prev => prev.filter(g => g.id !== id));
   };
 
+  const reloadSingleGroup = async (g: Group) => {
+    if (!g.url) return alert("Group này không có link!");
+    setReloadingIds(prev => [...prev, g.id]);
+    try {
+      const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(g.url)}`);
+      if (!res.ok) throw new Error();
+      const meta = await res.json();
+      const body = {
+        name: meta.title || g.name,
+        membersCount: meta.membersCount || g.membersCount,
+        description: meta.description || g.description,
+        privacy: meta.privacy || g.privacy
+      };
+      await fetch(`/api/marketing-groups/${g.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      await fetchGroups();
+    } catch (e) {
+      alert("Không thể cập nhật group này!");
+    } finally {
+      setReloadingIds(prev => prev.filter(id => id !== g.id));
+    }
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -210,6 +238,46 @@ export default function MarketingGroupsPage() {
     fetchGroups();
   };
 
+  const startBulkReload = async () => {
+    let targetGroups = groups.filter(g => g.url && g.status === "active");
+    if (reloadScope !== "all") {
+      targetGroups = targetGroups.filter(g => g.categoryId === reloadScope);
+    }
+    if (targetGroups.length === 0) return alert("Không tìm thấy group nào có link hợp lệ trong phạm vi này!");
+
+    const queue = targetGroups.map(g => ({ id: g.id, name: g.name, url: g.url!, status: "pending" as const, msg: "" }));
+    setReloadProgress(queue);
+    setIsProcessingReload(true);
+
+    for (let i = 0; i < queue.length; i++) {
+      const item = queue[i];
+      setReloadProgress(prev => { const n = [...prev]; n[i].status = "processing"; return n; });
+
+      try {
+        const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(item.url)}`);
+        if (!res.ok) throw new Error();
+        const meta = await res.json();
+        
+        const body = {
+          name: meta.title || item.name,
+          membersCount: meta.membersCount || null,
+          description: meta.description || "",
+          privacy: meta.privacy || "public"
+        };
+        
+        await fetch(`/api/marketing-groups/${item.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        
+        setReloadProgress(prev => { const n = [...prev]; n[i].status = "success"; n[i].msg = "Thành công"; return n; });
+      } catch (e: any) {
+        setReloadProgress(prev => { const n = [...prev]; n[i].status = "error"; n[i].msg = "Lỗi / Bị chặn"; return n; });
+      }
+      await new Promise(r => setTimeout(r, 1500));
+    }
+
+    setIsProcessingReload(false);
+    fetchGroups();
+  };
+
   const handleSort = (key: string) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -270,6 +338,9 @@ export default function MarketingGroupsPage() {
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý các Group Facebook, Zalo về NLMT để tiếp cận khách hàng</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setShowReloadBulk(true)} style={{ background: "white", color: "#3b82f6", border: "1px solid #bfdbfe", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+            🔄 Cập Nhật Data
+          </button>
           <button onClick={() => setShowCategoryModal(true)} style={{ background: "white", color: "#334155", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             🗂️ Quản Lý Danh Mục
           </button>
@@ -370,11 +441,14 @@ export default function MarketingGroupsPage() {
                         <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
                       </td>
                       <td style={{ padding: "16px 20px" }}>
-                        {g.membersCount ? (
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569", fontWeight: 500 }}>
-                            👥 {g.membersCount.toLocaleString("vi")}
-                          </div>
-                        ) : <span style={{ color: "#94a3b8", fontSize: 13 }}>-</span>}
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569", fontWeight: 500 }}>
+                          {g.membersCount ? `👥 ${g.membersCount.toLocaleString("vi")}` : <span style={{ color: "#94a3b8" }}>-</span>}
+                          {g.url && (
+                            <button onClick={() => reloadSingleGroup(g)} disabled={reloadingIds.includes(g.id)} style={{ background: "transparent", border: "none", cursor: reloadingIds.includes(g.id) ? "not-allowed" : "pointer", padding: "2px 4px", borderRadius: 4, opacity: reloadingIds.includes(g.id) ? 0.5 : 1 }} title="Cập nhật lại số lượng">
+                              {reloadingIds.includes(g.id) ? "⏳" : "🔄"}
+                            </button>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -603,6 +677,69 @@ export default function MarketingGroupsPage() {
             <div style={{ marginTop: 20, textAlign: "right" }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ background: "#f1f5f9", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600, color: "#334155" }}>Đóng</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Bulk Reload */}
+      {showReloadBulk && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={e => { if (e.target === e.currentTarget && !isProcessingReload) setShowReloadBulk(false); }}>
+          <div style={{ background: "white", borderRadius: 20, padding: 28, width: "100%", maxWidth: 600, boxShadow: "0 20px 60px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
+            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 800, color: "#0f172a" }}>🔄 Cập Nhật Số Lượng Thành Viên</h2>
+
+            {!isProcessingReload && reloadProgress.length === 0 && (
+              <>
+                <p style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>Hệ thống sẽ quét lại toàn bộ các link trong phạm vi được chọn. Nhóm nào bị lỗi link sẽ được tự động bỏ qua.</p>
+                
+                <div style={{ marginTop: 16 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Phạm vi cập nhật</label>
+                  <select value={reloadScope} onChange={e => setReloadScope(e.target.value === "all" ? "all" : parseInt(e.target.value))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                    <option value="all">Toàn bộ nhóm đang hoạt động</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>Chỉ danh mục: {c.name}</option>)}
+                  </select>
+                </div>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+                  <button onClick={() => setShowReloadBulk(false)} style={{ flex: 1, background: "#f1f5f9", border: "none", borderRadius: 10, padding: 12, fontSize: 14, cursor: "pointer", fontWeight: 600, color: "#334155" }}>Hủy</button>
+                  <button onClick={startBulkReload} style={{ flex: 2, background: "linear-gradient(135deg,#3b82f6,#2563eb)", color: "white", border: "none", borderRadius: 10, padding: 12, fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+                    ▶️ Bắt đầu Cập Nhật
+                  </button>
+                </div>
+              </>
+            )}
+
+            {(isProcessingReload || reloadProgress.length > 0) && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 15, margin: 0, color: "#0f172a" }}>⏳ Tiến độ Cập Nhật</h3>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: isProcessingReload ? "#eab308" : "#10b981" }}>
+                    {reloadProgress.filter(p => p.status === "success" || p.status === "error").length} / {reloadProgress.length}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 300, overflowY: "auto", paddingRight: 4 }}>
+                  {reloadProgress.map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc", padding: "10px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: 13, color: "#334155", maxWidth: "70%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.name}>{item.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, display: "flex", gap: 6, alignItems: "center" }}>
+                        {item.status === "pending" && <span style={{ color: "#94a3b8" }}>Chờ...</span>}
+                        {item.status === "processing" && <span style={{ color: "#eab308" }}>Đang lấy dữ liệu...</span>}
+                        {item.status === "success" && <span style={{ color: "#10b981" }}>✅ {item.msg}</span>}
+                        {item.status === "error" && <span style={{ color: "#ef4444" }}>❌ {item.msg}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {!isProcessingReload && (
+                  <div style={{ marginTop: 24, textAlign: "right" }}>
+                    <button onClick={() => { setShowReloadBulk(false); setReloadProgress([]); }} style={{ background: "#f1f5f9", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, cursor: "pointer", fontWeight: 600, color: "#334155" }}>
+                      Đóng
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
