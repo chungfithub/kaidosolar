@@ -11,10 +11,19 @@ export async function GET(req: NextRequest) {
     // Giả lập User-Agent của một trình duyệt thông thường để tránh bị block quá dễ
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "cache-control": "max-age=0",
+        "sec-ch-ua": "\"Not A(Brand\";v=\"99\", \"Google Chrome\";v=\"121\", \"Chromium\";v=\"121\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
       },
-      next: { revalidate: 3600 }, // Cache response 1 giờ nếu cùng URL
     });
 
     if (!response.ok) {
@@ -37,12 +46,24 @@ export async function GET(req: NextRequest) {
 
     // Phân tích số thành viên từ description (VD: "có 10.5K thành viên" hoặc "has 10,500 members")
     let membersCount = null;
-    const membersMatch = description.match(/(?:có|has)\s+([\d.,KkMm]+)\s*(?:thành viên|members)/i);
-    
-    if (membersMatch) {
-      let countStr = membersMatch[1].toUpperCase();
+    let countStr = "";
+
+    const fbJsonMatch = html.match(/"formatted_count_text":"([^"]+)"/i);
+    if (fbJsonMatch) {
+      // Decode unicode like "132,9K th\u00e0nh vi\u00ean"
+      const decodedStr = fbJsonMatch[1].replace(/\\u[\dA-F]{4}/gi, (match) => {
+        return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+      });
+      const numMatch = decodedStr.match(/([\d\.,]+[KkMm]?)/);
+      if (numMatch) countStr = numMatch[1].toUpperCase();
+    } else {
+      const membersMatch = description.match(/(?:có|has)\s+([\d.,KkMm]+)\s*(?:thành viên|members)/i) || 
+                           html.match(/([\d\.,]+[KkMm]?)\s*(?:thành viên|members)/i);
+      if (membersMatch) countStr = membersMatch[1].toUpperCase();
+    }
+
+    if (countStr) {
       let multiplier = 1;
-      
       if (countStr.includes("K")) {
         multiplier = 1000;
         countStr = countStr.replace("K", "");
@@ -51,13 +72,11 @@ export async function GET(req: NextRequest) {
         countStr = countStr.replace("M", "");
       }
 
-      // Xóa dấu phẩy phân cách hàng nghìn (VD: 10,500 -> 10500) nhưng giữ dấu chấm thập phân nếu có K/M
-      // Tuy nhiên ở VN có thể dùng dấu chấm hoặc phẩy lộn xộn.
-      // Cách đơn giản: Nếu có K, M thì dấu chấm/phẩy là thập phân.
+      // Xóa dấu phẩy phân cách hàng nghìn nhưng giữ dấu thập phân
       if (multiplier > 1) {
-        countStr = countStr.replace(",", "."); // Đưa về chuẩn float
+        countStr = countStr.replace(",", "."); // 132,9K -> 132.9
       } else {
-        countStr = countStr.replace(/[,.]/g, ""); // Số nguyên bình thường (10.500 -> 10500)
+        countStr = countStr.replace(/[,.]/g, ""); // 13.500 -> 13500
       }
 
       const parsed = parseFloat(countStr) * multiplier;
