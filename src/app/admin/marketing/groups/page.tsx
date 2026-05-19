@@ -365,6 +365,9 @@ export default function MarketingGroupsPage() {
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý các Group Facebook, Zalo về NLMT để tiếp cận khách hàng</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <Link href="/admin/marketing/groups/growth" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(245,158,11,0.3)", textDecoration: "none" }}>
+            📈 Báo Cáo Tăng Trưởng
+          </Link>
           <button onClick={() => setShowReloadBulk(true)} style={{ background: "white", color: "#3b82f6", border: "1px solid #bfdbfe", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             🔄 Cập Nhật Data
           </button>
@@ -441,9 +444,6 @@ export default function MarketingGroupsPage() {
                   <th onClick={() => handleSort("membersCount")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Số Thành Viên {getSortIcon("membersCount")}
                   </th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                    Tăng Trưởng
-                  </th>
                   <th onClick={() => handleSort("privacy")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Quyền Riêng Tư {getSortIcon("privacy")}
                   </th>
@@ -479,18 +479,6 @@ export default function MarketingGroupsPage() {
                             </button>
                           )}
                         </div>
-                      </td>
-                      <td style={{ padding: "16px 20px" }}>
-                        {(() => {
-                          const growth = calculateGrowth(g.history);
-                          if (growth === null) return <span style={{ color: "#94a3b8", fontSize: 13 }}>-</span>;
-                          const isPositive = growth >= 0;
-                          return (
-                            <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 700, fontSize: 13, background: isPositive ? "#d1fae5" : "#fee2e2", padding: "4px 8px", borderRadius: 6 }}>
-                              {isPositive ? "+" : ""}{growth.toLocaleString("vi")} {isPositive ? "📈" : "📉"}
-                            </span>
-                          );
-                        })()}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>
