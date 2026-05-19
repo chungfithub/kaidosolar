@@ -9,6 +9,9 @@ export async function GET() {
     include: {
       _count: {
         select: { groups: true }
+      },
+      groups: {
+        select: { groupId: true }
       }
     }
   });

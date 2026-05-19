@@ -31,6 +31,7 @@ interface Campaign {
   description: string;
   status: string;
   _count?: { groups: number };
+  groups?: { groupId: number }[];
   createdAt: string;
 }
 
@@ -184,7 +185,31 @@ export default function GrowthAnalyticsPage() {
     const absolute = latest.membersCount - baseline.membersCount;
     const percent = baseline.membersCount === 0 ? 0 : (absolute / baseline.membersCount) * 100;
     
-    return { absolute, percent };
+    return { absolute, percent, baseline: baseline.membersCount };
+  };
+
+  const getCampaignGrowth = (campaign: Campaign, period: Period) => {
+    if (!campaign.groups || campaign.groups.length === 0) return null;
+    
+    let totalAbsolute = 0;
+    let totalBaseline = 0;
+    let hasData = false;
+
+    campaign.groups.forEach(cg => {
+      const g = groups.find(x => x.id === cg.groupId);
+      if (g) {
+        const growth = getGrowth(g, period);
+        if (growth !== null) {
+          totalAbsolute += growth.absolute;
+          totalBaseline += growth.baseline;
+          hasData = true;
+        }
+      }
+    });
+
+    if (!hasData) return null;
+    const percent = totalBaseline === 0 ? 0 : (totalAbsolute / totalBaseline) * 100;
+    return { absolute: totalAbsolute, percent };
   };
 
   const renderLeaderboard = (sourceGroups: Group[], currentPeriod: Period, setPeriodFunc: (p: Period) => void, isLoading: boolean) => {
@@ -382,7 +407,14 @@ export default function GrowthAnalyticsPage() {
             // Campaign List
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h2 style={{ margin: 0, fontSize: 18, color: "#0f172a" }}>Danh Sách Chiến Dịch</h2>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <h2 style={{ margin: 0, fontSize: 18, color: "#0f172a" }}>Danh Sách Chiến Dịch</h2>
+                  <div style={{ display: "flex", gap: 4, background: "#f1f5f9", padding: 4, borderRadius: 8 }}>
+                    <button onClick={() => setCampaignPeriod("7")} style={{ background: campaignPeriod === "7" ? "white" : "transparent", color: campaignPeriod === "7" ? "#0f172a" : "#64748b", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: campaignPeriod === "7" ? "0 1px 2px rgba(0,0,0,0.05)" : "none" }}>7 Ngày</button>
+                    <button onClick={() => setCampaignPeriod("30")} style={{ background: campaignPeriod === "30" ? "white" : "transparent", color: campaignPeriod === "30" ? "#0f172a" : "#64748b", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: campaignPeriod === "30" ? "0 1px 2px rgba(0,0,0,0.05)" : "none" }}>30 Ngày</button>
+                    <button onClick={() => setCampaignPeriod("all")} style={{ background: campaignPeriod === "all" ? "white" : "transparent", color: campaignPeriod === "all" ? "#0f172a" : "#64748b", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: campaignPeriod === "all" ? "0 1px 2px rgba(0,0,0,0.05)" : "none" }}>Toàn bộ</button>
+                  </div>
+                </div>
                 <button onClick={() => setShowAddCampaign(true)} style={{ background: "linear-gradient(135deg, #10b981, #059669)", color: "white", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
                   ➕ Tạo Chiến Dịch Mới
                 </button>
@@ -398,22 +430,73 @@ export default function GrowthAnalyticsPage() {
                   <button onClick={() => setShowAddCampaign(true)} style={{ background: "#f1f5f9", color: "#334155", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>Tạo chiến dịch đầu tiên</button>
                 </div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-                  {campaigns.map(c => (
-                    <div key={c.id} style={{ background: "white", borderRadius: 16, padding: 20, border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                          <h3 style={{ margin: 0, fontSize: 16, color: "#0f172a", fontWeight: 800 }}>{c.name}</h3>
-                          <span style={{ background: "#fef3c7", color: "#d97706", fontSize: 12, fontWeight: 800, padding: "4px 8px", borderRadius: 6 }}>{c._count?.groups || 0} Nhóm</span>
-                        </div>
-                        <p style={{ margin: 0, fontSize: 13, color: "#64748b", lineHeight: 1.5, minHeight: 40 }}>{c.description || "Không có mô tả"}</p>
-                      </div>
-                      <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-                        <button onClick={() => setSelectedCampaignId(c.id)} style={{ flex: 1, background: "#f1f5f9", color: "#0f172a", border: "none", borderRadius: 8, padding: "8px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Xem Chi Tiết</button>
-                        <button onClick={() => deleteCampaign(c.id)} style={{ background: "#fef2f2", color: "#ef4444", border: "none", borderRadius: 8, padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Xóa</button>
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ background: "white", borderRadius: 16, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)" }}>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, width: 60 }}>#</th>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tên Chiến Dịch</th>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Mô Tả</th>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Số Nhóm</th>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tăng Trưởng</th>
+                          <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Ngày Tạo</th>
+                          <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {campaigns.map((c, index) => {
+                          const growth = getCampaignGrowth(c, campaignPeriod);
+                          const isPositive = growth !== null && growth.absolute >= 0;
+                          return (
+                            <tr key={c.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                              <td style={{ padding: "16px 20px", fontWeight: 700, color: "#94a3b8", fontSize: 14 }}>
+                                {index + 1}
+                              </td>
+                              <td style={{ padding: "16px 20px", fontWeight: 700, color: "#0f172a", fontSize: 15 }}>
+                                {c.name}
+                              </td>
+                              <td style={{ padding: "16px 20px", fontSize: 13, color: "#64748b", maxWidth: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {c.description || <span style={{ color: "#cbd5e1" }}>Không có mô tả</span>}
+                              </td>
+                              <td style={{ padding: "16px 20px" }}>
+                                <span style={{ background: "#fef3c7", color: "#d97706", fontSize: 12, fontWeight: 800, padding: "4px 8px", borderRadius: 6 }}>
+                                  {c._count?.groups || 0} Nhóm
+                                </span>
+                              </td>
+                              <td style={{ padding: "16px 20px" }}>
+                                {growth === null ? (
+                                  <span style={{ color: "#94a3b8", fontWeight: 600, fontSize: 13 }}>-</span>
+                                ) : (
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 800, fontSize: 13, background: isPositive ? "#d1fae5" : "#fee2e2", padding: "4px 8px", borderRadius: 6 }}>
+                                      {isPositive ? "+" : ""}{growth.absolute.toLocaleString("vi")}
+                                    </span>
+                                    <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 800, fontSize: 12 }}>
+                                      {isPositive ? "+" : ""}{growth.percent.toFixed(2)}%
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: "16px 20px", fontSize: 13, color: "#475569", fontWeight: 500 }}>
+                                {new Date(c.createdAt).toLocaleDateString("vi-VN", { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                              </td>
+                              <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                                  <button onClick={() => setSelectedCampaignId(c.id)} style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700, color: "#3b82f6", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
+                                    Xem Chi Tiết ↗
+                                  </button>
+                                  <button onClick={() => deleteCampaign(c.id)} style={{ background: "#fef2f2", border: "none", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700, color: "#ef4444" }}>
+                                    Xóa
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </>
