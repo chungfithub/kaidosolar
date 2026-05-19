@@ -167,56 +167,66 @@ export default function MarketingGroupsPage() {
           <button onClick={openAdd} style={{ background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", borderRadius: 8, padding: "10px 24px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>➕ Thêm Group đầu tiên</button>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
-          {filtered.map(g => {
-            const meta = PLATFORM_META[g.platform] || PLATFORM_META.other;
-            return (
-              <div key={g.id} style={{ background: "white", borderRadius: 14, border: "1px solid #e2e8f0", padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "box-shadow 0.2s", display: "flex", flexDirection: "column", gap: 12 }} onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.1)"} onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"}>
-                {/* Platform badge + status */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
-                    <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 }}>
-                      {g.privacy === "private" ? "🔒 Nhóm kín" : "🌍 Công khai"}
-                    </span>
-                  </div>
-                  <span style={{ background: g.status === "active" ? "#ecfdf5" : "#fef2f2", color: g.status === "active" ? "#059669" : "#dc2626", fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20 }}>{g.status === "active" ? "✅ Hoạt động" : "⏸️ Tạm dừng"}</span>
-                </div>
-
-                {/* Name */}
-                <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>{g.name}</h3>
-                  {g.description && <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>{g.description}</p>}
-                </div>
-
-                {/* Stats */}
-                {g.membersCount && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569" }}>
-                    <span>👥</span> <strong>{g.membersCount.toLocaleString("vi")}</strong> thành viên
-                  </div>
-                )}
-
-                {/* URL */}
-                {g.url && (
-                  <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: meta.color, textDecoration: "none", background: meta.bg, padding: "6px 10px", borderRadius: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    🔗 Mở {meta.label}
-                  </a>
-                )}
-
-                {/* Actions */}
-                <div style={{ display: "flex", gap: 8, borderTop: "1px solid #f1f5f9", paddingTop: 12 }}>
-                  <button onClick={() => openEdit(g)} style={{ flex: 1, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "7px", fontSize: 12, cursor: "pointer", fontWeight: 600, color: "#334155" }}>✏️ Sửa</button>
-                  <button onClick={() => {
-                    const newStatus = g.status === "active" ? "inactive" : "active";
-                    fetch(`/api/marketing-groups/${g.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) }).then(() => fetchGroups());
-                  }} style={{ flex: 1, background: g.status === "active" ? "#fef2f2" : "#ecfdf5", border: "none", borderRadius: 8, padding: "7px", fontSize: 12, cursor: "pointer", fontWeight: 600, color: g.status === "active" ? "#dc2626" : "#059669" }}>
-                    {g.status === "active" ? "⏸️ Tạm dừng" : "▶️ Kích hoạt"}
-                  </button>
-                  <button onClick={() => remove(g.id)} style={{ background: "#fef2f2", border: "none", borderRadius: 8, padding: "7px 10px", fontSize: 12, cursor: "pointer", color: "#dc2626" }}>🗑️</button>
-                </div>
-              </div>
-            );
-          })}
+        <div style={{ background: "white", borderRadius: 16, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)" }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
+              <thead>
+                <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tên Group</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Nền Tảng</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Số Thành Viên</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Quyền Riêng Tư</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Trạng Thái</th>
+                  <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(g => {
+                  const meta = PLATFORM_META[g.platform] || PLATFORM_META.other;
+                  return (
+                    <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "16px 20px" }}>
+                        <div style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{g.name}</div>
+                        {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        {g.membersCount ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569", fontWeight: 500 }}>
+                            👥 {g.membersCount.toLocaleString("vi")}
+                          </div>
+                        ) : <span style={{ color: "#94a3b8", fontSize: 13 }}>-</span>}
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                          {g.privacy === "private" ? "🔒 Nhóm kín" : "🌍 Công khai"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        <span style={{ background: g.status === "active" ? "#ecfdf5" : "#fef2f2", color: g.status === "active" ? "#059669" : "#dc2626", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                          {g.status === "active" ? "✅ Hoạt động" : "⏸️ Tạm dừng"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                        <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                          <button onClick={() => openEdit(g)} style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 6, padding: "6px 10px", fontSize: 12, cursor: "pointer", fontWeight: 600, color: "#334155", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>✏️ Sửa</button>
+                          <button onClick={() => {
+                            const newStatus = g.status === "active" ? "inactive" : "active";
+                            fetch(`/api/marketing-groups/${g.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) }).then(() => fetchGroups());
+                          }} style={{ background: g.status === "active" ? "#fef2f2" : "#ecfdf5", border: "none", borderRadius: 6, padding: "6px 10px", fontSize: 12, cursor: "pointer", fontWeight: 600, color: g.status === "active" ? "#dc2626" : "#059669" }}>
+                            {g.status === "active" ? "⏸️ Dừng" : "▶️ Bật"}
+                          </button>
+                          <button onClick={() => remove(g.id)} style={{ background: "#fef2f2", border: "none", borderRadius: 6, padding: "6px 10px", fontSize: 12, cursor: "pointer", color: "#dc2626" }}>🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
