@@ -180,17 +180,25 @@ export default function GrowthAnalyticsPage() {
     }
     
     if (latest.id === baseline.id) return null;
-    return latest.membersCount - baseline.membersCount;
+    
+    const absolute = latest.membersCount - baseline.membersCount;
+    const percent = baseline.membersCount === 0 ? 0 : (absolute / baseline.membersCount) * 100;
+    
+    return { absolute, percent };
   };
 
   const renderLeaderboard = (sourceGroups: Group[], currentPeriod: Period, setPeriodFunc: (p: Period) => void, isLoading: boolean) => {
     const rankedGroups = sourceGroups
       .map(g => ({ ...g, growth: getGrowth(g, currentPeriod) }))
-      .filter(g => g.growth !== null)
-      .sort((a, b) => (b.growth as number) - (a.growth as number));
+      .sort((a, b) => {
+        if (a.growth === null && b.growth === null) return 0;
+        if (a.growth === null) return 1;
+        if (b.growth === null) return -1;
+        return b.growth.absolute - a.growth.absolute;
+      });
 
-    const topGrowing = rankedGroups.filter(g => (g.growth as number) > 0).slice(0, 3);
-    const decliners = rankedGroups.filter(g => (g.growth as number) < 0).reverse().slice(0, 3);
+    const topGrowing = rankedGroups.filter(g => g.growth !== null && g.growth.absolute > 0).slice(0, 3);
+    const decliners = rankedGroups.filter(g => g.growth !== null && g.growth.absolute < 0).reverse().slice(0, 3);
 
     return (
       <>
@@ -222,7 +230,9 @@ export default function GrowthAnalyticsPage() {
                         <span style={{ fontSize: 18, fontWeight: 800, color: i === 0 ? "#f59e0b" : "#94a3b8" }}>#{i + 1}</span>
                         <span style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.name}</span>
                       </div>
-                      <span style={{ fontWeight: 800, color: "#10b981", fontSize: 14, background: "#ecfdf5", padding: "4px 8px", borderRadius: 6 }}>+{g.growth?.toLocaleString("vi")}</span>
+                      <span style={{ fontWeight: 800, color: "#10b981", fontSize: 14, background: "#ecfdf5", padding: "4px 8px", borderRadius: 6 }}>
+                        +{g.growth?.absolute.toLocaleString("vi")} ({g.growth?.percent.toFixed(1)}%)
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -237,7 +247,9 @@ export default function GrowthAnalyticsPage() {
                         <span style={{ fontSize: 18, fontWeight: 800, color: "#ef4444" }}>🔻</span>
                         <span style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.name}</span>
                       </div>
-                      <span style={{ fontWeight: 800, color: "#ef4444", fontSize: 14, background: "#fef2f2", padding: "4px 8px", borderRadius: 6 }}>{g.growth?.toLocaleString("vi")}</span>
+                      <span style={{ fontWeight: 800, color: "#ef4444", fontSize: 14, background: "#fef2f2", padding: "4px 8px", borderRadius: 6 }}>
+                        {g.growth?.absolute.toLocaleString("vi")} ({g.growth?.percent.toFixed(1)}%)
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -254,13 +266,14 @@ export default function GrowthAnalyticsPage() {
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tên Group</th>
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Danh Mục</th>
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thành Viên Hiện Tại</th>
-                      <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Mức Tăng Trưởng</th>
+                      <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Số lượng</th>
+                      <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tỷ lệ (%)</th>
                       <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rankedGroups.map((g, index) => {
-                      const isPositive = (g.growth as number) >= 0;
+                      const isPositive = g.growth !== null && g.growth.absolute >= 0;
                       return (
                         <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                           <td style={{ padding: "16px 20px", fontWeight: 800, color: index < 3 ? "#f59e0b" : "#94a3b8", fontSize: 16 }}>
@@ -276,9 +289,22 @@ export default function GrowthAnalyticsPage() {
                             👥 {g.membersCount?.toLocaleString("vi")}
                           </td>
                           <td style={{ padding: "16px 20px" }}>
-                            <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 800, fontSize: 14, background: isPositive ? "#d1fae5" : "#fee2e2", padding: "6px 10px", borderRadius: 8, display: "inline-block" }}>
-                              {isPositive ? "+" : ""}{g.growth?.toLocaleString("vi")} {isPositive ? "📈" : "📉"}
-                            </span>
+                            {g.growth === null ? (
+                              <span style={{ color: "#94a3b8", fontWeight: 600, fontSize: 13 }}>Chưa đủ dữ liệu</span>
+                            ) : (
+                              <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 800, fontSize: 14, background: isPositive ? "#d1fae5" : "#fee2e2", padding: "6px 10px", borderRadius: 8, display: "inline-block" }}>
+                                {isPositive ? "+" : ""}{g.growth.absolute.toLocaleString("vi")} {isPositive ? "📈" : "📉"}
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            {g.growth === null ? (
+                              <span style={{ color: "#94a3b8", fontWeight: 600, fontSize: 13 }}>-</span>
+                            ) : (
+                              <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 800, fontSize: 14 }}>
+                                {isPositive ? "+" : ""}{g.growth.percent.toFixed(2)}%
+                              </span>
+                            )}
                           </td>
                           <td style={{ padding: "16px 20px", textAlign: "right" }}>
                             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>

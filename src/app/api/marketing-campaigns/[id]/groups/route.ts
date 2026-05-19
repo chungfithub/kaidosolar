@@ -15,16 +15,18 @@ export async function POST(
     return NextResponse.json({ error: "Invalid groupIds" }, { status: 400 });
   }
 
-  // Create many using createMany with skipDuplicates to ignore existing pairs
-  const data = groupIds.map((groupId: number) => ({
-    campaignId,
-    groupId
-  }));
-
-  await (prisma as any).marketingCampaignGroup.createMany({
-    data,
-    skipDuplicates: true
-  });
+  for (const groupId of groupIds) {
+    try {
+      await (prisma as any).marketingCampaignGroup.create({
+        data: {
+          campaignId,
+          groupId
+        }
+      });
+    } catch (error) {
+      // ignore duplicates
+    }
+  }
 
   return NextResponse.json({ success: true });
 }
