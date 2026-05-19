@@ -323,17 +323,22 @@ export default function MarketingGroupsPage() {
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Ghi chú về group này, nội dung chào hàng, đối tượng khách hàng..." rows={3} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f8fafc", padding: "12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                <input 
-                  type="checkbox" 
-                  id="privacy-checkbox" 
-                  checked={form.privacy === "private"} 
-                  onChange={e => setForm(f => ({ ...f, privacy: e.target.checked ? "private" : "public" }))} 
-                  style={{ width: 16, height: 16, cursor: "pointer" }} 
-                />
-                <label htmlFor="privacy-checkbox" style={{ fontSize: 13, fontWeight: 600, color: "#334155", cursor: "pointer", userSelect: "none", display: "flex", alignItems: "center", gap: 6 }}>
-                  {form.privacy === "private" ? "🔒 Nhóm Kín (Private)" : "🌍 Nhóm Công Khai (Public)"}
-                </label>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Quyền Riêng Tư</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button 
+                    onClick={() => setForm(f => ({ ...f, privacy: "public" }))} 
+                    style={{ flex: 1, padding: "10px 4px", borderRadius: 8, border: `2px solid ${form.privacy === "public" ? "#0284c7" : "#e2e8f0"}`, background: form.privacy === "public" ? "#e0f2fe" : "white", cursor: "pointer", fontSize: 13, fontWeight: 600, color: form.privacy === "public" ? "#0284c7" : "#64748b", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 0.2s" }}
+                  >
+                    🌍 Nhóm Công Khai
+                  </button>
+                  <button 
+                    onClick={() => setForm(f => ({ ...f, privacy: "private" }))} 
+                    style={{ flex: 1, padding: "10px 4px", borderRadius: 8, border: `2px solid ${form.privacy === "private" ? "#64748b" : "#e2e8f0"}`, background: form.privacy === "private" ? "#f1f5f9" : "white", cursor: "pointer", fontSize: 13, fontWeight: 600, color: form.privacy === "private" ? "#475569" : "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 0.2s" }}
+                  >
+                    🔒 Nhóm Kín
+                  </button>
+                </div>
               </div>
             </div>
 
