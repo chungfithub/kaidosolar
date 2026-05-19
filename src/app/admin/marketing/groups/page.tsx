@@ -8,6 +8,7 @@ interface Group {
   name: string;
   platform: string;
   url?: string;
+  category?: string;
   membersCount?: number;
   description?: string;
   privacy: string;
@@ -28,13 +29,15 @@ export default function MarketingGroupsPage() {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [search, setSearch] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("all");
-  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active" });
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", category: "" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
 
   const [showBulk, setShowBulk] = useState(false);
   const [bulkText, setBulkText] = useState("");
+  const [bulkCategory, setBulkCategory] = useState("");
   const [bulkProgress, setBulkProgress] = useState<{ url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
@@ -48,13 +51,13 @@ export default function MarketingGroupsPage() {
 
   const openAdd = () => {
     setEditingGroup(null);
-    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active" });
+    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", category: "" });
     setShowForm(true);
   };
 
   const openEdit = (g: Group) => {
     setEditingGroup(g);
-    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status });
+    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, category: g.category || "" });
     setShowForm(true);
   };
 
@@ -143,7 +146,8 @@ export default function MarketingGroupsPage() {
           membersCount: meta.membersCount || null,
           description: meta.description || "",
           privacy: meta.privacy || "public",
-          status: "active"
+          status: "active",
+          category: bulkCategory || undefined
         };
 
         const postRes = await fetch("/api/marketing-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -186,11 +190,14 @@ export default function MarketingGroupsPage() {
     return <span style={{ marginLeft: 4, color: "#10b981" }}>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>;
   };
 
+  const uniqueCategories = Array.from(new Set(groups.map(g => g.category).filter(Boolean))) as string[];
+
   const filtered = groups
     .filter(g => {
       const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase());
       const matchPlatform = filterPlatform === "all" || g.platform === filterPlatform;
-      return matchSearch && matchPlatform;
+      const matchCategory = filterCategory === "all" || g.category === filterCategory;
+      return matchSearch && matchPlatform && matchCategory;
     })
     .sort((a: any, b: any) => {
       let aVal = a[sortConfig.key];
@@ -260,6 +267,14 @@ export default function MarketingGroupsPage() {
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Tìm kiếm group..." style={{ flex: 1, minWidth: 200, border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc" }} />
+        
+        {uniqueCategories.length > 0 && (
+          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc", cursor: "pointer" }}>
+            <option value="all">Tất cả danh mục</option>
+            {uniqueCategories.map(c => <option key={c} value={c}>📁 {c}</option>)}
+          </select>
+        )}
+
         <select value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)} style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", background: "#f8fafc", cursor: "pointer" }}>
           <option value="all">Tất cả nền tảng</option>
           <option value="facebook">📘 Facebook</option>
@@ -287,6 +302,9 @@ export default function MarketingGroupsPage() {
                   <th onClick={() => handleSort("name")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Tên Group {getSortIcon("name")}
                   </th>
+                  <th onClick={() => handleSort("category")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Danh Mục {getSortIcon("category")}
+                  </th>
                   <th onClick={() => handleSort("platform")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Nền Tảng {getSortIcon("platform")}
                   </th>
@@ -312,6 +330,9 @@ export default function MarketingGroupsPage() {
                       <td style={{ padding: "16px 20px" }}>
                         <div style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{g.name}</div>
                         {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
@@ -375,6 +396,14 @@ export default function MarketingGroupsPage() {
                     );
                   })}
                 </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Danh mục (Không bắt buộc)</label>
+                <input list="category-list" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="VD: Khách sỉ, Thợ lắp đặt..." style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                <datalist id="category-list">
+                  {uniqueCategories.map(c => <option key={c} value={c} />)}
+                </datalist>
               </div>
 
               <div>
@@ -451,12 +480,17 @@ export default function MarketingGroupsPage() {
                   style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "12px", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "monospace" }} 
                 />
                 
-                <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <label style={{ cursor: "pointer", display: "inline-block", background: "#f1f5f9", color: "#475569", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600 }}>
                     📁 Tải file .txt lên
                     <input type="file" accept=".txt" onChange={handleFileUpload} style={{ display: "none" }} />
                   </label>
                   <span style={{ fontSize: 12, color: "#94a3b8" }}>Hệ thống tự động nối dữ liệu vào ô trên.</span>
+                </div>
+
+                <div style={{ marginTop: 16 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Gán Danh Mục Chung (Không bắt buộc)</label>
+                  <input list="category-list" value={bulkCategory} onChange={e => setBulkCategory(e.target.value)} placeholder="Tất cả link trên sẽ được gán vào danh mục này..." style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
                 </div>
 
                 <div style={{ display: "flex", gap: 10, marginTop: 24 }}>

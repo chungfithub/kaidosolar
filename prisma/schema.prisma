@@ -263,6 +263,7 @@ model MarketingGroup {
   name         String
   platform     String   // facebook, zalo, other
   url          String?
+  category     String?
   membersCount Int?
   description  String?
   privacy      String   @default("public") // public, private
