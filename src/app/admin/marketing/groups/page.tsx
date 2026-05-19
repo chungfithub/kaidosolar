@@ -31,6 +31,7 @@ export default function MarketingGroupsPage() {
   const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
 
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
@@ -94,11 +95,39 @@ export default function MarketingGroupsPage() {
     setGroups(prev => prev.filter(g => g.id !== id));
   };
 
-  const filtered = groups.filter(g => {
-    const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase());
-    const matchPlatform = filterPlatform === "all" || g.platform === filterPlatform;
-    return matchSearch && matchPlatform;
-  });
+  const handleSort = (key: string) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return <span style={{ opacity: 0.3, marginLeft: 4 }}>↕</span>;
+    return <span style={{ marginLeft: 4, color: "#10b981" }}>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>;
+  };
+
+  const filtered = groups
+    .filter(g => {
+      const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase());
+      const matchPlatform = filterPlatform === "all" || g.platform === filterPlatform;
+      return matchSearch && matchPlatform;
+    })
+    .sort((a: any, b: any) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+      
+      if (aVal === null || aVal === undefined) aVal = sortConfig.key === "membersCount" ? 0 : "";
+      if (bVal === null || bVal === undefined) bVal = sortConfig.key === "membersCount" ? 0 : "";
+
+      if (typeof aVal === "string") aVal = aVal.toLowerCase();
+      if (typeof bVal === "string") bVal = bVal.toLowerCase();
+
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
 
   const stats = {
     total: groups.length,
@@ -172,12 +201,24 @@ export default function MarketingGroupsPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tên Group</th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Nền Tảng</th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Số Thành Viên</th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Quyền Riêng Tư</th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Trạng Thái</th>
-                  <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thao Tác</th>
+                  <th onClick={() => handleSort("name")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Tên Group {getSortIcon("name")}
+                  </th>
+                  <th onClick={() => handleSort("platform")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Nền Tảng {getSortIcon("platform")}
+                  </th>
+                  <th onClick={() => handleSort("membersCount")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Số Thành Viên {getSortIcon("membersCount")}
+                  </th>
+                  <th onClick={() => handleSort("privacy")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Quyền Riêng Tư {getSortIcon("privacy")}
+                  </th>
+                  <th onClick={() => handleSort("status")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                    Trạng Thái {getSortIcon("status")}
+                  </th>
+                  <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Thao Tác
+                  </th>
                 </tr>
               </thead>
               <tbody>
