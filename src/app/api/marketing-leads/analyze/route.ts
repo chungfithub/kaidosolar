@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { getSetting } from "@/app/actions/settings";
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey = (await getSetting("GEMINI_API_KEY")) || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json({ error: "Chưa cấu hình GEMINI_API_KEY" }, { status: 400 });
     }
 
@@ -13,7 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Không có nội dung để phân tích" }, { status: 400 });
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `Bạn là chuyên gia phân tích khách hàng tiềm năng ngành Điện Mặt Trời (Solar) tại Việt Nam.
 

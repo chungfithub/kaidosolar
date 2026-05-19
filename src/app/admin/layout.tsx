@@ -9,7 +9,7 @@ import AiAssistant from "./AiAssistant";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/admin/login" || pathname.includes("/print")) {
     return <>{children}</>;
   }
 
@@ -43,6 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "👤 Data Khách Hàng", path: "/admin/marketing/prospects" },
       ]
     },
+    { name: "⚙️ Cài đặt hệ thống", path: "/admin/settings", icon: "⚙️" },
   ];
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);

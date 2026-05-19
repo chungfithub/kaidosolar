@@ -207,9 +207,9 @@ export default function RetailClient({ products, customerSession }: Props) {
         <div className="hero-bg"></div>
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">☀️ Giải pháp năng lượng xanh #1 Việt Nam</div>
-            <h1>Tiết Kiệm Chi Phí Điện Với <span className="highlight">Năng Lượng Mặt Trời</span></h1>
-            <p>Kaido Solar cung cấp giải pháp điện mặt trời toàn diện cho hộ gia đình và doanh nghiệp. Tiết kiệm đến 90% hóa đơn tiền điện, bảo hành lên đến 25 năm.</p>
+            <div className="hero-badge">⚡ Tiền điện càng cao, lắp điện mặt trời càng đáng</div>
+            <h1>Giảm Tiền Điện Mỗi Tháng Với <span className="highlight">Điện Mặt Trời</span></h1>
+            <p>Kaido Solar tư vấn giải pháp hòa lưới, hybrid và lưu trữ theo đúng nhu cầu thực tế — tính toán rõ ràng chi phí, sản lượng và thời gian hoàn vốn để bạn yên tâm đầu tư lâu dài.</p>
             <div className="hero-buttons">
               <a href="#calculator" className="btn btn-primary">⚡ Báo Giá Ngay</a>
               <a href="#services" className="btn btn-outline" style={{ color: 'white', borderColor: 'white' }}>Tìm Hiểu Thêm →</a>
@@ -247,20 +247,20 @@ export default function RetailClient({ products, customerSession }: Props) {
         <div className="container">
           <div className="stats-grid">
             <div className="stat-item reveal">
-              <div className="stat-number" data-target="1500" data-suffix="+">0</div>
-              <div className="stat-label">Dự án hoàn thành</div>
+              <div className="stat-number" data-target="200" data-suffix="+">0</div>
+              <div className="stat-label">Dự án đã tư vấn &amp; triển khai</div>
             </div>
             <div className="stat-item reveal">
-              <div className="stat-number" data-target="50" data-suffix=" MWp">0</div>
-              <div className="stat-label">Tổng công suất lắp đặt</div>
+              <div className="stat-number" data-target="5" data-suffix=" MWp+">0</div>
+              <div className="stat-label">Tổng công suất hệ thống</div>
             </div>
             <div className="stat-item reveal">
-              <div className="stat-number" data-target="1200" data-suffix="+">0</div>
-              <div className="stat-label">Khách hàng tin tưởng</div>
+              <div className="stat-number" data-target="300" data-suffix="+">0</div>
+              <div className="stat-label">Khách hàng đã phục vụ</div>
             </div>
             <div className="stat-item reveal">
-              <div className="stat-number" data-target="8" data-suffix=" Năm">0</div>
-              <div className="stat-label">Kinh nghiệm</div>
+              <div className="stat-number" data-target="5" data-suffix="+ Năm">0</div>
+              <div className="stat-label">Kinh nghiệm kỹ thuật</div>
             </div>
           </div>
         </div>

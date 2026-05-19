@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { PrismaClient } from "@prisma/client";
+import { getSetting } from "@/app/actions/settings";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey = (await getSetting("GEMINI_API_KEY")) || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json({ error: "Chưa cấu hình GEMINI_API_KEY" }, { status: 400 });
     }
 
@@ -194,7 +196,7 @@ Khi người dùng gửi ảnh:
 - Tối đa 200 từ (không tính lệnh ACTION)
 - LUÔN thực hiện lệnh, không hỏi lại nếu đã có đủ thông tin`;
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
 
     // Build user message parts
     const userParts: any[] = [];

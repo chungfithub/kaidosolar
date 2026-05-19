@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { getSetting } from "@/app/actions/settings";
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey = (await getSetting("GEMINI_API_KEY")) || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json({ error: "Chưa cấu hình GEMINI_API_KEY" }, { status: 400 });
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const modelName = (formData.get("modelName") as string) || "gemini-2.5-flash";
