@@ -38,18 +38,19 @@ echo "🗄️  Sync database..."
 npx prisma db push
 npx prisma generate
 
-# 6. Build production
+# 6. Build production (Xóa cache cũ để tránh lỗi Server Action)
 echo "🔨 Build..."
+rm -rf .next
 npm run build
 
 # 7. Khởi động với PM2
 echo "🟢 Khởi động app..."
-pm2 stop kaido-solar 2>/dev/null || true
-pm2 start npm --name "kaido-solar" -- start
+pm2 stop kaido-web 2>/dev/null || true
+pm2 start npm --name "kaido-web" -- start
 pm2 save
 pm2 startup
 
 echo ""
 echo "✅ Deploy xong! App đang chạy tại port 3000"
-echo "📊 Xem logs: pm2 logs kaido-solar"
-echo "🔄 Restart: pm2 restart kaido-solar"
+echo "📊 Xem logs: pm2 logs kaido-web"
+echo "🔄 Restart an toàn: pm2 stop kaido-web && rm -rf .next && npm run build && pm2 start kaido-web"
