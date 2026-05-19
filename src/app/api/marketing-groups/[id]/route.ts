@@ -9,10 +9,25 @@ export async function PATCH(
 ) {
   const { id } = await params;
   const body = await req.json();
+
+  if (body.membersCount) {
+    body.lastSyncAt = new Date();
+  }
+
   const group = await (prisma as any).marketingGroup.update({
     where: { id: parseInt(id) },
     data: body
   });
+
+  if (body.membersCount) {
+    await (prisma as any).marketingGroupHistory.create({
+      data: {
+        groupId: parseInt(id),
+        membersCount: body.membersCount
+      }
+    });
+  }
+
   return NextResponse.json(group);
 }
 

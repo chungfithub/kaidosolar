@@ -8,6 +8,12 @@ interface Category {
   name: string;
 }
 
+interface GroupHistory {
+  id: number;
+  membersCount: number;
+  recordedAt: string;
+}
+
 interface Group {
   id: number;
   name: string;
@@ -19,6 +25,9 @@ interface Group {
   description?: string;
   privacy: string;
   status: string;
+  syncFrequency: string;
+  lastSyncAt?: string;
+  history?: GroupHistory[];
   createdAt: string;
 }
 
@@ -36,7 +45,7 @@ export default function MarketingGroupsPage() {
   const [search, setSearch] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
-  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "" });
+  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "", syncFrequency: "manual" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
@@ -53,7 +62,7 @@ export default function MarketingGroupsPage() {
 
   const [reloadingIds, setReloadingIds] = useState<number[]>([]);
   const [showReloadBulk, setShowReloadBulk] = useState(false);
-  const [reloadScope, setReloadScope] = useState<"all" | number>("all");
+  const [reloadScope, setReloadScope] = useState<"all" | "due" | number>("all");
   const [reloadProgress, setReloadProgress] = useState<{ id: number; name: string; url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
   const [isProcessingReload, setIsProcessingReload] = useState(false);
 
@@ -72,13 +81,13 @@ export default function MarketingGroupsPage() {
 
   const openAdd = () => {
     setEditingGroup(null);
-    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "" });
+    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "", syncFrequency: "manual" });
     setShowForm(true);
   };
 
   const openEdit = (g: Group) => {
     setEditingGroup(g);
-    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, categoryId: g.categoryId ? String(g.categoryId) : "" });
+    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, categoryId: g.categoryId ? String(g.categoryId) : "", syncFrequency: g.syncFrequency || "manual" });
     setShowForm(true);
   };
 
@@ -240,7 +249,17 @@ export default function MarketingGroupsPage() {
 
   const startBulkReload = async () => {
     let targetGroups = groups.filter(g => g.url && g.status === "active");
-    if (reloadScope !== "all") {
+    if (reloadScope === "due") {
+      targetGroups = targetGroups.filter(g => {
+        if (g.syncFrequency === "manual") return false;
+        if (!g.lastSyncAt) return true;
+        const daysSince = (new Date().getTime() - new Date(g.lastSyncAt).getTime()) / (1000 * 3600 * 24);
+        if (g.syncFrequency === "daily" && daysSince >= 1) return true;
+        if (g.syncFrequency === "weekly" && daysSince >= 7) return true;
+        if (g.syncFrequency === "monthly" && daysSince >= 30) return true;
+        return false;
+      });
+    } else if (reloadScope !== "all") {
       targetGroups = targetGroups.filter(g => g.categoryId === reloadScope);
     }
     if (targetGroups.length === 0) return alert("Không tìm thấy group nào có link hợp lệ trong phạm vi này!");
@@ -312,6 +331,14 @@ export default function MarketingGroupsPage() {
       if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
+
+  const calculateGrowth = (history: GroupHistory[] = []) => {
+    if (history.length < 2) return null;
+    const oldest = history[0].membersCount;
+    const newest = history[history.length - 1].membersCount;
+    const diff = newest - oldest;
+    return diff;
+  };
 
   const stats = {
     total: groups.length,
@@ -414,6 +441,9 @@ export default function MarketingGroupsPage() {
                   <th onClick={() => handleSort("membersCount")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Số Thành Viên {getSortIcon("membersCount")}
                   </th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Tăng Trưởng
+                  </th>
                   <th onClick={() => handleSort("privacy")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Quyền Riêng Tư {getSortIcon("privacy")}
                   </th>
@@ -449,6 +479,18 @@ export default function MarketingGroupsPage() {
                             </button>
                           )}
                         </div>
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        {(() => {
+                          const growth = calculateGrowth(g.history);
+                          if (growth === null) return <span style={{ color: "#94a3b8", fontSize: 13 }}>-</span>;
+                          const isPositive = growth >= 0;
+                          return (
+                            <span style={{ color: isPositive ? "#059669" : "#dc2626", fontWeight: 700, fontSize: 13, background: isPositive ? "#d1fae5" : "#fee2e2", padding: "4px 8px", borderRadius: 6 }}>
+                              {isPositive ? "+" : ""}{growth.toLocaleString("vi")} {isPositive ? "📈" : "📉"}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: g.privacy === "private" ? "#f1f5f9" : "#e0f2fe", color: g.privacy === "private" ? "#64748b" : "#0284c7", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -539,6 +581,17 @@ export default function MarketingGroupsPage() {
               <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Mô tả</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Ghi chú về group này, nội dung chào hàng, đối tượng khách hàng..." rows={3} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Lịch Quét Thành Viên Tự Động</label>
+                <select value={form.syncFrequency} onChange={e => setForm(f => ({ ...f, syncFrequency: e.target.value }))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                  <option value="manual">Chỉ quét thủ công</option>
+                  <option value="daily">Mỗi ngày</option>
+                  <option value="weekly">Mỗi 7 ngày</option>
+                  <option value="monthly">Mỗi 30 ngày</option>
+                </select>
+                <p style={{ margin: "6px 0 0", fontSize: 12, color: "#64748b" }}>Cần chạy tính năng "Quét nhóm đến hạn" để tự động cập nhật và tính toán tăng trưởng.</p>
               </div>
 
               <div>
@@ -693,7 +746,8 @@ export default function MarketingGroupsPage() {
                 
                 <div style={{ marginTop: 16 }}>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Phạm vi cập nhật</label>
-                  <select value={reloadScope} onChange={e => setReloadScope(e.target.value === "all" ? "all" : parseInt(e.target.value))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                  <select value={reloadScope} onChange={e => setReloadScope(e.target.value === "all" || e.target.value === "due" ? e.target.value : parseInt(e.target.value))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
+                    <option value="due">🚀 Chỉ quét những nhóm ĐẾN HẠN (Khuyên dùng)</option>
                     <option value="all">Toàn bộ nhóm đang hoạt động</option>
                     {categories.map(c => <option key={c.id} value={c.id}>Chỉ danh mục: {c.name}</option>)}
                   </select>
