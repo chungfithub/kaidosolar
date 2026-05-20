@@ -66,6 +66,9 @@ export default function MarketingGroupsPage() {
   const [reloadProgress, setReloadProgress] = useState<{ id: number; name: string; url: string; status: "pending" | "processing" | "success" | "error"; msg?: string }[]>([]);
   const [isProcessingReload, setIsProcessingReload] = useState(false);
 
+  // Visited Groups Tracking
+  const [visitedGroups, setVisitedGroups] = useState<Set<number>>(new Set());
+
   const fetchGroups = async () => {
     const r = await fetch("/api/marketing-groups");
     setGroups(await r.json());
@@ -77,7 +80,27 @@ export default function MarketingGroupsPage() {
     setCategories(await r.json());
   };
 
-  useEffect(() => { fetchGroups(); fetchCategories(); }, []);
+  useEffect(() => { 
+    fetchGroups(); 
+    fetchCategories(); 
+    const saved = localStorage.getItem('growth_visited_groups');
+    if (saved) {
+      try { setVisitedGroups(new Set(JSON.parse(saved))); } catch (e) {}
+    }
+  }, []);
+
+  const markGroupAsVisited = (id: number) => {
+    const newVisited = new Set(visitedGroups);
+    newVisited.add(id);
+    setVisitedGroups(newVisited);
+    localStorage.setItem('growth_visited_groups', JSON.stringify(Array.from(newVisited)));
+  };
+
+  const resetVisitedGroups = () => {
+    if (!confirm("Bạn muốn xóa toàn bộ lịch sử 'Đã check' của các nhóm?")) return;
+    setVisitedGroups(new Set());
+    localStorage.removeItem('growth_visited_groups');
+  };
 
   const openAdd = () => {
     setEditingGroup(null);
@@ -414,6 +437,11 @@ export default function MarketingGroupsPage() {
           <option value="zalo">💬 Zalo</option>
           <option value="other">🔗 Khác</option>
         </select>
+
+        <div style={{ flex: 1 }}></div>
+        <button onClick={resetVisitedGroups} style={{ background: "white", color: "#ef4444", border: "1px solid #fca5a5", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 2px rgba(0,0,0,0.05)", height: 36 }}>
+          🔄 Làm mới trạng thái Check
+        </button>
       </div>
 
       {/* Groups Grid */}
@@ -450,6 +478,9 @@ export default function MarketingGroupsPage() {
                   <th onClick={() => handleSort("status")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
                     Trạng Thái {getSortIcon("status")}
                   </th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Đã Check
+                  </th>
                   <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
                     Thao Tác
                   </th>
@@ -458,11 +489,12 @@ export default function MarketingGroupsPage() {
               <tbody>
                 {filtered.map(g => {
                   const meta = PLATFORM_META[g.platform] || PLATFORM_META.other;
+                  const isVisited = visitedGroups.has(g.id);
                   return (
-                    <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", background: isVisited ? "#f8fafc" : "transparent", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = isVisited ? "#f1f5f9" : "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = isVisited ? "#f8fafc" : "transparent"}>
                       <td style={{ padding: "16px 20px" }}>
                         <div style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{g.name}</div>
-                        {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
+                        {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" onClick={() => markGroupAsVisited(g.id)} style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category.name}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
@@ -489,6 +521,13 @@ export default function MarketingGroupsPage() {
                         <span style={{ background: g.status === "active" ? "#ecfdf5" : "#fef2f2", color: g.status === "active" ? "#059669" : "#dc2626", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
                           {g.status === "active" ? "✅ Hoạt động" : "⏸️ Tạm dừng"}
                         </span>
+                      </td>
+                      <td style={{ padding: "16px 20px" }}>
+                        {isVisited ? (
+                          <span style={{ color: "#10b981", fontWeight: 800, fontSize: 12, background: "#ecfdf5", padding: "4px 8px", borderRadius: 6, border: "1px solid #10b98140" }}>✅ Đã Check</span>
+                        ) : (
+                          <span style={{ color: "#94a3b8", fontWeight: 600, fontSize: 12, background: "#f1f5f9", padding: "4px 8px", borderRadius: 6 }}>➖ Chưa vào</span>
+                        )}
                       </td>
                       <td style={{ padding: "16px 20px", textAlign: "right" }}>
                         <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
