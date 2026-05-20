@@ -67,9 +67,19 @@ export default function GrowthAnalyticsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryToAdd, setSelectedCategoryToAdd] = useState<string>("all");
 
+  // Visited Groups Tracking
+  const [visitedGroups, setVisitedGroups] = useState<Set<number>>(new Set());
+
   useEffect(() => {
     fetchGroups();
     fetchCategories();
+    // Load visited groups from localStorage
+    const saved = localStorage.getItem('growth_visited_groups');
+    if (saved) {
+      try {
+        setVisitedGroups(new Set(JSON.parse(saved)));
+      } catch (e) {}
+    }
   }, []);
 
   useEffect(() => {
@@ -212,6 +222,19 @@ export default function GrowthAnalyticsPage() {
     return { absolute: totalAbsolute, percent };
   };
 
+  const markGroupAsVisited = (id: number) => {
+    const newVisited = new Set(visitedGroups);
+    newVisited.add(id);
+    setVisitedGroups(newVisited);
+    localStorage.setItem('growth_visited_groups', JSON.stringify(Array.from(newVisited)));
+  };
+
+  const resetVisitedGroups = () => {
+    if (!confirm("Bạn muốn xóa toàn bộ lịch sử 'Đã check' của các nhóm?")) return;
+    setVisitedGroups(new Set());
+    localStorage.removeItem('growth_visited_groups');
+  };
+
   const renderLeaderboard = (sourceGroups: Group[], currentPeriod: Period, setPeriodFunc: (p: Period) => void, isLoading: boolean) => {
     const rankedGroups = sourceGroups
       .map(g => ({ ...g, growth: getGrowth(g, currentPeriod) }))
@@ -228,10 +251,15 @@ export default function GrowthAnalyticsPage() {
     return (
       <>
         {/* Filters */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 24, background: "white", padding: 6, borderRadius: 12, border: "1px solid #e2e8f0", width: "fit-content" }}>
-          <button onClick={() => setPeriodFunc("7")} style={{ background: currentPeriod === "7" ? "#f1f5f9" : "transparent", color: currentPeriod === "7" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>7 Ngày Qua</button>
-          <button onClick={() => setPeriodFunc("30")} style={{ background: currentPeriod === "30" ? "#f1f5f9" : "transparent", color: currentPeriod === "30" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>30 Ngày Qua</button>
-          <button onClick={() => setPeriodFunc("all")} style={{ background: currentPeriod === "all" ? "#f1f5f9" : "transparent", color: currentPeriod === "all" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>Toàn Bộ Thời Gian</button>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ display: "flex", gap: 8, background: "white", padding: 6, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+            <button onClick={() => setPeriodFunc("7")} style={{ background: currentPeriod === "7" ? "#f1f5f9" : "transparent", color: currentPeriod === "7" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>7 Ngày Qua</button>
+            <button onClick={() => setPeriodFunc("30")} style={{ background: currentPeriod === "30" ? "#f1f5f9" : "transparent", color: currentPeriod === "30" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>30 Ngày Qua</button>
+            <button onClick={() => setPeriodFunc("all")} style={{ background: currentPeriod === "all" ? "#f1f5f9" : "transparent", color: currentPeriod === "all" ? "#0f172a" : "#64748b", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>Toàn Bộ Thời Gian</button>
+          </div>
+          <button onClick={resetVisitedGroups} style={{ background: "white", color: "#ef4444", border: "1px solid #fca5a5", borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
+            🔄 Làm mới trạng thái Check
+          </button>
         </div>
 
         {isLoading ? (
@@ -293,15 +321,17 @@ export default function GrowthAnalyticsPage() {
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thành Viên Hiện Tại</th>
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Số lượng</th>
                       <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Tỷ lệ (%)</th>
+                      <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Trạng thái</th>
                       <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rankedGroups.map((g, index) => {
                       const isPositive = g.growth !== null && g.growth.absolute >= 0;
+                      const isVisited = visitedGroups.has(g.id);
                       return (
-                        <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                          <td style={{ padding: "16px 20px", fontWeight: 800, color: index < 3 ? "#f59e0b" : "#94a3b8", fontSize: 16 }}>
+                        <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", background: isVisited ? "#f8fafc" : "transparent", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = isVisited ? "#f1f5f9" : "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = isVisited ? "#f8fafc" : "transparent"}>
+                          <td style={{ padding: "16px 20px", fontWeight: 800, color: index < 3 && !isVisited ? "#f59e0b" : "#94a3b8", fontSize: 16 }}>
                             #{index + 1}
                           </td>
                           <td style={{ padding: "16px 20px", fontWeight: 700, color: "#0f172a", fontSize: 14 }}>
@@ -331,10 +361,17 @@ export default function GrowthAnalyticsPage() {
                               </span>
                             )}
                           </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            {isVisited ? (
+                              <span style={{ color: "#10b981", fontWeight: 800, fontSize: 12, background: "#ecfdf5", padding: "4px 8px", borderRadius: 6, border: "1px solid #10b98140" }}>✅ Đã Check</span>
+                            ) : (
+                              <span style={{ color: "#94a3b8", fontWeight: 600, fontSize: 12, background: "#f1f5f9", padding: "4px 8px", borderRadius: 6 }}>➖ Chưa vào</span>
+                            )}
+                          </td>
                           <td style={{ padding: "16px 20px", textAlign: "right" }}>
                             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                               {g.url && (
-                                <a href={g.url} target="_blank" rel="noopener noreferrer" style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700, color: "#3b82f6", textDecoration: "none", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
+                                <a href={g.url} target="_blank" rel="noopener noreferrer" onClick={() => markGroupAsVisited(g.id)} style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700, color: "#3b82f6", textDecoration: "none", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
                                   Mở ↗
                                 </a>
                               )}
