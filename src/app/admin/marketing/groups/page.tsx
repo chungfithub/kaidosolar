@@ -460,28 +460,28 @@ export default function MarketingGroupsPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                  <th onClick={() => handleSort("name")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("name")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Tên Group {getSortIcon("name")}
                   </th>
-                  <th onClick={() => handleSort("category")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("category")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Danh Mục {getSortIcon("category")}
                   </th>
-                  <th onClick={() => handleSort("platform")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("platform")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Nền Tảng {getSortIcon("platform")}
                   </th>
-                  <th onClick={() => handleSort("membersCount")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("membersCount")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Số Thành Viên {getSortIcon("membersCount")}
                   </th>
-                  <th onClick={() => handleSort("privacy")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("privacy")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Quyền Riêng Tư {getSortIcon("privacy")}
                   </th>
-                  <th onClick={() => handleSort("status")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none" }}>
+                  <th onClick={() => handleSort("status")} style={{ cursor: "pointer", padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, userSelect: "none", whiteSpace: "nowrap" }}>
                     Trạng Thái {getSortIcon("status")}
                   </th>
-                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
                     Đã Check
                   </th>
-                  <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  <th style={{ padding: "16px 20px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
                     Thao Tác
                   </th>
                 </tr>
