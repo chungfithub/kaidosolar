@@ -19,8 +19,7 @@ interface Group {
   name: string;
   platform: string;
   url?: string;
-  categoryId?: number;
-  category?: Category;
+  categories: Category[];
   membersCount?: number;
   history?: GroupHistory[];
 }
@@ -150,7 +149,7 @@ export default function GrowthAnalyticsPage() {
     if (selectedCategoryToAdd === "all") {
       targetIds = groups.map(g => g.id);
     } else {
-      targetIds = groups.filter(g => g.categoryId === parseInt(selectedCategoryToAdd)).map(g => g.id);
+      targetIds = groups.filter(g => g.categories && g.categories.some(c => c.id === parseInt(selectedCategoryToAdd))).map(g => g.id);
     }
 
     if (targetIds.length === 0) return alert("Không tìm thấy group nào trong danh mục này");
@@ -335,10 +334,22 @@ export default function GrowthAnalyticsPage() {
                             #{index + 1}
                           </td>
                           <td style={{ padding: "16px 20px", fontWeight: 700, color: "#0f172a", fontSize: 14 }}>
-                            {g.name}
+                            <div style={{ maxWidth: "260px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={g.name}>
+                              {g.name}
+                            </div>
                           </td>
                           <td style={{ padding: "16px 20px" }}>
-                            {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category.name}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
+                            {g.categories && g.categories.length > 0 ? (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                                {g.categories.map(c => (
+                                  <span key={c.id} style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0", whiteSpace: "nowrap" }}>
+                                    📁 {c.name}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span style={{ color: "#cbd5e1" }}>-</span>
+                            )}
                           </td>
                           <td style={{ padding: "16px 20px", fontSize: 13, color: "#475569", fontWeight: 600 }}>
                             👥 {g.membersCount?.toLocaleString("vi")}

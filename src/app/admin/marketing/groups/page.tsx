@@ -19,8 +19,7 @@ interface Group {
   name: string;
   platform: string;
   url?: string;
-  categoryId?: number;
-  category?: Category;
+  categories: Category[];
   membersCount?: number;
   description?: string;
   privacy: string;
@@ -45,7 +44,7 @@ export default function MarketingGroupsPage() {
   const [search, setSearch] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
-  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "", syncFrequency: "manual" });
+  const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryIds: [] as number[], syncFrequency: "manual" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
@@ -104,13 +103,13 @@ export default function MarketingGroupsPage() {
 
   const openAdd = () => {
     setEditingGroup(null);
-    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryId: "", syncFrequency: "manual" });
+    setForm({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryIds: [], syncFrequency: "manual" });
     setShowForm(true);
   };
 
   const openEdit = (g: Group) => {
     setEditingGroup(g);
-    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, categoryId: g.categoryId ? String(g.categoryId) : "", syncFrequency: g.syncFrequency || "manual" });
+    setForm({ name: g.name, platform: g.platform, url: g.url || "", membersCount: String(g.membersCount || ""), description: g.description || "", privacy: g.privacy || "public", status: g.status, categoryIds: g.categories ? g.categories.map(c => c.id) : [], syncFrequency: g.syncFrequency || "manual" });
     setShowForm(true);
   };
 
@@ -122,7 +121,12 @@ export default function MarketingGroupsPage() {
   };
 
   const removeCategory = async (id: number) => {
-    if (!confirm("Xóa danh mục này?")) return;
+    const password = prompt("Vui lòng nhập mật khẩu xác thực để xóa danh mục này:");
+    if (password === null) return; // Hủy bỏ
+    if (password !== "admin") {
+      alert("Sai mật khẩu xác thực! Không thể xóa danh mục.");
+      return;
+    }
     await fetch(`/api/marketing-categories/${id}`, { method: "DELETE" });
     fetchCategories();
     fetchGroups();
@@ -133,7 +137,7 @@ export default function MarketingGroupsPage() {
     const body = { 
       ...form, 
       membersCount: form.membersCount ? parseInt(form.membersCount) : null,
-      categoryId: form.categoryId ? parseInt(form.categoryId) : null
+      categoryIds: form.categoryIds
     };
     if (editingGroup) {
       await fetch(`/api/marketing-groups/${editingGroup.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -283,7 +287,7 @@ export default function MarketingGroupsPage() {
         return false;
       });
     } else if (reloadScope !== "all") {
-      targetGroups = targetGroups.filter(g => g.categoryId === reloadScope);
+      targetGroups = targetGroups.filter(g => g.categories && g.categories.some(c => c.id === reloadScope));
     }
     if (targetGroups.length === 0) return alert("Không tìm thấy group nào có link hợp lệ trong phạm vi này!");
 
@@ -337,7 +341,7 @@ export default function MarketingGroupsPage() {
     .filter(g => {
       const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase());
       const matchPlatform = filterPlatform === "all" || g.platform === filterPlatform;
-      const matchCategory = filterCategory === "all" || g.categoryId === parseInt(filterCategory);
+      const matchCategory = filterCategory === "all" || (g.categories && g.categories.some(c => c.id === parseInt(filterCategory)));
       return matchSearch && matchPlatform && matchCategory;
     })
     .sort((a: any, b: any) => {
@@ -493,11 +497,21 @@ export default function MarketingGroupsPage() {
                   return (
                     <tr key={g.id} style={{ borderBottom: "1px solid #f1f5f9", background: isVisited ? "#f8fafc" : "transparent", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = isVisited ? "#f1f5f9" : "#f8fafc"} onMouseLeave={e => e.currentTarget.style.background = isVisited ? "#f8fafc" : "transparent"}>
                       <td style={{ padding: "16px 20px" }}>
-                        <div style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{g.name}</div>
+                        <div style={{ fontWeight: 600, color: "#0f172a", fontSize: 14, maxWidth: "260px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={g.name}>{g.name}</div>
                         {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer" onClick={() => markGroupAsVisited(g.id)} style={{ fontSize: 12, color: meta.color, textDecoration: "none", display: "inline-block", marginTop: 4 }}>🔗 Mở link</a>}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
-                        {g.category ? <span style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0" }}>📁 {g.category.name}</span> : <span style={{ color: "#cbd5e1" }}>-</span>}
+                        {g.categories && g.categories.length > 0 ? (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                            {g.categories.map(c => (
+                              <span key={c.id} style={{ background: "#f1f5f9", color: "#475569", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, border: "1px solid #e2e8f0", whiteSpace: "nowrap" }}>
+                                📁 {c.name}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span style={{ color: "#cbd5e1" }}>-</span>
+                        )}
                       </td>
                       <td style={{ padding: "16px 20px" }}>
                         <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 4 }}>{meta.icon} {meta.label}</span>
@@ -574,11 +588,44 @@ export default function MarketingGroupsPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 6 }}>Danh mục (Không bắt buộc)</label>
-                <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))} style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "white", cursor: "pointer" }}>
-                  <option value="">-- Chưa phân loại --</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#334155", display: "block", marginBottom: 8 }}>Danh mục (Chọn nhiều)</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxHeight: 120, overflowY: "auto", padding: "8px", border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc" }}>
+                  {categories.length === 0 ? (
+                    <span style={{ fontSize: 12, color: "#94a3b8" }}>Chưa có danh mục nào. Hãy tạo danh mục trước.</span>
+                  ) : (
+                    categories.map(c => {
+                      const isSelected = form.categoryIds.includes(c.id);
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            const newIds = isSelected 
+                              ? form.categoryIds.filter(id => id !== c.id)
+                              : [...form.categoryIds, c.id];
+                            setForm(f => ({ ...f, categoryIds: newIds }));
+                          }}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                            border: `1px solid ${isSelected ? "#3b82f6" : "#e2e8f0"}`,
+                            background: isSelected ? "#eff6ff" : "white",
+                            color: isSelected ? "#3b82f6" : "#475569",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4
+                          }}
+                        >
+                          {isSelected ? "✅" : "📁"} {c.name}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
               </div>
 
               <div>

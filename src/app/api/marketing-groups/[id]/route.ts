@@ -14,9 +14,26 @@ export async function PATCH(
     body.lastSyncAt = new Date();
   }
 
+  const { categoryIds, categoryId, ...rest } = body;
+  const groupData: any = { ...rest };
+
+  if (categoryIds !== undefined || categoryId !== undefined) {
+    let finalCategoryIds: number[] = [];
+    if (categoryIds && Array.isArray(categoryIds)) {
+      finalCategoryIds = categoryIds.map((id: any) => typeof id === 'string' ? parseInt(id) : id).filter(Boolean);
+    } else if (categoryId) {
+      const parsed = typeof categoryId === 'string' ? parseInt(categoryId) : categoryId;
+      if (parsed) finalCategoryIds = [parsed];
+    }
+
+    groupData.categories = {
+      set: finalCategoryIds.map(id => ({ id }))
+    };
+  }
+
   const group = await (prisma as any).marketingGroup.update({
     where: { id: parseInt(id) },
-    data: body
+    data: groupData
   });
 
   if (body.membersCount) {

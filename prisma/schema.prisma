@@ -272,7 +272,6 @@ model MarketingGroup {
   name           String
   platform       String   // facebook, zalo, other
   url            String?
-  categoryId     Int?
   membersCount   Int?
   description    String?
   privacy        String   @default("public") // public, private
@@ -282,7 +281,7 @@ model MarketingGroup {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  category       MarketingCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categories     MarketingCategory[]
   history        MarketingGroupHistory[]
   campaigns      MarketingCampaignGroup[]
 }

@@ -15,7 +15,7 @@ export async function GET(
         include: {
           group: {
             include: {
-              category: true,
+              categories: true,
               history: { orderBy: { recordedAt: 'asc' } }
             }
           }

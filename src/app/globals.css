@@ -32,6 +32,10 @@ h1,h2,h3,h4,h5 { font-family:'Outfit',sans-serif; }
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
 }
 .sidebar-header {
   padding: 24px;
@@ -165,6 +169,7 @@ tr:hover td { background: rgba(0,0,0,0.02); }
     top: 0;
     left: -280px;
     height: 100vh;
+    overflow-y: auto;
     z-index: 1001;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 4px 0 24px rgba(0,0,0,0.1);
