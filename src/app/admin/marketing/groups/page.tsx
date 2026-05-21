@@ -158,9 +158,13 @@ export default function MarketingGroupsPage() {
       const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(form.url)}`);
       if (res.ok) {
         const data = await res.json();
+        const parsedTitle = (data.title || "").trim();
+        const isInvalidTitle = !parsedTitle || 
+          ["facebook", "error", "log in", "đăng nhập", "sign up", "đăng ký", "lỗi"].some(kw => parsedTitle.toLowerCase().includes(kw));
+
         setForm(prev => ({
           ...prev,
-          name: prev.name || data.title || "",
+          name: prev.name || (isInvalidTitle ? "" : parsedTitle),
           membersCount: prev.membersCount || (data.membersCount ? String(data.membersCount) : ""),
           privacy: data.privacy || prev.privacy
         }));

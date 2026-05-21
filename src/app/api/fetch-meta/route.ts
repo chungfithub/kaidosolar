@@ -19,7 +19,9 @@ function parseHtmlMeta(html: string) {
     lowerTitle.includes("unsupported browser") ||
     lowerTitle.includes("trình duyệt không hỗ trợ") ||
     lowerTitle.includes("không tìm thấy trang") ||
-    lowerTitle.includes("page not found")
+    lowerTitle.includes("page not found") ||
+    lowerTitle === "error" ||
+    lowerTitle === "lỗi"
   ) {
     title = "";
   }
