@@ -304,15 +304,16 @@ export default function MarketingGroupsPage() {
       setReloadProgress(prev => { const n = [...prev]; n[i].status = "processing"; return n; });
 
       try {
+        const originalGroup = targetGroups[i];
         const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(item.url)}`);
         if (!res.ok) throw new Error();
         const meta = await res.json();
         
         const body = {
-          name: meta.title || item.name,
-          membersCount: meta.membersCount || null,
-          description: meta.description || "",
-          privacy: meta.privacy || "public"
+          name: meta.title || originalGroup.name,
+          membersCount: meta.membersCount || originalGroup.membersCount,
+          description: meta.description || originalGroup.description || "",
+          privacy: meta.privacy || originalGroup.privacy
         };
         
         await fetch(`/api/marketing-groups/${item.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
