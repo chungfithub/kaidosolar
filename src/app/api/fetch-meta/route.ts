@@ -10,6 +10,7 @@ function parseHtmlMeta(html: string) {
 
   // Kiểm tra xem có bị chuyển hướng về trang đăng nhập hoặc bị block không
   const lowerTitle = title.toLowerCase();
+  let isBlocked = false;
   if (
     lowerTitle === "facebook" || 
     lowerTitle.includes("log in") || 
@@ -21,8 +22,12 @@ function parseHtmlMeta(html: string) {
     lowerTitle.includes("không tìm thấy trang") ||
     lowerTitle.includes("page not found") ||
     lowerTitle === "error" ||
-    lowerTitle === "lỗi"
+    lowerTitle === "lỗi" ||
+    html.includes("checkpoint") ||
+    html.includes("login_form") ||
+    html.includes("mbasic_login_form")
   ) {
+    isBlocked = true;
     title = "";
   }
 
@@ -78,7 +83,7 @@ function parseHtmlMeta(html: string) {
     privacy = "private";
   }
 
-  return { title, description, membersCount, privacy };
+  return { title, description, membersCount, privacy, isBlocked };
 }
 
 export async function GET(req: NextRequest) {
@@ -128,7 +133,7 @@ export async function GET(req: NextRequest) {
       console.error("Direct fetch failed, fallback to proxy", e);
     }
 
-    let parsed = { title: "", description: "", membersCount: null as number | null, privacy: "public" };
+    let parsed = { title: "", description: "", membersCount: null as number | null, privacy: "public", isBlocked: false };
     if (directOk && html) {
       parsed = parseHtmlMeta(html);
     }
@@ -143,12 +148,19 @@ export async function GET(req: NextRequest) {
             const proxyParsed = parseHtmlMeta(json.contents);
             if (proxyParsed.title) {
               parsed = proxyParsed;
+            } else if (proxyParsed.isBlocked) {
+              parsed.isBlocked = true;
             }
           }
         }
       } catch (proxyErr) {
         console.error("Fallback allorigins proxy also failed:", proxyErr);
       }
+    }
+
+    // Nếu sau cả 2 lớp vẫn không có tiêu đề, mặc định coi là bị chặn/lỗi
+    if (!parsed.title) {
+      parsed.isBlocked = true;
     }
 
     return NextResponse.json(parsed);
@@ -160,6 +172,7 @@ export async function GET(req: NextRequest) {
       description: "",
       membersCount: null,
       privacy: "public",
+      isBlocked: true,
       error: "Không thể lấy dữ liệu"
     });
   }

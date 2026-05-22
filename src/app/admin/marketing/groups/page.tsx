@@ -47,7 +47,16 @@ export default function MarketingGroupsPage() {
   const [form, setForm] = useState({ name: "", platform: "facebook", url: "", membersCount: "", description: "", privacy: "public", status: "active", categoryIds: [] as number[], syncFrequency: "manual" });
   const [saving, setSaving] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
+  const [fbNotice, setFbNotice] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
+  const [isLocal, setIsLocal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  useEffect(() => {
+    if (!showForm) {
+      setFbNotice(null);
+    }
+  }, [showForm]);
 
   const [showBulk, setShowBulk] = useState(false);
   const [bulkText, setBulkText] = useState("");
@@ -85,6 +94,12 @@ export default function MarketingGroupsPage() {
     const saved = localStorage.getItem('growth_visited_groups');
     if (saved) {
       try { setVisitedGroups(new Set(JSON.parse(saved))); } catch (e) {}
+    }
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (hostname === "localhost" || hostname === "127.0.0.1" || hostname.startsWith("192.168.")) {
+        setIsLocal(true);
+      }
     }
   }, []);
 
@@ -154,6 +169,7 @@ export default function MarketingGroupsPage() {
     if (form.name && form.membersCount) return; // Không ghi đè nếu đã nhập tay
 
     setFetchingMeta(true);
+    setFbNotice(null);
     try {
       const res = await fetch(`/api/fetch-meta?url=${encodeURIComponent(form.url)}`);
       if (res.ok) {
@@ -161,6 +177,12 @@ export default function MarketingGroupsPage() {
         const parsedTitle = (data.title || "").trim();
         const isInvalidTitle = !parsedTitle || 
           ["facebook", "error", "log in", "đăng nhập", "sign up", "đăng ký", "lỗi"].some(kw => parsedTitle.toLowerCase().includes(kw));
+
+        if (data.isBlocked || isInvalidTitle) {
+          if (form.url.includes("facebook.com")) {
+            setFbNotice("Facebook đã chặn hoặc yêu cầu đăng nhập. Bạn vui lòng tự nhập Tên Group và Số thành viên bên dưới, hoặc cấu hình FACEBOOK_COOKIE trong .env trên Server để tự động cập nhật lâu dài.");
+          }
+        }
 
         setForm(prev => ({
           ...prev,
@@ -171,8 +193,46 @@ export default function MarketingGroupsPage() {
       }
     } catch (e) {
       console.error("Failed to fetch meta", e);
+      if (form.url.includes("facebook.com")) {
+        setFbNotice("Không thể kết nối đến API lấy thông tin. Vui lòng nhập tay Tên Group và Số thành viên.");
+      }
     } finally {
       setFetchingMeta(false);
+    }
+  };
+
+  const syncToServer = async () => {
+    if (syncing) return;
+
+    const savedServerUrl = localStorage.getItem("kaido_sync_server_url") || "https://kaidosolar.com";
+    const serverUrlInput = prompt(
+      "Nhập địa chỉ domain Server sản xuất của bạn để đồng bộ:\nVí dụ: https://kaidosolar.com",
+      savedServerUrl
+    );
+    if (!serverUrlInput) return;
+
+    const targetUrl = serverUrlInput.trim().replace(/\/$/, "");
+    localStorage.setItem("kaido_sync_server_url", targetUrl);
+
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/marketing-groups/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serverUrl: targetUrl })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`🎉 ${data.message}`);
+      } else {
+        alert(`❌ Lỗi đồng bộ: ${data.error || "Không rõ nguyên nhân"}`);
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert(`❌ Lỗi kết nối: Không thể thực hiện đồng bộ. Hãy chắc chắn Server đã online và địa chỉ nhập đúng.`);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -397,6 +457,28 @@ export default function MarketingGroupsPage() {
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý các Group Facebook, Zalo về NLMT để tiếp cận khách hàng</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          {isLocal && (
+            <button 
+              onClick={syncToServer} 
+              disabled={syncing}
+              style={{ 
+                background: syncing ? "#94a3b8" : "linear-gradient(135deg, #3b82f6, #1d4ed8)", 
+                color: "white", 
+                border: "none", 
+                borderRadius: 10, 
+                padding: "10px 20px", 
+                fontSize: 14, 
+                fontWeight: 700, 
+                cursor: syncing ? "not-allowed" : "pointer", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 8, 
+                boxShadow: "0 4px 12px rgba(59,130,246,0.3)" 
+              }}
+            >
+              {syncing ? "⏳ Đang đồng bộ..." : "📤 Đồng Bộ Lên Server"}
+            </button>
+          )}
           <Link href="/admin/marketing/groups/growth" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(245,158,11,0.3)", textDecoration: "none" }}>
             📈 Báo Cáo Tăng Trưởng
           </Link>
@@ -650,6 +732,24 @@ export default function MarketingGroupsPage() {
                   placeholder="https://www.facebook.com/groups/..." 
                   style={{ width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }} 
                 />
+                {fbNotice && (
+                  <div style={{
+                    marginTop: 8,
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg, #fef3c7, #fffbeb)",
+                    border: "1px solid #fde68a",
+                    color: "#b45309",
+                    fontSize: 12,
+                    lineHeight: "1.5",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8
+                  }}>
+                    <span style={{ fontSize: 14 }}>💡</span>
+                    <div style={{ flex: 1 }}>{fbNotice}</div>
+                  </div>
+                )}
               </div>
 
               <div>
