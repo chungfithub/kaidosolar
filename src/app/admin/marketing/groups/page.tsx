@@ -51,6 +51,8 @@ export default function MarketingGroupsPage() {
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
   const [isLocal, setIsLocal] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showToolsDropdown, setShowToolsDropdown] = useState(false);
+  const [cleaningDuplicates, setCleaningDuplicates] = useState(false);
 
   useEffect(() => {
     if (!showForm) {
@@ -233,6 +235,28 @@ export default function MarketingGroupsPage() {
       alert(`❌ Lỗi kết nối: Không thể thực hiện đồng bộ. Hãy chắc chắn Server đã online và địa chỉ nhập đúng.`);
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const cleanDuplicates = async () => {
+    if (!confirm("Bạn có chắc chắn muốn quét và xóa các nhóm trùng lặp?\nHệ thống sẽ giữ lại nhóm có số lượng thành viên cao nhất hoặc nhóm được tạo trước, và dọn dẹp các nhóm còn lại.")) return;
+    
+    setCleaningDuplicates(true);
+    setShowToolsDropdown(false);
+    try {
+      const res = await fetch("/api/marketing-groups/clean-duplicates", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`🎉 ${data.message}`);
+        await fetchGroups();
+      } else {
+        alert(`❌ Lỗi dọn dẹp: ${data.error || "Không rõ nguyên nhân"}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("❌ Lỗi kết nối: Không thể thực hiện dọn dẹp.");
+    } finally {
+      setCleaningDuplicates(false);
     }
   };
 
@@ -482,12 +506,130 @@ export default function MarketingGroupsPage() {
           <Link href="/admin/marketing/groups/growth" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(245,158,11,0.3)", textDecoration: "none" }}>
             📈 Báo Cáo Tăng Trưởng
           </Link>
-          <button onClick={() => setShowReloadBulk(true)} style={{ background: "white", color: "#3b82f6", border: "1px solid #bfdbfe", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-            🔄 Cập Nhật Data
-          </button>
-          <button onClick={() => setShowCategoryModal(true)} style={{ background: "white", color: "#334155", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-            🗂️ Quản Lý Danh Mục
-          </button>
+          {/* Công Cụ Nhóm Dropdown */}
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <button 
+              onClick={() => setShowToolsDropdown(!showToolsDropdown)} 
+              disabled={cleaningDuplicates}
+              style={{ 
+                background: "white", 
+                color: "#1e293b", 
+                border: "1px solid #cbd5e1", 
+                borderRadius: 10, 
+                padding: "10px 20px", 
+                fontSize: 14, 
+                fontWeight: 700, 
+                cursor: "pointer", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 8, 
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#94a3b8"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
+            >
+              🛠️ Công Cụ Nhóm <span style={{ fontSize: 10, transition: "transform 0.2s", display: "inline-block", transform: showToolsDropdown ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+            </button>
+            
+            {showToolsDropdown && (
+              <>
+                {/* Backdrop to close dropdown when clicking outside */}
+                <div 
+                  onClick={() => setShowToolsDropdown(false)} 
+                  style={{ position: "fixed", inset: 0, zIndex: 998 }} 
+                />
+                
+                {/* Dropdown Card */}
+                <div style={{ 
+                  position: "absolute", 
+                  top: "120%", 
+                  right: 0, 
+                  background: "white", 
+                  borderRadius: 12, 
+                  border: "1px solid #e2e8f0", 
+                  boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", 
+                  padding: "6px", 
+                  minWidth: 200, 
+                  zIndex: 999,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2
+                }}>
+                  <button 
+                    onClick={() => { setShowReloadBulk(true); setShowToolsDropdown(false); }} 
+                    style={{ 
+                      background: "transparent", 
+                      border: "none", 
+                      borderRadius: 8, 
+                      padding: "10px 12px", 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      color: "#334155", 
+                      textAlign: "left", 
+                      cursor: "pointer", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: 8,
+                      width: "100%",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    🔄 Cập Nhật Data
+                  </button>
+                  <button 
+                    onClick={() => { setShowCategoryModal(true); setShowToolsDropdown(false); }} 
+                    style={{ 
+                      background: "transparent", 
+                      border: "none", 
+                      borderRadius: 8, 
+                      padding: "10px 12px", 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      color: "#334155", 
+                      textAlign: "left", 
+                      cursor: "pointer", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: 8,
+                      width: "100%",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    🗂️ Quản Lý Danh Mục
+                  </button>
+                  <div style={{ height: "1px", background: "#e2e8f0", margin: "4px 8px" }} />
+                  <button 
+                    onClick={cleanDuplicates} 
+                    style={{ 
+                      background: "transparent", 
+                      border: "none", 
+                      borderRadius: 8, 
+                      padding: "10px 12px", 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      color: "#ef4444", 
+                      textAlign: "left", 
+                      cursor: "pointer", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: 8,
+                      width: "100%",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    🗑️ Xóa Nhóm Trùng
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           <button onClick={() => setShowBulk(true)} style={{ background: "white", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             ⚡ Thêm Hàng Loạt
           </button>
