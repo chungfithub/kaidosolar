@@ -312,7 +312,7 @@ export default function SanPhamClient({ products, initialCategory, customerSessi
             <Link href="/" className="nav-logo" style={{ fontSize: "1.4rem" }}>Kaido <span>Solar</span></Link>
             <div style={{ display: "flex", gap: "24px", color: "var(--text-muted)", fontSize: "0.9rem" }}>
               <a href="tel:0789968888" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📞 0789.96.8888 - 0901.096.096</a>
-              <a href="mailto:info@kaidosolar.vn" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📧 info@kaidosolar.vn</a>
+              <a href="mailto:info@kaidosolar.com" style={{ color: "var(--text-muted)", textDecoration: "none" }}>📧 info@kaidosolar.com</a>
             </div>
           </div>
           <div className="footer-bottom" style={{ marginTop: "24px" }}>

@@ -618,7 +618,7 @@ export default function RetailClient({ products, customerSession }: Props) {
               <h4>Liên Hệ</h4>
               <ul className="footer-links">
                 <li><span style={{ color: 'var(--primary)' }}>📞</span> 0789.96.8888 - 0901.096.096</li>
-                <li><span style={{ color: 'var(--primary)' }}>📧</span> info@kaidosolar.vn</li>
+                <li><span style={{ color: 'var(--primary)' }}>📧</span> info@kaidosolar.com</li>
                 <li><span style={{ color: 'var(--primary)' }}>📍</span> 123 Đường Điện Biên Phủ, Hà Nội</li>
               </ul>
             </div>

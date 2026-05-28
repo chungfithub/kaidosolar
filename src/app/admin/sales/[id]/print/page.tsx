@@ -189,7 +189,7 @@ export default async function PrintSalePage({ params }: { params: { id: string }
             <div className="company-name">CÔNG TY TNHH ĐIỆN MẶT TRỜI KAIDO VIỆT NAM</div>
             <div><strong>Địa chỉ:</strong> Xã Thổ Tang - Tỉnh Phú Thọ</div>
             <div><strong>Hotline:</strong> 0901.096.096 - <strong>Zalo:</strong> 0901.096.096</div>
-            <div><strong>Email:</strong> contact@kaidosolar.vn - <strong>Website:</strong> www.kaidosolar.vn</div>
+            <div><strong>Email:</strong> contact@kaidosolar.com - <strong>Website:</strong> www.kaidosolar.com</div>
           </div>
         </div>
 
