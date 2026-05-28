@@ -183,9 +183,7 @@ export default async function PrintQuotationPage({ params }: { params: { id: str
         {/* Header */}
         <div className="header-section">
           <div className="logo-box">
-            <h2 style={{ color: '#0ea5e9', fontSize: '32px', margin: 0, fontWeight: 900, fontStyle: 'italic' }}>
-              KAIDO<span style={{ color: '#f59e0b' }}>SOLAR</span>
-            </h2>
+            <img src="/logo.jpg" alt="Kaido Solar Logo" style={{ maxWidth: '100%', maxHeight: '75px', objectFit: 'contain' }} />
           </div>
           <div className="company-info">
             <div className="company-name">CÔNG TY TNHH ĐIỆN MẶT TRỜI KAIDO VIỆT NAM</div>
