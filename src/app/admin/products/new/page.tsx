@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import ProductForm from "../ProductForm";
 import { getSuppliers } from "@/app/actions/product";
 

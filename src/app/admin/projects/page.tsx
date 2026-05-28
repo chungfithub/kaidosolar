@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
 import { Edit } from "lucide-react";

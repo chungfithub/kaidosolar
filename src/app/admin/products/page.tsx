@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PrismaClient } from "@prisma/client";
 import ProductTable from "./ProductTable";
 import ProductsHeader from "./ProductsHeader";

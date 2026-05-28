@@ -1,12 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, HardHat, Plus, Trash2 } from 'lucide-react';
-import { addProjectItem, removeProjectItem, assignInstaller } from '@/app/actions/project';
+import { Box, HardHat, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem } from '@/app/actions/project';
 
 export default function ProjectDashboardClient({ project, availableProducts, availableInstallers }: any) {
   const [addingItem, setAddingItem] = useState(false);
   const [addingInstaller, setAddingInstaller] = useState(false);
+  
+  // Inline edit state
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editPrice, setEditPrice] = useState<number>(0);
+  const [editQuantity, setEditQuantity] = useState<number>(0);
+
+  const startEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditPrice(item.price);
+    setEditQuantity(item.quantity);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleSave = async (itemId: number) => {
+    await updateProjectItem(project.id, itemId, editQuantity, editPrice);
+    setEditingId(null);
+  };
 
   return (
     <>
@@ -53,26 +73,95 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
                 <th>Thành tiền</th>
-                <th>Xóa</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
-              {project.items.map((item: any) => (
-                <tr key={item.id}>
-                  <td>{item.product.name}</td>
-                  <td>{new Intl.NumberFormat('en-US').format(item.price)}đ</td>
-                  <td>{item.quantity}</td>
-                  <td style={{ fontWeight: 'bold' }}>{new Intl.NumberFormat('en-US').format(item.price * item.quantity)}đ</td>
-                  <td>
-                    <button 
-                      className="btn btn-danger btn-action" 
-                      onClick={() => removeProjectItem(project.id, item.id)}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {project.items.map((item: any) => {
+                const isEditing = editingId === item.id;
+                return (
+                  <tr key={item.id}>
+                    <td>{item.product.name}</td>
+                    <td>
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          className="form-control" 
+                          style={{ width: '130px', padding: '6px 8px', margin: 0, fontSize: '0.9rem' }} 
+                          value={editPrice}
+                          onChange={e => setEditPrice(parseInt(e.target.value, 10) || 0)}
+                        />
+                      ) : (
+                        `${new Intl.NumberFormat('en-US').format(item.price)}đ`
+                      )}
+                    </td>
+                    <td>
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          className="form-control" 
+                          style={{ width: '80px', padding: '6px 8px', margin: 0, fontSize: '0.9rem' }} 
+                          value={editQuantity}
+                          onChange={e => setEditQuantity(parseInt(e.target.value, 10) || 0)}
+                          min={1}
+                        />
+                      ) : (
+                        item.quantity
+                      )}
+                    </td>
+                    <td style={{ fontWeight: 'bold' }}>
+                      {isEditing ? (
+                        `${new Intl.NumberFormat('en-US').format(editPrice * editQuantity)}đ`
+                      ) : (
+                        `${new Intl.NumberFormat('en-US').format(item.price * item.quantity)}đ`
+                      )}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {isEditing ? (
+                          <>
+                            <button 
+                              className="btn btn-action" 
+                              style={{ background: '#10b981', color: 'white', padding: '6px' }}
+                              onClick={() => handleSave(item.id)}
+                              title="Lưu thay đổi"
+                            >
+                              <Check size={14} />
+                            </button>
+                            <button 
+                              className="btn btn-action btn-outline" 
+                              style={{ padding: '6px' }}
+                              onClick={cancelEdit}
+                              title="Hủy"
+                            >
+                              <X size={14} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button 
+                              className="btn btn-action btn-outline" 
+                              style={{ padding: '6px', color: 'var(--primary)' }}
+                              onClick={() => startEdit(item)}
+                              title="Chỉnh sửa đơn giá & số lượng"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button 
+                              className="btn btn-danger btn-action" 
+                              style={{ padding: '6px' }}
+                              onClick={() => removeProjectItem(project.id, item.id)}
+                              title="Xóa sản phẩm"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               {project.items.length === 0 && (
                 <tr>
                   <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có thiết bị nào.</td>

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Box, HardHat, FileText } from 'lucide-react';
+import { ArrowLeft, Box, HardHat, FileText, Printer } from 'lucide-react';
 import ProjectDashboardClient from './ProjectDashboardClient';
 import StatusUpdater from './StatusUpdater';
 
@@ -40,10 +40,16 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
         <div className="page-title">
           Chi tiết dự án: <span style={{ color: 'var(--primary)', marginLeft: '12px' }}>{project.name}</span>
         </div>
-        <Link href="/admin/projects" className="btn-back">
-          <ArrowLeft size={18} />
-          Quay lại danh sách
-        </Link>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Link href={`/admin/projects/${project.id}/print`} target="_blank" className="btn btn-primary" style={{ background: '#0ea5e9', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
+            <Printer size={18} />
+            Xuất Báo Giá (A4)
+          </Link>
+          <Link href="/admin/projects" className="btn-back">
+            <ArrowLeft size={18} />
+            Quay lại danh sách
+          </Link>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '24px', alignItems: 'start' }}>

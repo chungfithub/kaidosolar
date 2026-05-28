@@ -187,8 +187,8 @@ export default async function PrintSalePage({ params }: { params: { id: string }
           </div>
           <div className="company-info">
             <div className="company-name">CÔNG TY TNHH ĐIỆN MẶT TRỜI KAIDO VIỆT NAM</div>
-            <div><strong>Địa chỉ:</strong> Số 123 Đường Điện Quang, Quận Ánh Sáng, TP. Hồ Chí Minh</div>
-            <div><strong>Hotline:</strong> 1900 9999 - <strong>Zalo:</strong> 0987 654 321</div>
+            <div><strong>Địa chỉ:</strong> Xã Thổ Tang - Tỉnh Phú Thọ</div>
+            <div><strong>Hotline:</strong> 0901.096.096 - <strong>Zalo:</strong> 0901.096.096</div>
             <div><strong>Email:</strong> contact@kaidosolar.vn - <strong>Website:</strong> www.kaidosolar.vn</div>
           </div>
         </div>

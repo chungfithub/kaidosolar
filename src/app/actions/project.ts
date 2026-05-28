@@ -91,6 +91,26 @@ export async function removeProjectItem(projectId: number, itemId: number) {
   }
 }
 
+export async function updateProjectItem(projectId: number, itemId: number, quantity: number, price: number) {
+  try {
+    await prisma.projectItem.update({
+      where: { id: itemId },
+      data: { quantity, price }
+    });
+    
+    // Update total cost
+    const items = await prisma.projectItem.findMany({ where: { projectId } });
+    const totalCost = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    await prisma.project.update({ where: { id: projectId }, data: { totalCost } });
+    
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating project item:', error);
+    return { error: 'Lỗi khi cập nhật sản phẩm.' };
+  }
+}
+
 export async function assignInstaller(prevState: any, formData: FormData) {
   const projectId = parseInt(formData.get('projectId') as string, 10);
   const installerId = parseInt(formData.get('installerId') as string, 10);

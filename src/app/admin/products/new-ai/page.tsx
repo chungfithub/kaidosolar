@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import BulkProductEditor from "../BulkProductEditor";
 import { getSuppliers } from "@/app/actions/product";
 
