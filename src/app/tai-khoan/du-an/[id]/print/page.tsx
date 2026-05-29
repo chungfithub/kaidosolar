@@ -438,9 +438,6 @@ export default async function CustomerPrintProjectQuotationPage({ params }: { pa
                   </td>
                   <td className="col-name">
                     <strong style={{ fontSize: '14px' }}>{item.product.name}</strong>
-                    {item.product.specs && (
-                      <div className="product-specs">{item.product.specs}</div>
-                    )}
                   </td>
                   <td className="col-quantity">
                     {item.quantity}{detectUnit(item.product.name)}
