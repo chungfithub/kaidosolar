@@ -330,7 +330,7 @@ export default async function PrintProjectQuotationPage({ params }: { params: Pr
           <table>
             <tbody>
               <tr>
-                <td style={{ width: '15%' }}>Kính gửi:</td>
+                <td style={{ width: '15%' }}>Khách Hàng:</td>
                 <td style={{ width: '45%' }}><strong>{project.customer.name}</strong></td>
                 <td style={{ width: '15%' }}>Mã dự án:</td>
                 <td style={{ width: '25%' }}><strong>{quotationCode}</strong></td>
@@ -461,8 +461,6 @@ export default async function PrintProjectQuotationPage({ params }: { params: Pr
           <p><strong>Ghi chú & Điều khoản bảo hành:</strong></p>
           <ul style={{ margin: '5px 0 15px 0', paddingLeft: '20px', lineHeight: '1.6' }}>
             <li>Báo giá trên là bảng giá dự toán vật tư thiết bị cho dự án <strong>{project.name}</strong>. Chi phí thực tế sẽ quyết toán theo khối lượng nghiệm thu thực tế sau khi thi công.</li>
-            <li>Đơn giá chưa bao gồm thuế VAT (8% hoặc 10% nếu khách hàng yêu cầu xuất hóa đơn đỏ).</li>
-            <li>Thời gian giao hàng và thi công hoàn thiện: từ 3 - 7 ngày làm việc kể từ ngày ký hợp đồng và nhận tạm ứng.</li>
             <li>Chính sách bảo hành thiết bị chính hãng theo đúng quy định hiển thị tại cột Bảo hành.</li>
             {project.notes && <li><strong>Ghi chú dự án:</strong> {project.notes}</li>}
           </ul>

@@ -204,7 +204,7 @@ export default async function PrintQuotationPage({ params }: { params: { id: str
           <table>
             <tbody>
               <tr>
-                <td style={{ width: '15%' }}>Kính gửi:</td>
+                <td style={{ width: '15%' }}>Khách Hàng:</td>
                 <td style={{ width: '45%' }}><strong>{order.customer.name}</strong></td>
                 <td style={{ width: '15%' }}>Mã báo giá:</td>
                 <td style={{ width: '25%' }}><strong>{order.orderCode}</strong></td>
