@@ -184,7 +184,7 @@ export default async function PrintSalePage({ params }: { params: { id: string }
             <img src="/logo.jpg" alt="Kaido Solar Logo" style={{ maxWidth: '100%', maxHeight: '75px', objectFit: 'contain' }} />
           </div>
           <div className="company-info">
-            <div className="company-name">CÔNG TY TNHH ĐIỆN MẶT TRỜI KAIDO VIỆT NAM</div>
+            <div className="company-name">CÔNG TY TNHH KAIDO SOLAR</div>
             <div><strong>Địa chỉ:</strong> Xã Thổ Tang - Tỉnh Phú Thọ</div>
             <div><strong>Hotline:</strong> 0901.096.096 - <strong>Zalo:</strong> 0901.096.096</div>
             <div><strong>Email:</strong> contact@kaidosolar.com - <strong>Website:</strong> www.kaidosolar.com</div>
