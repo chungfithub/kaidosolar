@@ -8,6 +8,11 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  const isPrintView = pathname.includes("/print");
+  if (isPrintView) {
+    return <>{children}</>;
+  }
+
   const navItems = [
     { href: "/tai-khoan", label: "📊 Tổng quan", exact: true },
     { href: "/tai-khoan/don-hang", label: "📦 Đơn hàng" },

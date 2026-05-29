@@ -121,9 +121,14 @@ export default async function DuAnPage() {
                       </div>
                     ))}
                     {project.totalCost > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(255,255,255,0.06)", fontWeight: 700 }}>
-                        <span style={{ color: "var(--text)" }}>Tổng chi phí:</span>
-                        <span style={{ color: "var(--primary)" }}>{new Intl.NumberFormat("vi-VN").format(project.totalCost)}đ</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <Link href={`/tai-khoan/du-an/${project.id}/print`} target="_blank" style={{ fontSize: "0.85rem", color: "var(--primary)", textDecoration: "none", border: "1px solid var(--primary)", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
+                          📄 Xem Báo Giá (A4)
+                        </Link>
+                        <div style={{ fontWeight: 700 }}>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.85rem", fontWeight: "normal" }}>Tổng chi phí: </span>
+                          <span style={{ color: "var(--primary)", fontSize: "1rem" }}>{new Intl.NumberFormat("vi-VN").format(project.totalCost)}đ</span>
+                        </div>
                       </div>
                     )}
                   </div>
