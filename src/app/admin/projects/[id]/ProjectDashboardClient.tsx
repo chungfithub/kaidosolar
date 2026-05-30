@@ -8,6 +8,11 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
   const [addingItem, setAddingItem] = useState(false);
   const [addingInstaller, setAddingInstaller] = useState(false);
   
+  // Searchable select states for adding items
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  
   // Inline edit state
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editPrice, setEditPrice] = useState<number>(0);
@@ -44,23 +49,122 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
 
         {addingItem && (
           <form action={async (formData) => {
+            if (!selectedProduct) {
+              alert('Vui lòng chọn một thiết bị từ danh sách tìm kiếm!');
+              return;
+            }
             formData.append('projectId', project.id.toString());
+            formData.append('productId', selectedProduct.id.toString());
             await addProjectItem(null, formData);
             setAddingItem(false);
+            setSelectedProduct(null);
+            setSearchQuery('');
           }} style={{ background: 'rgba(0,0,0,0.02)', padding: '16px', borderRadius: '8px', marginBottom: '20px', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <div className="form-group" style={{ flex: 2, margin: 0 }}>
-                <select name="productId" required style={{ width: '100%', padding: '10px' }}>
-                  <option value="">-- Chọn sản phẩm --</option>
-                  {availableProducts.map((p: any) => (
-                    <option key={p.id} value={p.id}>{p.name} - {new Intl.NumberFormat('en-US').format(p.price)}đ</option>
-                  ))}
-                </select>
+              <div className="form-group" style={{ flex: 2, margin: 0, position: 'relative' }}>
+                <input 
+                  type="text" 
+                  className="form-control"
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    background: 'var(--dark-bg, #0f172a)',
+                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
+                    color: 'var(--text, #f8fafc)',
+                    borderRadius: '8px',
+                    cursor: 'text'
+                  }}
+                  placeholder="🔍 Nhập để tìm kiếm thiết bị..."
+                  value={isOpen ? searchQuery : (selectedProduct ? `${selectedProduct.name} - ${new Intl.NumberFormat('en-US').format(selectedProduct.price)}đ` : '')}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsOpen(true);
+                  }}
+                  onFocus={() => {
+                    setIsOpen(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setIsOpen(false), 250);
+                  }}
+                />
+                
+                {isOpen && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '100%', 
+                    left: 0, 
+                    right: 0, 
+                    background: '#1e293b', 
+                    border: '1px solid rgba(255,255,255,0.15)', 
+                    borderRadius: '8px', 
+                    maxHeight: '220px', 
+                    overflowY: 'auto', 
+                    zIndex: 1000, 
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.3)',
+                    marginTop: '4px'
+                  }}>
+                    {availableProducts
+                      .filter((p: any) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .map((p: any) => (
+                        <div 
+                          key={p.id} 
+                          style={{ 
+                            padding: '10px 14px', 
+                            cursor: 'pointer', 
+                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            fontSize: '0.9rem',
+                            color: '#cbd5e1'
+                          }}
+                          onMouseDown={() => {
+                            setSelectedProduct(p);
+                            setSearchQuery('');
+                            setIsOpen(false);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(16,185,129,0.15)';
+                            e.currentTarget.style.color = '#fff';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.color = '#cbd5e1';
+                          }}
+                        >
+                          <span style={{ fontWeight: 500 }}>{p.name}</span>
+                          <span style={{ color: 'var(--primary, #10b981)', fontSize: '0.85rem' }}>
+                            {new Intl.NumberFormat('en-US').format(p.price)}đ
+                          </span>
+                        </div>
+                      ))}
+                    {availableProducts.filter((p: any) => p.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                      <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                        Không tìm thấy thiết bị nào khớp
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="form-group" style={{ flex: 1, margin: 0 }}>
-                <input type="number" name="quantity" defaultValue={1} min={1} required style={{ width: '100%', padding: '10px' }} placeholder="Số lượng" />
+                <input 
+                  type="number" 
+                  name="quantity" 
+                  defaultValue={1} 
+                  min={1} 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px',
+                    background: 'var(--dark-bg, #0f172a)',
+                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
+                    color: 'var(--text, #f8fafc)',
+                    borderRadius: '8px'
+                  }} 
+                  placeholder="Số lượng" 
+                />
               </div>
-              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px' }}>Thêm</button>
+              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: '8px' }}>Thêm</button>
             </div>
           </form>
         )}
