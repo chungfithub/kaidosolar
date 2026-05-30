@@ -68,9 +68,9 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                   style={{ 
                     width: '100%', 
                     padding: '10px 12px', 
-                    background: 'var(--dark-bg, #0f172a)',
-                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
-                    color: 'var(--text, #f8fafc)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     borderRadius: '8px',
                     cursor: 'text'
                   }}
@@ -94,13 +94,13 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                     top: '100%', 
                     left: 0, 
                     right: 0, 
-                    background: '#1e293b', 
-                    border: '1px solid rgba(255,255,255,0.15)', 
+                    background: '#ffffff', 
+                    border: '1px solid #cbd5e1', 
                     borderRadius: '8px', 
                     maxHeight: '220px', 
                     overflowY: 'auto', 
                     zIndex: 1000, 
-                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.3)',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                     marginTop: '4px'
                   }}>
                     {availableProducts
@@ -111,12 +111,12 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                           style={{ 
                             padding: '10px 14px', 
                             cursor: 'pointer', 
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                            borderBottom: '1px solid #f1f5f9',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             fontSize: '0.9rem',
-                            color: '#cbd5e1'
+                            color: '#334155'
                           }}
                           onMouseDown={() => {
                             setSelectedProduct(p);
@@ -124,12 +124,12 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                             setIsOpen(false);
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(16,185,129,0.15)';
-                            e.currentTarget.style.color = '#fff';
+                            e.currentTarget.style.background = 'rgba(16,185,129,0.1)';
+                            e.currentTarget.style.color = 'var(--primary, #10b981)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = '#cbd5e1';
+                            e.currentTarget.style.color = '#334155';
                           }}
                         >
                           <span style={{ fontWeight: 500 }}>{p.name}</span>
@@ -139,7 +139,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                         </div>
                       ))}
                     {availableProducts.filter((p: any) => p.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                      <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                      <div style={{ padding: '12px', textAlign: 'center', color: '#64748b', fontSize: '0.85rem', fontStyle: 'italic' }}>
                         Không tìm thấy thiết bị nào khớp
                       </div>
                     )}
@@ -156,9 +156,9 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                   style={{ 
                     width: '100%', 
                     padding: '10px 12px',
-                    background: 'var(--dark-bg, #0f172a)',
-                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
-                    color: 'var(--text, #f8fafc)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     borderRadius: '8px'
                   }} 
                   placeholder="Số lượng" 
