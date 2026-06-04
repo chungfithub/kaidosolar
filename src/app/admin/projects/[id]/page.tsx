@@ -45,6 +45,10 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
             <Printer size={18} />
             Xuất Hợp Đồng
           </Link>
+          <Link href={`/admin/projects/${project.id}/invoice`} target="_blank" className="btn btn-primary" style={{ background: '#f59e0b', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
+            <Printer size={18} />
+            Xuất Hóa Đơn
+          </Link>
           <Link href={`/admin/projects/${project.id}/print`} target="_blank" className="btn btn-primary" style={{ background: '#0ea5e9', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
             <Printer size={18} />
             Xuất Báo Giá (A4)

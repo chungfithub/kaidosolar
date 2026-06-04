@@ -8,7 +8,7 @@ export default function DashboardLayoutClient({ children, session, logoutAction 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const isPrintView = pathname.includes("/print");
+  const isPrintView = pathname.includes("/print") || pathname.includes("/invoice") || pathname.includes("/contract");
   if (isPrintView) {
     return <>{children}</>;
   }

@@ -9,7 +9,7 @@ import AiAssistant from "./AiAssistant";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  if (pathname === "/admin/login" || pathname.includes("/print")) {
+  if (pathname === "/admin/login" || pathname.includes("/print") || pathname.includes("/invoice") || pathname.includes("/contract")) {
     return <>{children}</>;
   }
 
