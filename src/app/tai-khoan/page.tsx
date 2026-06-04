@@ -25,7 +25,7 @@ export default async function TaiKhoanPage() {
 
   const customerId = session.customerId as number;
 
-  const [orders, projects] = await Promise.all([
+  const [orders, projects, allOrders, completedProjects] = await Promise.all([
     prisma.order.findMany({
       where: { customerId },
       include: { items: { include: { product: true } } },
@@ -37,16 +37,26 @@ export default async function TaiKhoanPage() {
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
+    prisma.order.findMany({
+      where: { customerId, status: { not: "cancelled" } },
+      include: { items: { include: { product: true } } },
+    }),
+    prisma.project.findMany({
+      where: { customerId, status: "completed" },
+      include: { items: { include: { product: true } } },
+    }),
   ]);
 
   const totalOrders = await prisma.order.count({ where: { customerId } });
   const totalProjects = await prisma.project.count({ where: { customerId } });
-  const warrantyItems = orders.flatMap(o => o.items).filter(i => i.warrantyNote || i.product.warranty);
+  const orderWarrantyCount = allOrders.flatMap(o => o.items).filter(i => i.warrantyNote || i.product.warranty).length;
+  const projectWarrantyCount = completedProjects.flatMap(p => p.items).filter(i => i.product.warranty).length;
+  const totalWarrantyItems = orderWarrantyCount + projectWarrantyCount;
 
   const stats = [
     { icon: "📦", label: "Đơn hàng", value: totalOrders, href: "/tai-khoan/don-hang", color: "#3b82f6" },
     { icon: "🏗️", label: "Dự án",    value: totalProjects, href: "/tai-khoan/du-an",  color: "#8b5cf6" },
-    { icon: "🛡️", label: "Sản phẩm bảo hành", value: warrantyItems.length, href: "/tai-khoan/bao-hanh", color: "#10b981" },
+    { icon: "🛡️", label: "Sản phẩm bảo hành", value: totalWarrantyItems, href: "/tai-khoan/bao-hanh", color: "#10b981" },
   ];
 
   const customer = await prisma.customer.findUnique({

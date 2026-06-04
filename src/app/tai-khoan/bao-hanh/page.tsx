@@ -43,8 +43,19 @@ export default async function BaoHanhPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Build warranty items list
-  const warrantyItems = orders.flatMap((order) =>
+  const completedProjects = await prisma.project.findMany({
+    where: {
+      customerId: session.customerId as number,
+      status: "completed",
+    },
+    include: {
+      items: { include: { product: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  // Build warranty items list from orders
+  const orderWarrantyItems = orders.flatMap((order) =>
     order.items.map((item) => {
       const warrantyText = item.warrantyNote ?? item.product.warranty;
       const years = parseWarrantyYears(warrantyText);
@@ -58,11 +69,12 @@ export default async function BaoHanhPage() {
       try { images = JSON.parse(item.product.images); } catch {}
 
       return {
-        id: item.id,
+        id: `order-item-${item.id}`,
         productName: item.product.name,
         category: item.product.category,
         image: images[0] ?? "",
-        orderCode: order.orderCode,
+        sourceLabel: "Đơn hàng",
+        sourceCode: order.orderCode,
         purchaseDate,
         warrantyText,
         years,
@@ -71,7 +83,42 @@ export default async function BaoHanhPage() {
         quantity: item.quantity,
       };
     })
-  ).filter(i => i.warrantyText);
+  );
+
+  // Build warranty items list from completed projects
+  const projectWarrantyItems = completedProjects.flatMap((project) =>
+    project.items.map((item) => {
+      const warrantyText = item.product.warranty;
+      const years = parseWarrantyYears(warrantyText);
+      const purchaseDate = project.updatedAt;
+      const expiryDate = years
+        ? new Date(new Date(purchaseDate).setFullYear(new Date(purchaseDate).getFullYear() + years))
+        : null;
+      const status = getWarrantyStatus(expiryDate);
+
+      let images: string[] = [];
+      try { images = JSON.parse(item.product.images); } catch {}
+
+      return {
+        id: `project-item-${item.id}`,
+        productName: item.product.name,
+        category: item.product.category,
+        image: images[0] ?? "",
+        sourceLabel: "Dự án",
+        sourceCode: project.name,
+        purchaseDate,
+        warrantyText,
+        years,
+        expiryDate,
+        status,
+        quantity: item.quantity,
+      };
+    })
+  );
+
+  const warrantyItems = [...orderWarrantyItems, ...projectWarrantyItems].filter(
+    (i) => i.warrantyText
+  );
 
   // Sort: active first, then expiring, then expired
   warrantyItems.sort((a, b) => {
@@ -129,7 +176,7 @@ export default async function BaoHanhPage() {
                 <div style={{ flex: 1, minWidth: "180px" }}>
                   <div style={{ color: "var(--text)", fontWeight: 600, marginBottom: "4px" }}>{item.productName}</div>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.83rem", marginBottom: "4px" }}>
-                    Đơn hàng: <span style={{ color: "var(--accent)" }}>{item.orderCode}</span> · Mua ngày {new Date(item.purchaseDate).toLocaleDateString("vi-VN")}
+                    {item.sourceLabel}: <span style={{ color: "var(--accent)" }}>{item.sourceCode}</span> · {item.sourceLabel === "Dự án" ? "Nghiệm thu" : "Mua"} ngày {new Date(item.purchaseDate).toLocaleDateString("vi-VN")}
                   </div>
                   <div style={{ color: "var(--primary)", fontSize: "0.83rem" }}>🛡️ {item.warrantyText}</div>
                 </div>
