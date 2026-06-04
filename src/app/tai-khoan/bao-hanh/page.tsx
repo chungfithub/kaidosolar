@@ -25,6 +25,35 @@ function getWarrantyStatus(expiryDate: Date | null): { label: string; color: str
   return { label: "Đang bảo hành", color: "#10b981", icon: "🟢", daysLeft };
 }
 
+function formatRemainingTime(expiryDate: Date | null): string {
+  if (!expiryDate) return "";
+  const now = new Date();
+  if (expiryDate.getTime() <= now.getTime()) return "Đã hết hạn";
+
+  let years = expiryDate.getFullYear() - now.getFullYear();
+  let months = expiryDate.getMonth() - now.getMonth();
+  let days = expiryDate.getDate() - now.getDate();
+
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  const parts = [];
+  if (years > 0) parts.push(`${years} năm`);
+  if (months > 0) parts.push(`${months} tháng`);
+  if (parts.length === 0 && days > 0) {
+    parts.push(`${days} ngày`);
+  }
+
+  return `Còn ${parts.join(" ")}`;
+}
+
 export default async function BaoHanhPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("customer_token")?.value;
@@ -188,8 +217,8 @@ export default async function BaoHanhPage() {
                       Hết hạn: <strong style={{ color: "var(--text)" }}>{new Date(item.expiryDate).toLocaleDateString("vi-VN")}</strong>
                     </div>
                   )}
-                  {daysLeft !== null && daysLeft > 0 && (
-                    <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Còn {daysLeft} ngày</div>
+                  {item.expiryDate && daysLeft !== null && daysLeft > 0 && (
+                    <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{formatRemainingTime(item.expiryDate)}</div>
                   )}
                 </div>
 
