@@ -96,19 +96,7 @@ export default async function DuAnPage() {
                   </div>
                 </div>
 
-                {/* Installers */}
-                {project.installers.length > 0 && (
-                  <div style={{ padding: "0 24px 16px" }}>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "8px" }}>👷 Kỹ thuật viên phụ trách:</div>
-                    {project.installers.map((pi) => (
-                      <div key={pi.id} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "8px", padding: "4px 12px", marginRight: "8px", fontSize: "0.85rem" }}>
-                        <span>🔧</span>
-                        <span style={{ color: "var(--text)" }}>{pi.installer.name}</span>
-                        <span style={{ color: "var(--text-muted)" }}>· {pi.installer.phone}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+
 
                 {/* Items */}
                 {project.items.length > 0 && (
