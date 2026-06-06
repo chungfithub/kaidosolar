@@ -7,10 +7,10 @@ import { redirect } from "next/navigation";
 const prisma = new PrismaClient();
 
 export async function saveCustomer(formData: FormData) {
-  const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
-  const email = formData.get("email") as string;
-  const address = formData.get("address") as string;
+  const name = (formData.get("name") as string || "").trim();
+  const phone = (formData.get("phone") as string || "").trim();
+  const email = (formData.get("email") as string || "").trim();
+  const address = (formData.get("address") as string || "").trim();
 
   await prisma.customer.create({
     data: {

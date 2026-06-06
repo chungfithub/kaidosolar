@@ -38,8 +38,8 @@ export default function NewCustomerPage() {
             </div>
             
             <div className="form-group">
-              <label>Số điện thoại <span style={{ color: '#ef4444' }}>*</span></label>
-              <input type="tel" name="phone" className="form-control" required />
+              <label>Số điện thoại</label>
+              <input type="tel" name="phone" className="form-control" />
             </div>
 
             <div className="form-group">
