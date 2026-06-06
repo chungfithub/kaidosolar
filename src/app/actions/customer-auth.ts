@@ -97,20 +97,37 @@ export async function registerCustomer(
 export async function loginCustomer(
   formData: FormData
 ): Promise<{ success: boolean; error?: string }> {
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
+  const identifier = (formData.get("email") as string)?.trim();
   const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return { success: false, error: "Vui lòng nhập email và mật khẩu." };
+  if (!identifier || !password) {
+    return { success: false, error: "Vui lòng nhập tài khoản và mật khẩu." };
   }
 
-  const account = await prisma.customerAccount.findUnique({
-    where: { email },
+  const normalizedIdentifier = identifier.toLowerCase();
+
+  // 1. Try to find the account by email
+  let account = await prisma.customerAccount.findUnique({
+    where: { email: normalizedIdentifier },
     include: { customer: true },
   });
 
+  // 2. If not found, check if it matches a customer's phone number
   if (!account) {
-    return { success: false, error: "Email chưa được đăng ký." };
+    const customer = await prisma.customer.findFirst({
+      where: { phone: identifier },
+      include: { account: true },
+    });
+    if (customer && customer.account) {
+      account = await prisma.customerAccount.findUnique({
+        where: { id: customer.account.id },
+        include: { customer: true },
+      });
+    }
+  }
+
+  if (!account) {
+    return { success: false, error: "Tài khoản (Email hoặc Số điện thoại) chưa được đăng ký." };
   }
   if (account.status !== "active") {
     return { success: false, error: "Tài khoản của bạn đã bị khóa." };
@@ -125,7 +142,7 @@ export async function loginCustomer(
     accountId: account.id,
     customerId: account.customerId,
     email: account.email,
-    name: account.customer?.name ?? email,
+    name: account.customer?.name ?? account.email,
   });
 
   const cookieStore = await cookies();

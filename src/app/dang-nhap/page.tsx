@@ -27,8 +27,8 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} style={{ background: "var(--dark-surface)", borderRadius: "20px", padding: "36px", border: "1px solid rgba(16,185,129,0.2)", display: "flex", flexDirection: "column", gap: "18px" }}>
       <div className="form-group">
-        <label>Email</label>
-        <input type="email" name="email" required placeholder="example@email.com" autoComplete="email" />
+        <label>Email hoặc Số điện thoại</label>
+        <input type="text" name="email" required placeholder="example@email.com hoặc số điện thoại" />
       </div>
 
       <div className="form-group">
