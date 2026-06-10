@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, Box, HardHat, FileText, Printer } from 'lucide-react';
 import ProjectDashboardClient from './ProjectDashboardClient';
 import StatusUpdater from './StatusUpdater';
+import RenameProjectTitle from './RenameProjectTitle';
 
 const prisma = new PrismaClient();
 
@@ -37,8 +38,8 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
   return (
     <div className="page-wrapper">
       <div className="page-header">
-        <div className="page-title">
-          Chi tiết dự án: <span style={{ color: 'var(--primary)', marginLeft: '12px' }}>{project.name}</span>
+        <div className="page-title" style={{ display: 'flex', alignItems: 'center' }}>
+          Chi tiết dự án: <RenameProjectTitle projectId={project.id} initialName={project.name} />
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <Link href={`/admin/projects/${project.id}/contract`} target="_blank" className="btn btn-primary" style={{ background: '#10b981', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>

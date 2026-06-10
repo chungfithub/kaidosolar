@@ -23,6 +23,7 @@ export default function ProductForm({ product, suppliers, showAiUpload = false }
   const [specs, setSpecs] = useState(product?.specs || "");
   const [aiHighlight, setAiHighlight] = useState(false);
   const [priceStr, setPriceStr] = useState(product?.price ? product.price.toLocaleString("en-US") : "");
+  const [isVisible, setIsVisible] = useState(product ? product.isVisible !== false : true);
   
   useEffect(() => {
     const pendingData = sessionStorage.getItem("pendingAiProduct");
@@ -364,6 +365,24 @@ export default function ProductForm({ product, suppliers, showAiUpload = false }
                 </select>
               </div>
               <input type="hidden" name="warranty" value={warrantyNum ? `${warrantyNum} ${warrantyUnit}` : ""} />
+            </div>
+
+            <div className="form-group" style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+              <label>Hiển thị trên website</label>
+              <div className="switch-container" style={{ marginTop: '8px' }}>
+                <label className="switch-toggle">
+                  <input 
+                    type="checkbox" 
+                    name="isVisible" 
+                    checked={isVisible}
+                    onChange={e => setIsVisible(e.target.checked)}
+                  />
+                  <span className="switch-slider"></span>
+                </label>
+                <span className="switch-label" onClick={() => setIsVisible(!isVisible)}>
+                  {isVisible ? "Đang bật" : "Đang tắt"}
+                </span>
+              </div>
             </div>
           </div>
 

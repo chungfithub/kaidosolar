@@ -6,7 +6,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export default async function Home() {
-  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
+  const products = await prisma.product.findMany({
+    where: { isVisible: true },
+    orderBy: { createdAt: "desc" }
+  });
 
   // Check customer session
   const cookieStore = await cookies();

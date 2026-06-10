@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
-import { deleteProduct } from "@/app/actions/product";
+import { deleteProduct, toggleProductVisibility } from "@/app/actions/product";
 
 export default function ProductTable({ initialProducts }: { initialProducts: any[] }) {
   const [products, setProducts] = useState(initialProducts);
@@ -72,6 +72,17 @@ export default function ProductTable({ initialProducts }: { initialProducts: any
       } catch (error) {
         alert("Lỗi khi xóa sản phẩm. Có thể sản phẩm này đang nằm trong đơn hàng.");
       }
+    }
+  };
+
+  const handleToggleVisibility = async (id: number, currentVal: boolean) => {
+    const newVal = !currentVal;
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: newVal } : p));
+    try {
+      await toggleProductVisibility(id, newVal);
+    } catch (error) {
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: currentVal } : p));
+      alert("Lỗi khi cập nhật trạng thái hiển thị");
     }
   };
 
@@ -241,6 +252,7 @@ export default function ProductTable({ initialProducts }: { initialProducts: any
             <th>Tồn kho</th>
             <th>Công suất</th>
             <th>Nhà cung cấp</th>
+            <th>Hiển thị web</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -299,6 +311,16 @@ export default function ProductTable({ initialProducts }: { initialProducts: any
                   )}
                 </td>
                 <td>
+                  <label className="switch-toggle" style={{ margin: '0 auto', display: 'block' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={p.isVisible !== false}
+                      onChange={() => handleToggleVisibility(p.id, p.isVisible !== false)}
+                    />
+                    <span className="switch-slider"></span>
+                  </label>
+                </td>
+                <td>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <Link href={`/admin/products/${p.id}`} className="btn btn-action" style={{ background: 'rgba(52,211,153,0.1)', color: 'var(--primary-light)' }}>
                       <Edit size={16} />
@@ -313,7 +335,7 @@ export default function ProductTable({ initialProducts }: { initialProducts: any
           })}
           {filteredProducts.length === 0 && (
             <tr>
-              <td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+              <td colSpan={10} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
                 Không tìm thấy sản phẩm nào.
               </td>
             </tr>

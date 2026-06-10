@@ -18,6 +18,7 @@ model Product {
   stock     Int      @default(0)
   specs     String?
   images    String   // Store JSON array of image URLs
+  isVisible Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

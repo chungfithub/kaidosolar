@@ -19,6 +19,7 @@ export default async function SanPhamPage({
   const danhMuc = sp["danh-muc"] ?? "all";
 
   const products = await prisma.product.findMany({
+    where: { isVisible: true },
     orderBy: { createdAt: "desc" },
   });
 

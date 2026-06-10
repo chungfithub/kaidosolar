@@ -18,7 +18,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     where: { id }
   });
 
-  if (!product) notFound();
+  if (!product || product.isVisible === false) notFound();
 
   let images: string[] = [];
   try {
@@ -89,12 +89,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                       <span>{product.capacity}</span>
                     </li>
                   )}
-                  <li>
-                    <span>Tồn kho</span>
-                    <span style={{ color: product.stock > 0 ? 'var(--primary)' : '#ef4444' }}>
-                      {product.stock > 0 ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}
-                    </span>
-                  </li>
                 </ul>
               </div>
 

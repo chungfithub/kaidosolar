@@ -194,3 +194,64 @@ export async function deleteProjectSecure(prevState: any, formData: FormData) {
   revalidatePath('/admin/projects');
   return { success: true };
 }
+
+export async function renameProject(projectId: number, newName: string) {
+  if (!newName || !newName.trim()) {
+    return { error: 'Tên dự án không được để trống.' };
+  }
+  try {
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { name: newName.trim() }
+    });
+    revalidatePath('/admin/projects');
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error renaming project:', error);
+    return { error: 'Lỗi khi đổi tên dự án.' };
+  }
+}
+
+export async function duplicateProject(projectId: number) {
+  try {
+    const originalProject = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { items: true }
+    });
+
+    if (!originalProject) {
+      return { error: 'Dự án gốc không tồn tại.' };
+    }
+
+    const duplicatedProject = await prisma.project.create({
+      data: {
+        name: `${originalProject.name} (Bản sao)`,
+        customerId: originalProject.customerId,
+        status: 'draft',
+        totalCost: originalProject.totalCost,
+        notes: originalProject.notes,
+        monthlyBill: originalProject.monthlyBill,
+        usageTime: originalProject.usageTime,
+        systemType: originalProject.systemType,
+        roofArea: originalProject.roofArea,
+        budget: originalProject.budget,
+        items: {
+          create: originalProject.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+            supplierId: item.supplierId
+          }))
+        }
+      }
+    });
+
+    revalidatePath('/admin/projects');
+    return { success: true, newProjectId: duplicatedProject.id };
+  } catch (error) {
+    console.error('Error duplicating project:', error);
+    return { error: 'Lỗi khi nhân bản dự án.' };
+  }
+}
+

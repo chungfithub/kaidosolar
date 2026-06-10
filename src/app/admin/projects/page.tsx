@@ -4,6 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
 import { Edit } from "lucide-react";
 import DeleteProjectButton from "./DeleteProjectButton";
+import DuplicateProjectButton from "./DuplicateProjectButton";
+import ProjectNameCell from "./ProjectNameCell";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +45,7 @@ export default async function ProjectsPage() {
             {projects.map(p => (
               <tr key={p.id}>
                 <td>#{p.id}</td>
-                <td><strong>{p.name}</strong></td>
+                <td><ProjectNameCell projectId={p.id} initialName={p.name} /></td>
                 <td>{p.customer?.name || "N/A"}</td>
                 <td>
                   <span className={`badge ${p.status === 'completed' ? 'badge-completed' : 'badge-pending'}`}>
@@ -59,6 +61,7 @@ export default async function ProjectsPage() {
                     <Link href={`/admin/projects/${p.id}`} className="btn btn-action" style={{ background: 'rgba(52,211,153,0.1)', color: 'var(--primary-light)' }}>
                       <Edit size={16} />
                     </Link>
+                    <DuplicateProjectButton projectId={p.id} projectName={p.name} />
                     <DeleteProjectButton projectId={p.id} projectName={p.name} />
                   </div>
                 </td>

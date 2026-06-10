@@ -18,6 +18,8 @@ export async function saveProduct(formData: FormData) {
   const specs = formData.get("specs") as string;
   const imagesStr = formData.get("images") as string; // JSON string array of URLs
 
+  const isVisible = formData.get("isVisible") === "true" || formData.get("isVisible") === "on";
+
   // Handle supplier prices parsing from hidden input
   const supplierPricesStr = formData.get("supplierPrices") as string;
   let supplierPrices: any[] = [];
@@ -39,6 +41,7 @@ export async function saveProduct(formData: FormData) {
         stock,
         specs,
         images: imagesStr,
+        isVisible,
         supplierPrices: {
           deleteMany: {}, // Simplest way to update relations: delete all and recreate
           create: supplierPrices.map(sp => ({
@@ -61,6 +64,7 @@ export async function saveProduct(formData: FormData) {
         stock,
         specs,
         images: imagesStr,
+        isVisible,
         supplierPrices: {
           create: supplierPrices.map(sp => ({
             supplierId: parseInt(sp.supplierId),
@@ -130,3 +134,14 @@ export async function deleteProduct(id: number) {
   });
   revalidatePath("/admin/products");
 }
+
+export async function toggleProductVisibility(id: number, isVisible: boolean) {
+  await prisma.product.update({
+    where: { id },
+    data: { isVisible }
+  });
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/san-pham");
+}
+
