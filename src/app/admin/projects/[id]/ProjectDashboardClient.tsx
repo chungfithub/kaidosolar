@@ -173,7 +173,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
           <table>
             <thead>
               <tr>
-                <th style={{ width: '80px', textAlign: 'center' }}>Thứ tự</th>
+                <th style={{ width: '50px', textAlign: 'center' }}>Thứ tự</th>
                 <th>Tên thiết bị</th>
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
@@ -189,7 +189,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                 return (
                   <tr key={item.id}>
                     <td style={{ textAlign: 'center' }}>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', justifyContent: 'center' }}>
                         <button 
                           type="button" 
                           onClick={() => reorderProjectItem(project.id, item.id, 'up')}
@@ -199,14 +199,14 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                             border: 'none', 
                             cursor: isFirst ? 'not-allowed' : 'pointer',
                             color: isFirst ? '#cbd5e1' : 'var(--primary)',
-                            padding: '4px',
+                            padding: '2px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                           title="Di chuyển lên"
                         >
-                          <ChevronUp size={18} />
+                          <ChevronUp size={16} />
                         </button>
                         <button 
                           type="button" 
@@ -217,14 +217,14 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                             border: 'none', 
                             cursor: isLast ? 'not-allowed' : 'pointer',
                             color: isLast ? '#cbd5e1' : 'var(--primary)',
-                            padding: '4px',
+                            padding: '2px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                           title="Di chuyển xuống"
                         >
-                          <ChevronDown size={18} />
+                          <ChevronDown size={16} />
                         </button>
                       </div>
                     </td>
