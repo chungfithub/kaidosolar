@@ -21,7 +21,11 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
     include: {
       customer: true,
       items: {
-        include: { product: true }
+        include: { product: true },
+        orderBy: [
+          { sortOrder: 'asc' },
+          { id: 'asc' }
+        ]
       },
       installers: {
         include: { installer: true }

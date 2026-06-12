@@ -70,7 +70,11 @@ export default async function CustomerPrintProjectQuotationPage({ params }: { pa
       items: {
         include: {
           product: true
-        }
+        },
+        orderBy: [
+          { sortOrder: 'asc' },
+          { id: 'asc' }
+        ]
       }
     }
   });

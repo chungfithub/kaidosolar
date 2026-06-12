@@ -39,7 +39,11 @@ export default async function PrintProjectInvoicePage({ params }: { params: Prom
       items: {
         include: {
           product: true
-        }
+        },
+        orderBy: [
+          { sortOrder: 'asc' },
+          { id: 'asc' }
+        ]
       }
     }
   });

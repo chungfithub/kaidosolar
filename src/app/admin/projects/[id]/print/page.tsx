@@ -39,7 +39,11 @@ export default async function PrintProjectQuotationPage({ params }: { params: Pr
       items: {
         include: {
           product: true
-        }
+        },
+        orderBy: [
+          { sortOrder: 'asc' },
+          { id: 'asc' }
+        ]
       }
     }
   });

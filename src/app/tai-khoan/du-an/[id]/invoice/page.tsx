@@ -70,7 +70,11 @@ export default async function CustomerPrintProjectInvoicePage({ params }: { para
       items: {
         include: {
           product: true
-        }
+        },
+        orderBy: [
+          { sortOrder: 'asc' },
+          { id: 'asc' }
+        ]
       }
     }
   });

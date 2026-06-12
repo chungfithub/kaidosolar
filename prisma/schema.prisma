@@ -127,6 +127,7 @@ model ProjectItem {
   supplierId Int?
   quantity   Int
   price      Int
+  sortOrder  Int      @default(0)
 
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)

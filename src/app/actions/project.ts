@@ -51,12 +51,20 @@ export async function addProjectItem(prevState: any, formData: FormData) {
     const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) return { error: 'Sản phẩm không tồn tại.' };
 
+    // Get maximum sortOrder to append to end of list
+    const maxItem = await prisma.projectItem.findFirst({
+      where: { projectId },
+      orderBy: { sortOrder: 'desc' }
+    });
+    const nextSortOrder = maxItem ? maxItem.sortOrder + 1 : 0;
+
     await prisma.projectItem.create({
       data: {
         projectId,
         productId,
         quantity,
-        price: product.price, // use default product price for now
+        price: product.price,
+        sortOrder: nextSortOrder,
       }
     });
 
@@ -241,7 +249,8 @@ export async function duplicateProject(projectId: number) {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
-            supplierId: item.supplierId
+            supplierId: item.supplierId,
+            sortOrder: item.sortOrder
           }))
         }
       }
@@ -254,4 +263,47 @@ export async function duplicateProject(projectId: number) {
     return { error: 'Lỗi khi nhân bản dự án.' };
   }
 }
+
+export async function reorderProjectItem(projectId: number, itemId: number, direction: 'up' | 'down') {
+  try {
+    const items = await prisma.projectItem.findMany({
+      where: { projectId },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { id: 'asc' }
+      ]
+    });
+
+    const index = items.findIndex(item => item.id === itemId);
+    if (index === -1) return { error: 'Không tìm thấy sản phẩm trong dự án.' };
+
+    if (direction === 'up' && index === 0) return { success: true }; // Already at top
+    if (direction === 'down' && index === items.length - 1) return { success: true }; // Already at bottom
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+    // Normalize all sortOrders to sequential integers to ensure clean swapping
+    await prisma.$transaction(
+      items.map((item, idx) => {
+        let newSortOrder = idx;
+        if (idx === index) {
+          newSortOrder = targetIndex;
+        } else if (idx === targetIndex) {
+          newSortOrder = index;
+        }
+        return prisma.projectItem.update({
+          where: { id: item.id },
+          data: { sortOrder: newSortOrder }
+        });
+      })
+    );
+
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error reordering item:', error);
+    return { error: 'Lỗi khi sắp xếp sản phẩm.' };
+  }
+}
+
 

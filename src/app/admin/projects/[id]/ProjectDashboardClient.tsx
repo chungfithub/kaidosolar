@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, HardHat, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem } from '@/app/actions/project';
+import { Box, HardHat, Plus, Trash2, Edit2, Check, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem, reorderProjectItem } from '@/app/actions/project';
 
 export default function ProjectDashboardClient({ project, availableProducts, availableInstallers }: any) {
   const [addingItem, setAddingItem] = useState(false);
@@ -173,6 +173,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
           <table>
             <thead>
               <tr>
+                <th style={{ width: '80px', textAlign: 'center' }}>Thứ tự</th>
                 <th>Tên thiết bị</th>
                 <th>Đơn giá</th>
                 <th>Số lượng</th>
@@ -181,10 +182,52 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
               </tr>
             </thead>
             <tbody>
-              {project.items.map((item: any) => {
+              {project.items.map((item: any, index: number) => {
                 const isEditing = editingId === item.id;
+                const isFirst = index === 0;
+                const isLast = index === project.items.length - 1;
                 return (
                   <tr key={item.id}>
+                    <td style={{ textAlign: 'center' }}>
+                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <button 
+                          type="button" 
+                          onClick={() => reorderProjectItem(project.id, item.id, 'up')}
+                          disabled={isFirst}
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            cursor: isFirst ? 'not-allowed' : 'pointer',
+                            color: isFirst ? '#cbd5e1' : 'var(--primary)',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Di chuyển lên"
+                        >
+                          <ChevronUp size={18} />
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => reorderProjectItem(project.id, item.id, 'down')}
+                          disabled={isLast}
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            cursor: isLast ? 'not-allowed' : 'pointer',
+                            color: isLast ? '#cbd5e1' : 'var(--primary)',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Di chuyển xuống"
+                        >
+                          <ChevronDown size={18} />
+                        </button>
+                      </div>
+                    </td>
                     <td>{item.product.name}</td>
                     <td>
                       {isEditing ? (
@@ -268,7 +311,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
               })}
               {project.items.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có thiết bị nào.</td>
+                  <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có thiết bị nào.</td>
                 </tr>
               )}
             </tbody>
