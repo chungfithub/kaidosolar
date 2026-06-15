@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Box, HardHat, Plus, Trash2, Edit2, Check, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem, reorderProjectItem } from '@/app/actions/project';
 
-export default function ProjectDashboardClient({ project, availableProducts, availableInstallers }: any) {
+export default function ProjectDashboardClient({ project, availableProducts, availableInstallers, availableSuppliers }: any) {
   const [addingItem, setAddingItem] = useState(false);
   const [addingInstaller, setAddingInstaller] = useState(false);
   
@@ -17,11 +17,13 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editPrice, setEditPrice] = useState<number>(0);
   const [editQuantity, setEditQuantity] = useState<number>(0);
+  const [editSupplierId, setEditSupplierId] = useState<number | null>(null);
 
   const startEdit = (item: any) => {
     setEditingId(item.id);
     setEditPrice(item.price);
     setEditQuantity(item.quantity);
+    setEditSupplierId(item.supplierId);
   };
 
   const cancelEdit = () => {
@@ -29,7 +31,7 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
   };
 
   const handleSave = async (itemId: number) => {
-    await updateProjectItem(project.id, itemId, editQuantity, editPrice);
+    await updateProjectItem(project.id, itemId, editQuantity, editPrice, editSupplierId);
     setEditingId(null);
   };
 
@@ -146,7 +148,27 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                   </div>
                 )}
               </div>
-              <div className="form-group" style={{ flex: 1, margin: 0 }}>
+              <div className="form-group" style={{ flex: 1.2, margin: 0 }}>
+                <select 
+                  name="supplierId" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
+                    borderRadius: '8px',
+                    height: '42px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="">-- Chọn Nhà cung cấp --</option>
+                  {availableSuppliers?.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group" style={{ flex: 0.6, margin: 0 }}>
                 <input 
                   type="number" 
                   name="quantity" 
@@ -159,12 +181,13 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                     background: '#ffffff',
                     border: '1px solid #cbd5e1',
                     color: '#0f172a',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    height: '42px'
                   }} 
                   placeholder="Số lượng" 
                 />
               </div>
-              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: '8px' }}>Thêm</button>
+              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: '8px', height: '42px' }}>Thêm</button>
             </div>
           </form>
         )}
@@ -228,7 +251,44 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
                         </button>
                       </div>
                     </td>
-                    <td>{item.product.name}</td>
+                    <td>
+                      <div style={{ fontWeight: 500 }}>{item.product.name}</div>
+                      {isEditing ? (
+                        <div style={{ marginTop: '6px' }}>
+                          <select
+                            value={editSupplierId || ''}
+                            onChange={e => setEditSupplierId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '0.8rem',
+                              borderRadius: '6px',
+                              border: '1px solid #cbd5e1',
+                              background: '#ffffff',
+                              color: '#334155',
+                              cursor: 'pointer',
+                              maxWidth: '220px'
+                            }}
+                          >
+                            <option value="">-- Chưa chọn NCC --</option>
+                            {availableSuppliers?.map((s: any) => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : (
+                        item.supplier ? (
+                          <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
+                            <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bbf7d0', fontWeight: 500 }}>
+                              NCC: {item.supplier.name}
+                            </span>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', fontStyle: 'italic' }}>
+                            NCC: Chưa chọn
+                          </div>
+                        )
+                      )}
+                    </td>
                     <td>
                       {isEditing ? (
                         <input 

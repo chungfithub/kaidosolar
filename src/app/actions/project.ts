@@ -43,6 +43,9 @@ export async function addProjectItem(prevState: any, formData: FormData) {
   const productId = parseInt(formData.get('productId') as string, 10);
   const quantity = parseInt(formData.get('quantity') as string, 10) || 1;
 
+  const supplierIdRaw = formData.get('supplierId') as string;
+  const supplierId = supplierIdRaw ? (parseInt(supplierIdRaw, 10) || null) : null;
+
   if (isNaN(projectId) || isNaN(productId)) {
     return { error: 'Thông tin không hợp lệ.' };
   }
@@ -65,6 +68,7 @@ export async function addProjectItem(prevState: any, formData: FormData) {
         quantity,
         price: product.price,
         sortOrder: nextSortOrder,
+        supplierId,
       }
     });
 
@@ -99,11 +103,11 @@ export async function removeProjectItem(projectId: number, itemId: number) {
   }
 }
 
-export async function updateProjectItem(projectId: number, itemId: number, quantity: number, price: number) {
+export async function updateProjectItem(projectId: number, itemId: number, quantity: number, price: number, supplierId: number | null) {
   try {
     await prisma.projectItem.update({
       where: { id: itemId },
-      data: { quantity, price }
+      data: { quantity, price, supplierId }
     });
     
     // Update total cost

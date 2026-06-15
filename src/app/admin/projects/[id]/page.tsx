@@ -21,7 +21,7 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
     include: {
       customer: true,
       items: {
-        include: { product: true },
+        include: { product: true, supplier: true },
         orderBy: [
           { sortOrder: 'asc' },
           { id: 'asc' }
@@ -35,9 +35,10 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
 
   if (!project) notFound();
 
-  // Fetch all available products and installers for the dropdowns
+  // Fetch all available products, installers and suppliers for the dropdowns
   const availableProducts = await prisma.product.findMany({ orderBy: { name: 'asc' }});
   const availableInstallers = await prisma.installer.findMany({ orderBy: { name: 'asc' }});
+  const availableSuppliers = await prisma.supplier.findMany({ orderBy: { name: 'asc' }});
 
   return (
     <div className="page-wrapper">
@@ -91,6 +92,7 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
             project={project} 
             availableProducts={availableProducts}
             availableInstallers={availableInstallers}
+            availableSuppliers={availableSuppliers}
           />
           
         </div>
