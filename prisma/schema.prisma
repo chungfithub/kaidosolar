@@ -114,6 +114,7 @@ model ProjectInstaller {
   installerId Int
   assignedAt DateTime @default(now())
   status     String   @default("assigned") // assigned, working, completed
+  notes      String?
 
   project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   installer  Installer @relation(fields: [installerId], references: [id], onDelete: Cascade)

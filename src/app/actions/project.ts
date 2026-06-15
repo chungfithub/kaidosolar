@@ -126,6 +126,7 @@ export async function updateProjectItem(projectId: number, itemId: number, quant
 export async function assignInstaller(prevState: any, formData: FormData) {
   const projectId = parseInt(formData.get('projectId') as string, 10);
   const installerId = parseInt(formData.get('installerId') as string, 10);
+  const notes = formData.get('notes') as string || null;
 
   if (isNaN(projectId) || isNaN(installerId)) {
     return { error: 'Thông tin không hợp lệ.' };
@@ -137,6 +138,7 @@ export async function assignInstaller(prevState: any, formData: FormData) {
         projectId,
         installerId,
         status: 'assigned',
+        notes,
       }
     });
   } catch (error) {
@@ -146,6 +148,24 @@ export async function assignInstaller(prevState: any, formData: FormData) {
 
   revalidatePath(`/admin/projects/${projectId}`);
   return { success: true };
+}
+
+export async function removeProjectInstaller(projectId: number, installerId: number) {
+  try {
+    await prisma.projectInstaller.delete({
+      where: {
+        projectId_installerId: {
+          projectId,
+          installerId
+        }
+      }
+    });
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error removing project installer:', error);
+    return { error: 'Lỗi khi gỡ nhân sự thi công.' };
+  }
 }
 
 export async function updateProjectStatus(projectId: number, status: string) {

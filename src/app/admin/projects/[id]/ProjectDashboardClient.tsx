@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Box, HardHat, Plus, Trash2, Edit2, Check, X, ChevronUp, ChevronDown } from 'lucide-react';
-import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem, reorderProjectItem } from '@/app/actions/project';
+import { addProjectItem, removeProjectItem, assignInstaller, updateProjectItem, reorderProjectItem, removeProjectInstaller } from '@/app/actions/project';
 
 export default function ProjectDashboardClient({ project, availableProducts, availableInstallers, availableSuppliers }: any) {
   const [addingItem, setAddingItem] = useState(false);
@@ -398,15 +398,44 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
             setAddingInstaller(false);
           }} style={{ background: 'rgba(0,0,0,0.02)', padding: '16px', borderRadius: '8px', marginBottom: '20px', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <div className="form-group" style={{ flex: 1, margin: 0 }}>
-                <select name="installerId" required style={{ width: '100%', padding: '10px' }}>
+              <div className="form-group" style={{ flex: 1.5, margin: 0 }}>
+                <select 
+                  name="installerId" 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
+                    borderRadius: '8px',
+                    height: '42px',
+                    cursor: 'pointer'
+                  }}
+                >
                   <option value="">-- Chọn Kỹ Thuật --</option>
                   {availableInstallers.map((i: any) => (
                     <option key={i.id} value={i.id}>{i.name}</option>
                   ))}
                 </select>
               </div>
-              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px' }}>Phân công</button>
+              <div className="form-group" style={{ flex: 2, margin: 0 }}>
+                <input 
+                  type="text" 
+                  name="notes" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
+                    borderRadius: '8px',
+                    height: '42px'
+                  }} 
+                  placeholder="Ghi chú công việc phân công (ví dụ: Lắp đặt khung giàn pin, đi dây...)" 
+                />
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: '8px', height: '42px' }}>Phân công</button>
             </div>
           </form>
         )}
@@ -416,21 +445,34 @@ export default function ProjectDashboardClient({ project, availableProducts, ava
             <thead>
               <tr>
                 <th>Tên Kỹ Thuật</th>
+                <th>Ghi chú công việc</th>
                 <th>Trạng thái</th>
+                <th style={{ width: '80px', textAlign: 'center' }}>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {project.installers.map((pi: any) => (
                 <tr key={pi.id}>
                   <td><strong>{pi.installer.name}</strong></td>
+                  <td>{pi.notes || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Không có ghi chú</span>}</td>
                   <td>
                     <span className="badge badge-pending">Đã phân công</span>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button 
+                      className="btn btn-danger btn-action" 
+                      style={{ padding: '6px' }}
+                      onClick={() => removeProjectInstaller(project.id, pi.installerId)}
+                      title="Gỡ phân công"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </td>
                 </tr>
               ))}
               {project.installers.length === 0 && (
                 <tr>
-                  <td colSpan={2} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Chưa phân công kỹ thuật nào.</td>
+                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Chưa phân công kỹ thuật nào.</td>
                 </tr>
               )}
             </tbody>
