@@ -280,7 +280,6 @@ export default function SanPhamClient({ products, initialCategory, customerSessi
                       </div>
                       <div className="product-info" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                         <h3 style={{ transition: "color .2s" }}>{p.name}</h3>
-                        <p className="specs" style={{ flex: 1 }}>{p.specs || "Chính hãng, bảo hành 12 năm"}</p>
                         <div className="product-price" style={{ marginTop: "auto" }}>
                           <span className="price">{new Intl.NumberFormat("vi-VN").format(p.price)}đ</span>
                         </div>
