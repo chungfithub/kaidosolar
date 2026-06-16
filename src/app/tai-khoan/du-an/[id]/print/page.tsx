@@ -432,13 +432,7 @@ export default async function CustomerPrintProjectQuotationPage({ params }: { pa
                 <tr key={item.id}>
                   <td className="col-tt">{index + 1}</td>
                   <td className="col-image">
-                    {firstImage ? (
-                      <img src={firstImage} alt={item.product.name} />
-                    ) : (
-                      <div style={{ width: '55px', height: '55px', border: '1px dashed #cbd5e1', borderRadius: '4px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '9px' }}>
-                        No Image
-                      </div>
-                    )}
+                    {firstImage && <img src={firstImage} alt={item.product.name} />}
                   </td>
                   <td className="col-name">
                     <strong style={{ fontSize: '14px' }}>{item.product.name}</strong>
