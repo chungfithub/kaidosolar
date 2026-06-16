@@ -5,6 +5,56 @@ import ProductActions from './ProductActions';
 
 const prisma = new PrismaClient();
 
+function renderSpecs(text: string) {
+  if (!text) return null;
+  
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const isList = lines.length > 1 || lines.some(l => l.startsWith('•') || l.startsWith('-') || l.startsWith('*') || l.includes(':'));
+  
+  if (!isList) {
+    return <p style={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>{text}</p>;
+  }
+
+  return (
+    <ul style={{ paddingLeft: '20px', listStyleType: 'disc', margin: '20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {lines.map((line, idx) => {
+        const isBullet = line.startsWith('•') || line.startsWith('-') || line.startsWith('*');
+        let content = line;
+        if (isBullet) {
+          content = line.replace(/^[•\-*]\s*/, '');
+        }
+        
+        let parts: React.ReactNode[];
+        if (content.includes('**')) {
+          const splitParts = content.split(/\*\*(.*?)\*\*/g);
+          parts = splitParts.map((part, i) => {
+            if (i % 2 === 1) {
+              return <strong key={i} style={{ color: 'var(--text)', fontWeight: 600 }}>{part}</strong>;
+            }
+            return part;
+          });
+        } else if (content.includes(':')) {
+          const colonIdx = content.indexOf(':');
+          const label = content.substring(0, colonIdx);
+          const value = content.substring(colonIdx);
+          parts = [
+            <strong key="label" style={{ color: 'var(--text)', fontWeight: 600 }}>{label}</strong>,
+            value
+          ];
+        } else {
+          parts = [content];
+        }
+
+        return (
+          <li key={idx} style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>
+            {parts}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const idStr = resolvedParams.id;
@@ -68,34 +118,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 {new Intl.NumberFormat('en-US').format(product.price)}đ
               </div>
 
-              <div className="pd-specs-card">
-                <h3 className="pd-specs-title">Thông số nổi bật</h3>
-                <ul className="pd-specs-list">
-                  <li>
-                    <span>Thương hiệu</span>
-                    <span>{product.brand || 'Chính hãng'}</span>
-                  </li>
-                  <li>
-                    <span>Tình trạng</span>
-                    <span>Mới 100%</span>
-                  </li>
-                  <li>
-                    <span>Bảo hành</span>
-                    <span>{product.warranty || 'Lên tới 12 năm'}</span>
-                  </li>
-                  {product.capacity && (
-                    <li>
-                      <span>Công suất</span>
-                      <span>{product.capacity}</span>
-                    </li>
-                  )}
-                </ul>
-              </div>
-
               <div style={{ marginBottom: '32px', color: 'var(--text-muted)', lineHeight: 1.8 }}>
-                <h3 style={{ fontSize: '1.1rem', color: 'var(--accent)', marginBottom: '12px' }}>Mô tả sản phẩm</h3>
-                <p>{defaultSpecs}</p>
-                <p style={{ marginTop: '12px' }}>Kaido Solar cam kết cung cấp thiết bị năng lượng mặt trời chất lượng cao, đem lại giải pháp tiết kiệm điện năng tối ưu cho gia đình và doanh nghiệp của bạn.</p>
+                {renderSpecs(defaultSpecs)}
+                <p style={{ marginTop: '16px' }}>Kaido Solar cam kết cung cấp thiết bị năng lượng mặt trời chất lượng cao, đem lại giải pháp tiết kiệm điện năng tối ưu cho gia đình và doanh nghiệp của bạn.</p>
               </div>
 
               <ProductActions product={{
