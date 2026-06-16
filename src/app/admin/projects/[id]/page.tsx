@@ -5,6 +5,7 @@ import { ArrowLeft, Box, HardHat, FileText, Printer } from 'lucide-react';
 import ProjectDashboardClient from './ProjectDashboardClient';
 import StatusUpdater from './StatusUpdater';
 import RenameProjectTitle from './RenameProjectTitle';
+import CustomerUpdater from './CustomerUpdater';
 
 const prisma = new PrismaClient();
 
@@ -35,10 +36,11 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
 
   if (!project) notFound();
 
-  // Fetch all available products, installers and suppliers for the dropdowns
+  // Fetch all available products, installers, suppliers and customers
   const availableProducts = await prisma.product.findMany({ orderBy: { name: 'asc' }});
   const availableInstallers = await prisma.installer.findMany({ orderBy: { name: 'asc' }});
   const availableSuppliers = await prisma.supplier.findMany({ orderBy: { name: 'asc' }});
+  const availableCustomers = await prisma.customer.findMany({ orderBy: { name: 'asc' }});
 
   return (
     <div className="page-wrapper">
@@ -76,10 +78,8 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
               Thông tin chung
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Khách hàng</p>
-                <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>{project.customer.name}</p>
-                <p style={{ color: 'var(--text-muted)' }}>{project.customer.phone}</p>
+              <div style={{ display: 'flex', width: '100%' }}>
+                <CustomerUpdater projectId={project.id} currentCustomer={project.customer} availableCustomers={availableCustomers} />
               </div>
               <div>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '8px' }}>Trạng thái hiện tại</p>

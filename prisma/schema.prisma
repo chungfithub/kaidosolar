@@ -90,7 +90,7 @@ model Customer {
 model Project {
   id          Int      @id @default(autoincrement())
   name        String
-  customerId  Int
+  customerId  Int?
   status      String   @default("draft") // draft, quoted, in_progress, completed
   totalCost   Int      @default(0)
   notes       String?
@@ -103,7 +103,7 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   items      ProjectItem[]
   installers ProjectInstaller[]
 }

@@ -309,20 +309,20 @@ export default async function PrintProjectContractPage({ params }: { params: Pro
           <tbody>
             <tr>
               <td className="info-label">Họ và tên:</td>
-              <td className="info-value"><strong>{project.customer.name}</strong></td>
+              <td className="info-value"><strong>{project.customer?.name || "..................................................................................................."}</strong></td>
             </tr>
             <tr>
               <td className="info-label">Địa chỉ:</td>
-              <td className="info-value">{project.customer.address || "..................................................................................................."}</td>
+              <td className="info-value">{project.customer?.address || "..................................................................................................."}</td>
             </tr>
             <tr>
               <td className="info-label">Điện thoại:</td>
-              <td className="info-value">{project.customer.phone}</td>
+              <td className="info-value">{project.customer?.phone || "..................................................................................................."}</td>
             </tr>
-            {project.customer.email && (
+            {project.customer?.email && (
               <tr>
                 <td className="info-label">Email:</td>
-                <td className="info-value">{project.customer.email}</td>
+                <td className="info-value">{project.customer?.email}</td>
               </tr>
             )}
           </tbody>

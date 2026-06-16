@@ -10,13 +10,16 @@ export async function createProject(prevState: any, formData: FormData) {
   const name = formData.get('name') as string;
   const customerIdStr = formData.get('customerId') as string;
 
-  if (!name || !customerIdStr) {
-    return { error: 'Vui lòng nhập đầy đủ tên dự án và chọn khách hàng.' };
+  if (!name) {
+    return { error: 'Vui lòng nhập tên dự án.' };
   }
 
-  const customerId = parseInt(customerIdStr, 10);
-  if (isNaN(customerId)) {
-    return { error: 'Khách hàng không hợp lệ.' };
+  let customerId: number | null = null;
+  if (customerIdStr) {
+    customerId = parseInt(customerIdStr, 10);
+    if (isNaN(customerId)) {
+      return { error: 'Khách hàng không hợp lệ.' };
+    }
   }
 
   try {
@@ -35,6 +38,20 @@ export async function createProject(prevState: any, formData: FormData) {
     if ((error as any).message?.includes('NEXT_REDIRECT')) throw error;
     console.error('Error creating project:', error);
     return { error: 'Có lỗi xảy ra khi tạo dự án.' };
+  }
+}
+
+export async function updateProjectCustomer(projectId: number, customerId: number | null) {
+  try {
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { customerId }
+    });
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating project customer:', error);
+    return { error: 'Lỗi khi cập nhật khách hàng.' };
   }
 }
 

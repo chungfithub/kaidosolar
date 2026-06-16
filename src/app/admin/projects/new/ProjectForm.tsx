@@ -49,10 +49,10 @@ export default function ProjectForm({ customers }: { customers: Customer[] }) {
 
         <div className="form-group">
           <label htmlFor="customerId">
-            Khách hàng <span style={{ color: 'var(--danger)' }}>*</span>
+            Khách hàng <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 'normal' }}>(Tùy chọn)</span>
           </label>
-          <select id="customerId" name="customerId" required defaultValue="">
-            <option value="" disabled>-- Chọn khách hàng --</option>
+          <select id="customerId" name="customerId" defaultValue="">
+            <option value="">-- Bỏ trống (Gán sau) --</option>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} - {c.phone}
@@ -60,7 +60,7 @@ export default function ProjectForm({ customers }: { customers: Customer[] }) {
             ))}
           </select>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-            * Nếu chưa có khách hàng, vui lòng tạo mới tại mục Quản lý Khách hàng trước.
+            Bạn có thể gán hoặc thay đổi khách hàng cho dự án này bất kỳ lúc nào sau khi khởi tạo.
           </p>
         </div>
 

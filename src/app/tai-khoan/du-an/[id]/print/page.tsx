@@ -374,20 +374,20 @@ export default async function CustomerPrintProjectQuotationPage({ params }: { pa
             <tbody>
               <tr>
                 <td style={{ width: '15%' }}>Khách Hàng:</td>
-                <td style={{ width: '45%' }}><strong>{project.customer.name}</strong></td>
+                <td style={{ width: '45%' }}><strong>{project.customer?.name || "..........................................................."}</strong></td>
                 <td style={{ width: '15%' }}>Mã dự án:</td>
                 <td style={{ width: '25%' }}><strong>{quotationCode}</strong></td>
               </tr>
               <tr>
                 <td>Địa chỉ:</td>
-                <td>{project.customer.address || "..........................................................."}</td>
+                <td>{project.customer?.address || "..........................................................."}</td>
                 <td>Điện thoại:</td>
-                <td>{project.customer.phone}</td>
+                <td>{project.customer?.phone || "..........................................................."}</td>
               </tr>
-              {project.customer.email && (
+              {project.customer?.email && (
                 <tr>
                   <td>Email:</td>
-                  <td>{project.customer.email}</td>
+                  <td>{project.customer?.email}</td>
                   <td>Tên dự án:</td>
                   <td><strong>{project.name}</strong></td>
                 </tr>
