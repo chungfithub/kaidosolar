@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Box, HardHat, FileText, Printer } from 'lucide-react';
+import { ArrowLeft, Box, HardHat, FileText, Printer, FileSpreadsheet } from 'lucide-react';
 import ProjectDashboardClient from './ProjectDashboardClient';
 import StatusUpdater from './StatusUpdater';
 import RenameProjectTitle from './RenameProjectTitle';
@@ -65,6 +65,10 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
             <Printer size={18} />
             Xuất Báo Giá Specs
           </Link>
+          <a href={`/api/projects/${project.id}/export-excel`} className="btn btn-primary" style={{ background: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
+            <FileSpreadsheet size={18} />
+            Xuất Excel
+          </a>
           <Link href="/admin/projects" className="btn-back">
             <ArrowLeft size={18} />
             Quay lại danh sách
