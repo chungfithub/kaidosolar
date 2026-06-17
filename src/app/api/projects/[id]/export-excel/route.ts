@@ -36,7 +36,19 @@ function getUnit(category: string | null, name: string): string {
 // Clean markdown bold symbols and format technical specs for plain excel cells
 function cleanSpecsForExcel(text: string | null): string {
   if (!text) return "";
-  return text
+  
+  let processed = text;
+  // If the text has few newlines but contains colons, let's break it down into lines
+  if (!text.includes("\n") || text.split("\n").length < 3) {
+    // Regex matches space + Capitalized label + colon (e.g., " Dung lượng:", " Điện áp:")
+    processed = text.replace(/\s+([A-Z\u00C0-\u017FĐ][A-Za-z0-9\u00C0-\u01BFĐ\s/_-]{1,30}):/g, "\n$1:");
+    
+    // Also split specific words onto separate lines
+    processed = processed.replace(/\s+(trọng lượng)\s+/gi, "\nTrọng lượng: ");
+    processed = processed.replace(/\s+(IP\d+)\s+/g, "\nCấp bảo vệ: $1\n");
+  }
+
+  return processed
     .split("\n")
     .map(line => {
       let cleaned = line.trim();

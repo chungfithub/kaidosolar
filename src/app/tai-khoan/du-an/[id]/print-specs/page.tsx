@@ -24,7 +24,16 @@ function detectUnit(name: string) {
 // Helper to render technical specs nicely in a table cell
 function renderSpecsCell(text: string | null) {
   if (!text) return "-";
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  
+  let processed = text;
+  // If the text has few newlines but contains colons, let's break it down into lines
+  if (!text.includes("\n") || text.split("\n").length < 3) {
+    processed = text.replace(/\s+([A-Z\u00C0-\u017FĐ][A-Za-z0-9\u00C0-\u01BFĐ\s/_-]{1,30}):/g, "\n$1:");
+    processed = processed.replace(/\s+(trọng lượng)\s+/gi, "\nTrọng lượng: ");
+    processed = processed.replace(/\s+(IP\d+)\s+/g, "\nCấp bảo vệ: $1\n");
+  }
+
+  const lines = processed.split('\n').map(l => l.trim()).filter(Boolean);
   if (lines.length === 0) return "-";
   return (
     <ul style={{ margin: 0, paddingLeft: '14px', listStyleType: 'disc', fontSize: '11.5px', textAlign: 'left', lineHeight: '1.35' }}>
