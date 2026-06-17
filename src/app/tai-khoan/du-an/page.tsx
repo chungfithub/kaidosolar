@@ -114,6 +114,9 @@ export default async function DuAnPage() {
                           <Link href={`/tai-khoan/du-an/${project.id}/print`} target="_blank" style={{ fontSize: "0.85rem", color: "var(--primary)", textDecoration: "none", border: "1px solid var(--primary)", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
                             📄 Xem Báo Giá (A4)
                           </Link>
+                          <Link href={`/tai-khoan/du-an/${project.id}/print-specs`} target="_blank" style={{ fontSize: "0.85rem", color: "#8b5cf6", textDecoration: "none", border: "1px solid #8b5cf6", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
+                            📋 Báo Giá Specs
+                          </Link>
                           <Link href={`/tai-khoan/du-an/${project.id}/invoice`} target="_blank" style={{ fontSize: "0.85rem", color: "#f59e0b", textDecoration: "none", border: "1px solid #f59e0b", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
                             🧾 Xem Hóa Đơn (A4)
                           </Link>

@@ -61,6 +61,10 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
             <Printer size={18} />
             Xuất Báo Giá (A4)
           </Link>
+          <Link href={`/admin/projects/${project.id}/print-specs`} target="_blank" className="btn btn-primary" style={{ background: '#6366f1', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
+            <Printer size={18} />
+            Xuất Báo Giá Specs
+          </Link>
           <Link href="/admin/projects" className="btn-back">
             <ArrowLeft size={18} />
             Quay lại danh sách
