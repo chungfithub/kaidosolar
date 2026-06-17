@@ -227,8 +227,26 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Helper to render an item row
     async function writeItemRow(item: typeof project.items[0], stt: number) {
+      // Calculate dynamic row height based on text content
+      const nameText = item.product.name || "";
+      const specsText = cleanSpecsForExcel(item.product.specs);
+      
+      // Estimate lines in Name column (width ~28)
+      const nameLines = Math.ceil(nameText.length / 26);
+      
+      // Estimate lines in Specs column (width ~38)
+      const specsLines = specsText.split("\r\n").reduce((sum, line) => {
+        return sum + Math.max(1, Math.ceil(line.length / 36));
+      }, 0);
+      
+      const totalEstimatedLines = Math.max(nameLines, specsLines);
+      const estimatedHeight = totalEstimatedLines * 15 + 15;
+      
+      // Minimum row height of 72 is used to ensure the image (62px / 46.5pt) fits perfectly
+      const finalRowHeight = Math.max(72, estimatedHeight);
+
       const row = worksheet.getRow(currentExcelRowIndex);
-      row.height = 72; // Generous height for image fit
+      row.height = finalRowHeight;
 
       // STT
       const cellStt = row.getCell(1);
@@ -272,9 +290,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             buffer: imageBuffer,
             extension: (extension === "png" ? "png" : "jpeg") as any
           });
-          // Anchor image inside the current cell E (column 4, 0-based)
+          // Anchor image inside the current cell E (column 4, 0-based), centering it vertically
+          const rowHeightInPoints = row.height || 72;
+          const imgHeightInPoints = 46.5; // 62px is ~46.5 points
+          const verticalPaddingPoints = Math.max(4, (rowHeightInPoints - imgHeightInPoints) / 2);
+          const rowOffset = verticalPaddingPoints / rowHeightInPoints;
+
           worksheet.addImage(imageId, {
-            tl: { col: 4.15, row: currentExcelRowIndex - 1 + 0.15 },
+            tl: { col: 4.15, row: currentExcelRowIndex - 1 + rowOffset },
             ext: { width: 62, height: 62 }
           });
         } catch (e) {
