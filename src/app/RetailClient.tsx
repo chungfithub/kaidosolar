@@ -118,7 +118,6 @@ export default function RetailClient({ products, customerSession }: Props) {
           <a href="#" className="nav-logo">Kaido <span>Solar</span></a>
 
           <ul className={`nav-links ${isMenuOpen ? "active" : ""}`} id="nav-links">
-            <li><a href="#services" onClick={() => setIsMenuOpen(false)}>Dịch Vụ</a></li>
             <li><Link href="/san-pham" onClick={() => setIsMenuOpen(false)}>Sản Phẩm</Link></li>
             <li><a href="#process" onClick={() => setIsMenuOpen(false)}>Quy Trình</a></li>
             <li><Link href="/du-an" onClick={() => setIsMenuOpen(false)}>Đăng Ký Dự Án</Link></li>
@@ -147,7 +146,7 @@ export default function RetailClient({ products, customerSession }: Props) {
               href="/cart"
               style={{
                 position: 'relative',
-                color: scrolled ? 'var(--accent)' : '#ffffff',
+                color: scrolled ? 'var(--accent)' : 'var(--accent)',
                 textDecoration: 'none',
                 fontSize: '1.4rem',
                 display: 'flex',
@@ -155,7 +154,6 @@ export default function RetailClient({ products, customerSession }: Props) {
                 justifyContent: 'center',
                 minWidth: '44px',
                 minHeight: '44px',
-                filter: scrolled ? 'none' : 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
               }}
               title="Giỏ hàng"
               aria-label="Giỏ hàng"
@@ -174,10 +172,10 @@ export default function RetailClient({ products, customerSession }: Props) {
                   href="/tai-khoan"
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
-                    background: scrolled ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.15)',
-                    border: scrolled ? '1px solid rgba(16,185,129,0.35)' : '1px solid rgba(255,255,255,0.5)',
+                    background: 'rgba(5,150,105,0.08)',
+                    border: '1px solid rgba(5,150,105,0.2)',
                     borderRadius: '20px', padding: '6px 14px',
-                    color: scrolled ? 'var(--primary)' : '#ffffff',
+                    color: 'var(--primary)',
                     textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
                   }}
                 >
@@ -185,8 +183,8 @@ export default function RetailClient({ products, customerSession }: Props) {
                 </Link>
               ) : (
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <Link href="/dang-nhap" style={{ color: scrolled ? 'var(--accent)' : 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: '0.85rem', padding: '6px 12px', borderRadius: '8px', border: scrolled ? '1px solid rgba(0,0,0,0.15)' : '1px solid rgba(255,255,255,0.35)', fontWeight: 500 }}>Đăng nhập</Link>
-                  <Link href="/dang-ky" className="nav-signup-btn" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.85rem', padding: '6px 14px', borderRadius: '8px', background: scrolled ? 'var(--primary)' : 'rgba(16,185,129,0.8)', fontWeight: 600 }}>Đăng ký</Link>
+                  <Link href="/dang-nhap" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(15,23,42,0.12)', fontWeight: 500 }}>Đăng nhập</Link>
+                  <Link href="/dang-ky" className="nav-signup-btn" style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.85rem', padding: '6px 14px', borderRadius: '8px', background: 'var(--primary)', fontWeight: 600 }}>Đăng ký</Link>
                 </div>
               )}
             </div>
@@ -205,37 +203,42 @@ export default function RetailClient({ products, customerSession }: Props) {
 
       <section className="hero" id="hero">
         <div className="hero-bg"></div>
+        <div className="hero-shapes">
+          <div className="shape"></div>
+          <div className="shape"></div>
+          <div className="shape"></div>
+        </div>
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">⚡ Tiền điện càng cao, lắp điện mặt trời càng đáng</div>
-            <h1>Giảm Tiền Điện Mỗi Tháng Với <span className="highlight">Điện Mặt Trời</span></h1>
-            <p>Kaido Solar tư vấn giải pháp hòa lưới, hybrid và lưu trữ theo đúng nhu cầu thực tế — tính toán rõ ràng chi phí, sản lượng và thời gian hoàn vốn để bạn yên tâm đầu tư lâu dài.</p>
+            <div className="hero-badge">🌿 Năng lượng bền vững cho tương lai xanh</div>
+            <h1>Kiến Tạo Giá Trị Bền Vững Bằng <span className="highlight">Năng Lượng Sạch</span></h1>
+            <p>Kaido Solar mang đến giải pháp tối ưu từ tấm pin mặt trời hòa lưới, hệ thống hybrid đến lưu trữ thông minh. Thiết kế kỹ thuật chuẩn xác, tính toán tỷ suất sinh lời và thời gian thu hồi vốn thực tế.</p>
             <div className="hero-buttons">
-              <a href="#calculator" className="btn btn-primary">⚡ Báo Giá Ngay</a>
-              <a href="#services" className="btn btn-outline" style={{ color: 'white', borderColor: 'white' }}>Tìm Hiểu Thêm →</a>
+              <a href="#calculator" className="btn btn-primary">⚡ Nhận Báo Giá Ngay</a>
+              <a href="/san-pham" className="btn btn-outline">Tìm Hiểu Thêm →</a>
             </div>
 
             {/* Hotline bar */}
-            <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ marginTop: '28px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <a
                 href="tel:07899688888"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  color: '#ffffff', textDecoration: 'none',
+                  color: 'var(--accent)', textDecoration: 'none',
                   fontSize: '1rem', fontWeight: 600,
                 }}
               >
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   width: '36px', height: '36px', borderRadius: '50%',
-                  background: 'rgba(16,185,129,0.85)',
+                  background: 'rgba(5,150,105,0.1)',
+                  color: 'var(--primary)',
                   fontSize: '1rem',
-                  animation: 'phonePulse 1.8s ease-in-out infinite',
                 }}>📞</span>
                 <span>
-                  <span style={{ color: 'rgba(255,255,255,0.75)', fontWeight: 400, fontSize: '0.9rem' }}>Gọi ngay: </span>
-                  <span style={{ color: '#4ade80', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.5px' }}>0789.96.8888</span>
-                  <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 400, fontSize: '0.85rem', marginLeft: '6px' }}>– Tư vấn miễn phí</span>
+                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.9rem' }}>Liên hệ chuyên gia: </span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 850, fontSize: '1.15rem', letterSpacing: '0.3px' }}>0789.96.8888</span>
+                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.85rem', marginLeft: '6px' }}>– Tư vấn miễn phí</span>
                 </span>
               </a>
             </div>
@@ -261,38 +264,6 @@ export default function RetailClient({ products, customerSession }: Props) {
             <div className="stat-item reveal">
               <div className="stat-number" data-target="5" data-suffix="+ Năm">0</div>
               <div className="stat-label">Kinh nghiệm kỹ thuật</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section" id="services">
-        <div className="container">
-          <div className="section-header reveal">
-            <div className="accent-line"></div>
-            <h2>Dịch Vụ Của Chúng Tôi</h2>
-            <p>Giải pháp năng lượng mặt trời toàn diện từ tư vấn đến bảo trì</p>
-          </div>
-          <div className="services-grid">
-            <div className="service-card reveal">
-              <div className="service-icon">📐</div>
-              <h3>Tư Vấn & Thiết Kế</h3>
-              <p>Khảo sát thực tế, tư vấn giải pháp tối ưu phù hợp nhu cầu sử dụng điện và ngân sách của bạn.</p>
-            </div>
-            <div className="service-card reveal">
-              <div className="service-icon">🔧</div>
-              <h3>Lắp Đặt Chuyên Nghiệp</h3>
-              <p>Đội ngũ kỹ thuật viên giàu kinh nghiệm, thi công nhanh chóng, đảm bảo an toàn và chất lượng.</p>
-            </div>
-            <div className="service-card reveal">
-              <div className="service-icon">🛡️</div>
-              <h3>Bảo Trì & Bảo Dưỡng</h3>
-              <p>Dịch vụ bảo trì định kỳ, vệ sinh tấm pin, kiểm tra hệ thống đảm bảo hiệu suất tối đa.</p>
-            </div>
-            <div className="service-card reveal">
-              <div className="service-icon">📊</div>
-              <h3>Giám Sát Hệ Thống</h3>
-              <p>Hệ thống giám sát trực tuyến 24/7, theo dõi sản lượng điện và hiệu suất hoạt động real-time.</p>
             </div>
           </div>
         </div>
