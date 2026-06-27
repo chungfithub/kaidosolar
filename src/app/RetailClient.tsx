@@ -649,7 +649,7 @@ export default function RetailClient({ products, customerSession }: Props) {
                   <div>
                     <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600, display: 'block' }}>Lượng CO2 giảm thiểu</span>
                     <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--primary)' }}>
-                      ~{Math.round((bill / 2000) * 12 * 0.8 * 25).toLocaleString()} kg CO2/Năm
+                      ~{new Intl.NumberFormat('vi-VN').format(Math.round((bill / 2000) * 12 * 0.8 * 25))} kg CO2/Năm
                     </span>
                   </div>
                   <div style={{ fontSize: '1.8rem' }}>🌳</div>
