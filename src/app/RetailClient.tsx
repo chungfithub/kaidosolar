@@ -298,22 +298,22 @@ export default function RetailClient({ products, customerSession }: Props) {
         </div>
       </section>
 
-      <section className="section" id="products" style={{ background: 'var(--dark-surface)' }}>
+      <section className="section" id="products" style={{ background: '#FFFFFF', borderBottom: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
           <div className="section-header reveal">
             <div className="accent-line"></div>
-            <h2>Danh Mục Sản Phẩm</h2>
-            <p>Thiết bị chính hãng từ các thương hiệu hàng đầu thế giới</p>
+            <h2>Giải Pháo Thiết Bị Năng Lượng</h2>
+            <p>Hệ thống sản phẩm chính hãng, hiệu suất cao đạt tiêu chuẩn kiểm định quốc tế</p>
           </div>
 
           {/* Category Cards → navigate to /san-pham */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '48px' }}>
             {[
-              { key: 'all',         icon: '🔆', label: 'Tất cả sản phẩm',       desc: `${products.length} sản phẩm`,                                     color: '#10b981' },
-              { key: 'panels',      icon: '☀️', label: 'Tấm Pin Mặt trời',       desc: `${products.filter(p=>p.category==='panels').length} sản phẩm`,      color: '#f59e0b' },
-              { key: 'inverters',   icon: '⚡', label: 'Biến tần - Inverter',    desc: `${products.filter(p=>p.category==='inverters').length} sản phẩm`,   color: '#3b82f6' },
-              { key: 'batteries',   icon: '🔋', label: 'Pin Lưu Trữ',            desc: `${products.filter(p=>p.category==='batteries').length} sản phẩm`,   color: '#8b5cf6' },
-              { key: 'accessories', icon: '🔩', label: 'Phụ Kiện Lắp đặt',      desc: `${products.filter(p=>p.category==='accessories').length} sản phẩm`, color: '#06b6d4' },
+              { key: 'all',         icon: '🌿', label: 'Tất cả sản phẩm',       desc: `Tổng số ${products.length} dòng sản phẩm`,                         color: '#059669' },
+              { key: 'panels',      icon: '☀️', label: 'Tấm Pin Mặt trời',       desc: `${products.filter(p=>p.category==='panels').length} sản phẩm cao cấp`,      color: '#F59E0B' },
+              { key: 'inverters',   icon: '⚡', label: 'Biến tần - Inverter',    desc: `${products.filter(p=>p.category==='inverters').length} dòng thiết bị`,   color: '#0284C7' },
+              { key: 'batteries',   icon: '🔋', label: 'Pin Lưu Trữ Lithium',    desc: `${products.filter(p=>p.category==='batteries').length} module lưu trữ`,   color: '#10B981' },
+              { key: 'accessories', icon: '🔩', label: 'Vật Tư Thi Công',        desc: `${products.filter(p=>p.category==='accessories').length} phụ kiện đồng bộ`, color: '#64748B' },
             ].filter(c => c.key === 'all' || products.some(p => p.category === c.key)).map(cat => (
               <Link
                 key={cat.key}
@@ -323,32 +323,35 @@ export default function RetailClient({ products, customerSession }: Props) {
                 <div
                   className="reveal"
                   style={{
-                    background: 'var(--dark-bg)',
-                    border: `1px solid ${cat.color}30`,
-                    borderRadius: '16px',
-                    padding: '28px 20px',
+                    background: '#F8FAFC',
+                    border: `1px solid var(--border)`,
+                    borderRadius: 'var(--radius)',
+                    padding: '32px 24px',
                     textAlign: 'center',
-                    transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                     cursor: 'pointer',
+                    boxShadow: '0 4px 6px rgba(15, 23, 42, 0.01)',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget;
                     el.style.transform = 'translateY(-4px)';
                     el.style.borderColor = cat.color;
-                    el.style.boxShadow = `0 8px 32px ${cat.color}25`;
+                    el.style.background = '#FFFFFF';
+                    el.style.boxShadow = `0 12px 30px ${cat.color}15`;
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget;
                     el.style.transform = 'translateY(0)';
-                    el.style.borderColor = `${cat.color}30`;
+                    el.style.borderColor = 'var(--border)';
+                    el.style.background = '#F8FAFC';
                     el.style.boxShadow = 'none';
                   }}
                 >
-                  <div style={{ fontSize: '2.4rem', marginBottom: '12px' }}>{cat.icon}</div>
-                  <h3 style={{ color: 'var(--accent)', fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>{cat.label}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>{cat.desc}</p>
-                  <div style={{ marginTop: '14px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: cat.color, fontSize: '0.85rem', fontWeight: 600 }}>
-                    Xem ngay →
+                  <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>{cat.icon}</div>
+                  <h3 style={{ color: 'var(--accent)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '8px' }}>{cat.label}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, fontWeight: 500 }}>{cat.desc}</p>
+                  <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: cat.color, fontSize: '0.88rem', fontWeight: 700 }}>
+                    Khám phá ngay →
                   </div>
                 </div>
               </Link>
@@ -356,11 +359,13 @@ export default function RetailClient({ products, customerSession }: Props) {
           </div>
 
           {/* Preview: latest products */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sản phẩm nổi bật</p>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }} className="reveal">
+            <span style={{ background: 'rgba(5, 150, 105, 0.08)', color: 'var(--primary)', padding: '6px 16px', borderRadius: '50px', fontSize: '0.85rem', fontWeight: 700 }}>
+              SẢN PHẨM KHUYÊN DÙNG
+            </span>
           </div>
           <div className="products-grid">
-            {products.slice(0, 6).map(p => {
+            {products.slice(0, 4).map(p => {
               let images: string[] = [];
               try { images = JSON.parse(p.images); } catch {}
               const thumb = images[0] ?? "";
@@ -378,13 +383,16 @@ export default function RetailClient({ products, customerSession }: Props) {
                       {thumb ? <img src={thumb} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div className="product-emoji">📦</div>}
                     </div>
                     <div className="product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <h3 style={{ transition: 'color .2s' }}>{p.name}</h3>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>
+                        {CATEGORY_LABELS[p.category] || p.category}
+                      </span>
+                      <h3 style={{ fontSize: '1.05rem', lineHeight: '1.4', margin: '0 0 12px 0', fontWeight: 700 }}>{p.name}</h3>
                       <div className="product-price" style={{ marginTop: 'auto' }}>
                         <span className="price">{new Intl.NumberFormat('vi-VN').format(p.price)}đ</span>
                       </div>
                     </div>
                   </Link>
-                  <button onClick={handleAddToCart} style={{ margin: '0 16px 16px', padding: '10px', borderRadius: '10px', background: isAdded ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.15)', color: isAdded ? 'var(--primary)' : 'var(--accent)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.3s ease', border: '1px solid rgba(16,185,129,0.3)' }}>
+                  <button onClick={handleAddToCart} style={{ margin: '0 16px 16px', padding: '12px', borderRadius: '12px', background: isAdded ? 'rgba(5, 150, 105, 0.15)' : 'rgba(5, 150, 105, 0.06)', color: isAdded ? 'var(--primary)' : 'var(--accent)', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem', transition: 'all 0.2s ease', border: '1px solid rgba(5, 150, 105, 0.15)' }}>
                     {isAdded ? '✅ Đã thêm vào giỏ!' : '🛒 Thêm vào giỏ'}
                   </button>
                 </div>
@@ -392,9 +400,9 @@ export default function RetailClient({ products, customerSession }: Props) {
             })}
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '36px' }}>
-            <Link href="/san-pham" className="btn btn-primary" style={{ fontSize: '1rem', padding: '14px 36px' }}>
-              Xem tất cả sản phẩm →
+          <div style={{ textAlign: 'center', marginTop: '48px' }} className="reveal">
+            <Link href="/san-pham" className="btn btn-primary" style={{ fontSize: '0.95rem', padding: '14px 36px' }}>
+              Xem toàn bộ sản phẩm thiết bị →
             </Link>
           </div>
         </div>
@@ -437,153 +445,240 @@ export default function RetailClient({ products, customerSession }: Props) {
         </div>
       </section>
 
-      <section className="section" id="calculator" style={{ background: 'var(--dark-surface)' }}>
+      <section className="section" id="calculator" style={{ background: '#F8FAFC' }}>
         <div className="container">
           <div className="section-header reveal">
             <div className="accent-line"></div>
-            <h2>Nhận Báo Giá Miễn Phí</h2>
-            <p>Điền thông tin để nhận tư vấn và báo giá lắp đặt điện mặt trời tại nhà bạn</p>
+            <h2>Ước Tính Sản Lượng & Tiết Kiệm</h2>
+            <p>Hệ thống tự động tính toán cấu hình hệ thống điện mặt trời và số tiền tiết kiệm tối ưu dựa trên hóa đơn điện của bạn</p>
           </div>
-          <div className="calculator reveal" style={{ maxWidth: '560px' }}>
-            {submitted ? (
-              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>✅</div>
-                <h3 style={{ color: 'var(--primary)', marginBottom: '10px' }}>Đã nhận thông tin!</h3>
-                <p style={{ color: 'var(--text-muted)' }}>Chúng tôi sẽ liên hệ với bạn trong vòng 30 phút để tư vấn và báo giá chi tiết.</p>
-                <button
-                  className="btn btn-primary"
-                  style={{ marginTop: '24px', padding: '12px 32px' }}
-                  onClick={() => { setSubmitted(false); setPhone(''); setProvince(''); setWard(''); }}
-                >
-                  Gửi yêu cầu mới
-                </button>
-              </div>
-            ) : (
-              <form action={async (formData) => {
-                const res = await submitQuoteRequest(formData);
-                if (res.success) { setSubmitted(true); }
-                else alert('Có lỗi xảy ra, vui lòng thử lại.');
-              }}>
 
-                {/* Bill Slider */}
-                <div className="form-group">
-                  <label className="quote-bill-label">
-                    <span>💡 Tiền điện hàng tháng</span>
-                    <span style={{
-                      background: 'linear-gradient(135deg, #10b981, #059669)',
-                      color: '#fff',
-                      padding: '4px 14px',
-                      borderRadius: '20px',
-                      fontWeight: 700,
-                      fontSize: '1rem',
-                      letterSpacing: '0.3px',
-                    }}>
-                      {new Intl.NumberFormat('vi-VN').format(bill)}đ
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '32px',
+            maxWidth: '1100px',
+            margin: '0 auto',
+            alignItems: 'start'
+          }} className="reveal">
+
+            {/* Left side: Calculator controls and customer info */}
+            <div className="calculator" style={{ width: '100%', margin: 0 }}>
+              {submitted ? (
+                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>✅</div>
+                  <h3 style={{ color: 'var(--primary)', marginBottom: '10px' }}>Đã nhận thông tin!</h3>
+                  <p style={{ color: 'var(--text-muted)' }}>Kaido Solar sẽ liên hệ với bạn trong vòng 30 phút để cung cấp báo giá chi tiết và thiết kế 3D miễn phí.</p>
+                  <button
+                    className="btn btn-primary"
+                    style={{ marginTop: '24px', padding: '12px 32px' }}
+                    onClick={() => { setSubmitted(false); setPhone(''); setProvince(''); setWard(''); }}
+                  >
+                    Tạo yêu cầu mới
+                  </button>
+                </div>
+              ) : (
+                <form action={async (formData) => {
+                  const res = await submitQuoteRequest(formData);
+                  if (res.success) { setSubmitted(true); }
+                  else alert('Có lỗi xảy ra, vui lòng thử lại.');
+                }}>
+
+                  {/* Bill Slider */}
+                  <div className="form-group">
+                    <label className="quote-bill-label">
+                      <span>💡 Tiền điện trung bình hàng tháng</span>
+                      <span style={{
+                        background: 'var(--gradient)',
+                        color: '#fff',
+                        padding: '4px 14px',
+                        borderRadius: '20px',
+                        fontWeight: 700,
+                        fontSize: '1rem',
+                        letterSpacing: '0.3px',
+                        boxShadow: '0 4px 10px rgba(5, 150, 105, 0.15)'
+                      }}>
+                        {new Intl.NumberFormat('vi-VN').format(bill)}đ
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      name="bill"
+                      min={500000}
+                      max={15000000}
+                      step={250000}
+                      value={bill}
+                      onChange={e => setBill(Number(e.target.value))}
+                      style={{
+                        width: '100%',
+                        marginTop: '12px',
+                        accentColor: 'var(--primary)',
+                        height: '6px',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px', fontWeight: 500 }}>
+                      <span>500k</span>
+                      <span>3 triệu</span>
+                      <span>6 triệu</span>
+                      <span>10 triệu</span>
+                      <span>15 triệu+</span>
+                    </div>
+                  </div>
+
+                  {/* Day/Night Usage */}
+                  <div className="form-group">
+                    <label>⏰ Khung giờ dùng điện nhiều nhất</label>
+                    <div className="quote-usage-grid">
+                      {([
+                        { value: 'day',   icon: '☀️', label: 'Ban ngày nhiều', desc: 'Hòa lưới trực tiếp' },
+                        { value: 'both',  icon: '🌤️', label: 'Cả ngày lẫn đêm', desc: 'Hybrid lưu trữ nhẹ' },
+                        { value: 'night', icon: '🌙', label: 'Ban đêm nhiều', desc: 'Hybrid lưu trữ lớn' },
+                      ] as const).map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`quote-usage-btn ${usageTime === opt.value ? 'active' : ''}`}
+                          onClick={() => setUsageTime(opt.value)}
+                        >
+                          <div className="quote-usage-icon">{opt.icon}</div>
+                          <div>
+                            <div className="quote-usage-label">{opt.label}</div>
+                            <div className="quote-usage-desc">{opt.desc}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <input type="hidden" name="usageTime" value={usageTime} />
+                  </div>
+
+                  {/* Name */}
+                  <div className="form-group">
+                    <label>👤 Họ và Tên của bạn *</label>
+                    <input type="text" name="name" placeholder="Nhập họ và tên" required />
+                  </div>
+
+                  {/* Phone */}
+                  <div className="form-group">
+                    <label>📱 Số điện thoại liên hệ *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      placeholder="Nhập số điện thoại để nhận kết quả phân tích"
+                      required
+                    />
+                  </div>
+
+                  {/* Province + Ward */}
+                  <div className="quote-location-grid">
+                    <div className="form-group">
+                      <label>🗺️ Tỉnh / Thành phố</label>
+                      <input
+                        type="text"
+                        name="province"
+                        value={province}
+                        onChange={e => setProvince(e.target.value)}
+                        placeholder="VD: Hà Nội"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>🏘️ Quận / Huyện / Xã</label>
+                      <input
+                        type="text"
+                        name="ward"
+                        value={ward}
+                        onChange={e => setWard(e.target.value)}
+                        placeholder="VD: Cầu Giấy"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}
+                  >
+                    📩 Gửi Thiết Kế & Báo Giá 3D Miễn Phí
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Right side: Live Calculated Energy Dashboard */}
+            <div style={{
+              background: '#FFFFFF',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '36px',
+              boxShadow: '0 20px 40px rgba(15, 23, 42, 0.03)',
+            }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--accent)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                📊 Phân Tích Hệ Thống Ước Tính
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '24px' }}>Số liệu tính toán dựa trên hóa đơn điện thực tế của hộ gia đình Việt Nam</p>
+              
+              <div style={{ display: 'grid', gap: '20px' }}>
+                
+                {/* System size */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: '#F8FAFC', borderRadius: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block' }}>Công suất khuyến nghị</span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--accent)' }}>
+                      {Math.max(3, Math.round((bill / 200000) * 10) / 10)} kWp
                     </span>
-                  </label>
-                  <input
-                    type="range"
-                    name="bill"
-                    min={200000}
-                    max={10000000}
-                    step={100000}
-                    value={bill}
-                    onChange={e => setBill(Number(e.target.value))}
-                    style={{
-                      width: '100%',
-                      marginTop: '12px',
-                      accentColor: 'var(--primary)',
-                      height: '6px',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                    <span>200k</span>
-                    <span>2.5 triệu</span>
-                    <span>5 triệu</span>
-                    <span>10 triệu+</span>
+                  </div>
+                  <div style={{ fontSize: '1.8rem' }}>🔆</div>
+                </div>
+
+                {/* Estimated savings */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: '#F0F9FF', borderRadius: '12px', borderLeft: '4px solid var(--sky-blue)' }}>
+                  <div>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--sky-blue)', fontWeight: 600, display: 'block' }}>Tiết kiệm cả đời (25 năm)</span>
+                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--sky-blue)' }}>
+                      ~{new Intl.NumberFormat('vi-VN').format(Math.round((bill * 12 * 25 * 0.85) / 1000000) * 1000000)}đ
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '1.8rem' }}>📈</div>
+                </div>
+
+                {/* CO2 reduction */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'rgba(5, 150, 105, 0.04)', borderRadius: '12px', borderLeft: '4px solid var(--primary)' }}>
+                  <div>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600, display: 'block' }}>Lượng CO2 giảm thiểu</span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--primary)' }}>
+                      ~{Math.round((bill / 2000) * 12 * 0.8 * 25).toLocaleString()} kg CO2/Năm
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '1.8rem' }}>🌳</div>
+                </div>
+
+                {/* Technical specifics visual */}
+                <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '20px', marginTop: '10px' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--accent)', display: 'block', marginBottom: '12px' }}>
+                    Yêu cầu không gian lắp đặt:
+                  </span>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{ background: '#F8FAFC', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>🏠</div>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text)' }}>
+                      Diện tích mái cần thiết: <strong>~{Math.round(Math.max(3, (bill / 200000)) * 6.5)} m²</strong>
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ background: '#F8FAFC', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>📦</div>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text)' }}>
+                      Số lượng tấm pin (loại 550Wp): <strong>~{Math.max(6, Math.ceil((bill / 200000) * 1.8))} tấm</strong>
+                    </span>
                   </div>
                 </div>
 
-                {/* Day/Night Usage */}
-                <div className="form-group">
-                  <label>⏰ Thói quen dùng điện</label>
-                  <div className="quote-usage-grid">
-                    {([
-                      { value: 'day',   icon: '☀️', label: 'Ban ngày nhiều', desc: 'Tối ưu nhất' },
-                      { value: 'both',  icon: '🌤️', label: 'Cả ngày lẫn đêm', desc: 'Phổ biến' },
-                      { value: 'night', icon: '🌙', label: 'Ban đêm nhiều', desc: 'Cần pin lưu trữ' },
-                    ] as const).map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        className={`quote-usage-btn ${usageTime === opt.value ? 'active' : ''}`}
-                        onClick={() => setUsageTime(opt.value)}
-                      >
-                        <div className="quote-usage-icon">{opt.icon}</div>
-                        <div>
-                          <div className="quote-usage-label">{opt.label}</div>
-                          <div className="quote-usage-desc">{opt.desc}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <input type="hidden" name="usageTime" value={usageTime} />
-                </div>
+              </div>
+            </div>
 
-                {/* Name */}
-                <div className="form-group">
-                  <label>👤 Họ và Tên *</label>
-                  <input type="text" name="name" placeholder="Nhập họ và tên của bạn" required />
-                </div>
-
-                {/* Phone */}
-                <div className="form-group">
-                  <label>📱 Số điện thoại *</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    placeholder="Nhập số điện thoại để nhận tư vấn"
-                    required
-                  />
-                </div>
-
-                {/* Province + Ward */}
-                <div className="quote-location-grid">
-                  <div className="form-group">
-                    <label>🗺️ Tỉnh / Thành phố</label>
-                    <input
-                      type="text"
-                      name="province"
-                      value={province}
-                      onChange={e => setProvince(e.target.value)}
-                      placeholder="VD: TP. Hồ Chí Minh"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>🏘️ Phường / Xã</label>
-                    <input
-                      type="text"
-                      name="ward"
-                      value={ward}
-                      onChange={e => setWard(e.target.value)}
-                      placeholder="VD: Phường Bến Nghé"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  📩 Gửi Yêu Cầu Tư Vấn Miễn Phí
-                </button>
-              </form>
-            )}
           </div>
         </div>
       </section>
