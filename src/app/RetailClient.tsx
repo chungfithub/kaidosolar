@@ -273,7 +273,7 @@ export default function RetailClient({ products, customerSession }: Props) {
         <div className="container">
           <div className="section-header reveal">
             <div className="accent-line"></div>
-            <h2>Giải Pháo Thiết Bị Năng Lượng</h2>
+            <h2>Giải Pháp Thiết Bị Năng Lượng</h2>
             <p>Hệ thống sản phẩm chính hãng, hiệu suất cao đạt tiêu chuẩn kiểm định quốc tế</p>
           </div>
 
