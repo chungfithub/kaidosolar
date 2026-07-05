@@ -215,7 +215,7 @@ export default function RetailClient({ products, customerSession }: Props) {
             <p>Kaido Solar mang đến giải pháp tối ưu từ tấm pin mặt trời hòa lưới, hệ thống hybrid đến lưu trữ thông minh. Thiết kế kỹ thuật chuẩn xác, tính toán tỷ suất sinh lời và thời gian thu hồi vốn thực tế.</p>
             <div className="hero-buttons">
               <a href="#calculator" className="btn btn-primary">⚡ Nhận Báo Giá Ngay</a>
-              <a href="/san-pham" className="btn btn-outline">Tìm Hiểu Thêm →</a>
+              <a href="/san-pham" className="btn btn-outline" style={{ color: 'white', borderColor: 'white' }}>Tìm Hiểu Thêm →</a>
             </div>
 
             {/* Hotline bar */}
@@ -224,21 +224,21 @@ export default function RetailClient({ products, customerSession }: Props) {
                 href="tel:07899688888"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  color: 'var(--accent)', textDecoration: 'none',
+                  color: '#ffffff', textDecoration: 'none',
                   fontSize: '1rem', fontWeight: 600,
                 }}
               >
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   width: '36px', height: '36px', borderRadius: '50%',
-                  background: 'rgba(5,150,105,0.1)',
-                  color: 'var(--primary)',
+                  background: 'rgba(74, 222, 128, 0.2)',
+                  color: '#4ade80',
                   fontSize: '1rem',
                 }}>📞</span>
                 <span>
-                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.9rem' }}>Liên hệ chuyên gia: </span>
-                  <span style={{ color: 'var(--primary)', fontWeight: 850, fontSize: '1.15rem', letterSpacing: '0.3px' }}>0789.96.8888</span>
-                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.85rem', marginLeft: '6px' }}>– Tư vấn miễn phí</span>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.75)', fontWeight: 400, fontSize: '0.9rem' }}>Liên hệ chuyên gia: </span>
+                  <span style={{ color: '#4ade80', fontWeight: 850, fontSize: '1.15rem', letterSpacing: '0.3px' }}>0789.96.8888</span>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: 400, fontSize: '0.85rem', marginLeft: '6px' }}>– Tư vấn miễn phí</span>
                 </span>
               </a>
             </div>
