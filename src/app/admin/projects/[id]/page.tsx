@@ -48,7 +48,11 @@ export default async function ProjectDashboardPage({ params }: { params: Promise
         <div className="page-title" style={{ display: 'flex', alignItems: 'center' }}>
           Chi tiết dự án: <RenameProjectTitle projectId={project.id} initialName={project.name} />
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <Link href={`/admin/projects/${project.id}/print-diagram`} target="_blank" className="btn btn-primary" style={{ background: '#ec4899', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
+            <Printer size={18} />
+            Xuất Sơ Đồ Điện
+          </Link>
           <Link href={`/admin/projects/${project.id}/contract`} target="_blank" className="btn btn-primary" style={{ background: '#10b981', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', color: 'white', fontWeight: 600 }}>
             <Printer size={18} />
             Xuất Hợp Đồng

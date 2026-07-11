@@ -110,7 +110,10 @@ export default async function DuAnPage() {
                     ))}
                     {project.totalCost > 0 && (
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                          <Link href={`/admin/projects/${project.id}/print-diagram`} target="_blank" style={{ fontSize: "0.85rem", color: "#ec4899", textDecoration: "none", border: "1px solid #ec4899", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
+                            ⚡ Sơ Đồ Điện
+                          </Link>
                           <Link href={`/tai-khoan/du-an/${project.id}/print`} target="_blank" style={{ fontSize: "0.85rem", color: "var(--primary)", textDecoration: "none", border: "1px solid var(--primary)", padding: "6px 14px", borderRadius: "8px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}>
                             📄 Xem Báo Giá (A4)
                           </Link>
