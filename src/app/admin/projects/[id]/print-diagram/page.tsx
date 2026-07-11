@@ -53,7 +53,6 @@ function extractBrand(name: string, defaultBrand: string): string {
   if (lower.includes("bss")) return "BSS";
   if (lower.includes("gigabox")) return "Gigabox";
   
-  // Return first word capitalized as brand if no match
   const parts = name.split(" ");
   return parts[0] ? parts[0] : defaultBrand;
 }
@@ -177,7 +176,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
         body {
           background: #f1f5f9;
           margin: 0;
-          padding: 20px;
+          padding: 15px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -203,10 +202,10 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
           font-size: 20px;
           font-weight: 800;
           text-transform: uppercase;
-          margin: 4px 0 12px 0;
+          margin: 2px 0 10px 0;
           letter-spacing: 0.5px;
           border-bottom: 2px solid #e2e8f0;
-          padding-bottom: 8px;
+          padding-bottom: 6px;
         }
 
         .canvas-area {
@@ -219,7 +218,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
         .line-dc-pos { stroke: #dc2626; stroke-width: 2.2; fill: none; }
         .line-dc-neg { stroke: #0f172a; stroke-width: 2.2; fill: none; }
         .line-ac-l { stroke: #dc2626; stroke-dasharray: none; stroke-width: 2.2; fill: none; }
-        .line-ac-n { stroke: #0f172a; stroke-dasharray: none; stroke-width: 2.2; fill: none; }
+        .line-ac-n { stroke: #2563eb; stroke-dasharray: none; stroke-width: 2.2; fill: none; }
         .line-pe { stroke: #16a34a; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; }
         .line-comm { stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 3,3; fill: none; }
         .line-ct { stroke: #ea580c; stroke-width: 1.5; stroke-dasharray: 2,2; fill: none; }
@@ -228,12 +227,12 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
         .specs-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 10px;
+          font-size: 9.5px;
           font-family: inherit;
         }
         .specs-table th, .specs-table td {
           border: 1px solid #94a3b8;
-          padding: 4px 6px;
+          padding: 3.5px 5px;
           text-align: left;
         }
         .specs-table th {
@@ -247,7 +246,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
         .legend-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 10px;
+          font-size: 9.5px;
         }
         .legend-table td {
           padding: 2.5px 4px;
@@ -260,12 +259,12 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
           grid-template-columns: 1.2fr 1.5fr 1.5fr 1fr 1fr;
           border-top: 2px solid #0f172a;
           font-size: 9.5px;
-          margin-top: 10px;
+          margin-top: 5px;
         }
         .footer-cell {
           border-right: 1px solid #cbd5e1;
-          padding: 6px 8px;
-          min-height: 36px;
+          padding: 5px 8px;
+          min-height: 32px;
         }
         .footer-cell:last-child {
           border-right: none;
@@ -275,7 +274,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
           color: #475569;
           text-transform: uppercase;
           font-size: 8px;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
         }
         .footer-value {
           font-weight: 700;
@@ -286,381 +285,412 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
       <div className="diagram-container">
         {/* Title */}
         <div className="diagram-header-title">
-          SƠ ĐỒ ĐIỆN MẶT TRỜI {systemType} {totalKWp.toFixed(2)}kWp {hasBattery ? `– LƯU TRỮ ${batteryCapacity}kWh` : ""}
+          SƠ ĐỒ HỆ THỐNG ĐIỆN MẶT TRỜI {systemType} {totalKWp.toFixed(2)}kWp {hasBattery ? `– LƯU TRỮ ${batteryCapacity}kWh` : ""}
         </div>
 
         {/* Dynamic Canvas SVG */}
         <div className="canvas-area">
-          <svg viewBox="0 0 1120 540" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style={{ background: '#ffffff' }}>
+          <svg viewBox="0 0 1120 620" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style={{ background: '#ffffff' }}>
             
-            {/* GRIDS & BUSBAR BACKGROUND SHAPES */}
-            {/* Tủ điện AC Dashed Box */}
-            <rect x="680" y="270" width="280" height="150" rx="6" fill="none" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="3,3" />
-            <text x="970" y="320" fill="#2563eb" font-size="10.5" font-weight="700">TỦ ĐIỆN AC:</text>
-            <text x="970" y="335" fill="#475569" font-size="9" font-weight="600">{cleanProductName(cabinetName)}</text>
-
-            {/* PE Ground Symbol */}
+            {/* PE Ground Symbol Template */}
             <defs>
               <g id="ground-symbol">
-                <line x1="0" y1="0" x2="0" y2="10" stroke="#16a34a" stroke-width="1.5" />
-                <line x1="-8" y1="10" x2="8" y2="10" stroke="#16a34a" stroke-width="1.5" />
-                <line x1="-5" y1="13" x2="5" y2="13" stroke="#16a34a" stroke-width="1.5" />
-                <line x1="-2" y1="16" x2="2" y2="16" stroke="#16a34a" stroke-width="1.5" />
+                <line x1="0" y1="0" x2="0" y2="8" stroke="#16a34a" stroke-width="1.5" />
+                <line x1="-8" y1="8" x2="8" y2="8" stroke="#16a34a" stroke-width="1.5" />
+                <line x1="-5" y1="11" x2="5" y2="11" stroke="#16a34a" stroke-width="1.5" />
+                <line x1="-2" y1="14" x2="2" y2="14" stroke="#16a34a" stroke-width="1.5" />
               </g>
               {/* Solar Panel Template */}
               <g id="panel-icon">
-                <rect x="0" y="0" width="22" height="36" fill="#1e293b" stroke="#cbd5e1" stroke-width="0.8" />
-                <line x1="11" y1="0" x2="11" y2="36" stroke="#475569" stroke-width="0.5" />
-                <line x1="0" y1="12" x2="22" y2="12" stroke="#475569" stroke-width="0.5" />
-                <line x1="0" y1="24" x2="22" y2="24" stroke="#475569" stroke-width="0.5" />
+                <rect x="0" y="0" width="22" height="34" fill="#1e293b" stroke="#cbd5e1" stroke-width="0.8" />
+                <line x1="11" y1="0" x2="11" y2="34" stroke="#475569" stroke-width="0.5" />
+                <line x1="0" y1="11" x2="22" y2="11" stroke="#475569" stroke-width="0.5" />
+                <line x1="0" y1="22" x2="22" y2="22" stroke="#475569" stroke-width="0.5" />
               </g>
             </defs>
 
-            {/* 1. SOLAR ARRAY (TOP LEFT) */}
-            <text x="40" y="25" fill="#0f172a" font-size="11" font-weight="700">TẤM PIN NĂNG LƯỢNG MẶT TRỜI</text>
-            <text x="40" y="38" fill="#475569" font-size="9.5" font-weight="600">{panelQty} x {cleanProductName(panelName)} ({totalKWp.toFixed(2)}kWp)</text>
+            {/* ==================== COLUMN 1: SOLAR & BATTERY & INVERTER (LEFT) ==================== */}
 
-            {/* String 1 Box */}
-            <rect x="30" y="55" width="200" height="85" rx="6" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
-            <text x="40" y="70" fill="#0f172a" font-size="9" font-weight="700">STRING 1 ({string1Qty} TẤM)</text>
-            {/* Draw 7 panels in grid */}
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <use key={`s1-p-${i}`} href="#panel-icon" x={40 + i * 24} y={80} />
-            ))}
-            {/* Wire poles string 1 */}
-            <circle cx="44" cy="122" r="2.5" fill="#dc2626" />
-            <text x="40" y="132" fill="#dc2626" font-size="9" font-weight="700">+</text>
-            <circle cx="196" cy="122" r="2.5" fill="#0f172a" />
-            <text x="194" y="132" fill="#0f172a" font-size="9" font-weight="700">-</text>
+            {/* 1. SOLAR PANELS */}
+            <g transform="translate(30, 40)">
+              <rect x="0" y="0" width="370" height="120" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+              <text x="15" y="-12" fill="#0f172a" font-size="10.5" font-weight="700">TẤM PIN NĂNG LƯỢNG MẶT TRỜI</text>
+              <text x="15" y="18" fill="#475569" font-size="8.5" font-weight="600">{panelQty} x {cleanProductName(panelName)} ({totalKWp.toFixed(2)}kWp)</text>
+              
+              {/* Ground inside solar */}
+              <use href="#ground-symbol" x="180" y="65" />
+              <line x1="120" y1="50" x2="180" y2="50" stroke="#16a34a" stroke-width="1.2" stroke-dasharray="3,3" />
+              
+              {/* Panel visual representations */}
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                <use key={`p-${i}`} href="#panel-icon" x={20 + i * 26} y={35} />
+              ))}
+              
+              {/* String labels */}
+              <text x="32" y="85" fill="#dc2626" font-size="9" font-weight="800">+</text>
+              <circle cx="35" cy="95" r="2.5" fill="#dc2626" />
+              
+              <text x="187" y="85" fill="#0f172a" font-size="9" font-weight="800">-</text>
+              <circle cx="190" cy="95" r="2.5" fill="#0f172a" />
 
-            {/* String 2 Box */}
-            <rect x="250" y="55" width="200" height="85" rx="6" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
-            <text x="260" y="70" fill="#0f172a" font-size="9" font-weight="700">STRING 2 ({string2Qty} TẤM)</text>
-            {/* Draw 7 panels in grid */}
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <use key={`s2-p-${i}`} href="#panel-icon" x={260 + i * 24} y={80} />
-            ))}
-            {/* Wire poles string 2 */}
-            <circle cx="264" cy="122" r="2.5" fill="#dc2626" />
-            <text x="260" y="132" fill="#dc2626" font-size="9" font-weight="700">+</text>
-            <circle cx="416" cy="122" r="2.5" fill="#0f172a" />
-            <text x="414" y="132" fill="#0f172a" font-size="9" font-weight="700">-</text>
+              <text x="212" y="85" fill="#dc2626" font-size="9" font-weight="800">+</text>
+              <circle cx="215" cy="95" r="2.5" fill="#dc2626" />
+              
+              <circle cx="350" cy="95" r="2.5" fill="#0f172a" />
+              <text x="347" y="85" fill="#0f172a" font-size="9" font-weight="800">-</text>
+            </g>
 
-            {/* Ground line for panels */}
-            <path d="M 120 116 L 120 148 L 330 148 L 330 120" className="line-pe" />
-            <use href="#ground-symbol" x="225" y="148" />
+            {/* 2. DC PROTECTION (CB DC & SPD DC) */}
+            <g transform="translate(70, 190)">
+              {/* CB DC */}
+              <rect x="0" y="0" width="36" height="50" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+              <line x1="10" y1="8" x2="10" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <line x1="26" y1="8" x2="26" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <rect x="13" y="15" width="10" height="15" rx="1" fill="#ea580c" />
+              <rect x="-5" y="8" width="46" height="12" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
+              <text x="18" y="17" fill="#0f172a" font-size="7.5" font-weight="800" text-anchor="middle">CB DC</text>
+              <text x="44" y="28" fill="#475569" font-size="8" font-weight="700">CB DC</text>
 
-            {/* 2. DC PROTECTION PANEL */}
-            {/* DC Breaker Box (CB DC) */}
-            <rect x="235" y="175" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <line x1="245" y1="185" x2="245" y2="220" stroke="#0f172a" stroke-width="1.5" />
-            <line x1="265" y1="185" x2="265" y2="220" stroke="#0f172a" stroke-width="1.5" />
-            {/* Toggle switch visual */}
-            <rect x="250" y="195" width="10" height="15" rx="1" fill="#dc2626" />
-            <text x="282" y="195" fill="#0f172a" font-size="8.5" font-weight="700">CB DC</text>
-            <text x="282" y="206" fill="#475569" font-size="7.5" font-weight="600">1000VDC</text>
-            <text x="282" y="217" fill="#475569" font-size="7.5" font-weight="600">32A</text>
+              {/* SPD DC */}
+              <rect x="75" y="0" width="36" height="50" rx="3" fill="#dc2626" stroke="#b91c1c" stroke-width="1" />
+              <rect x="80" y="10" width="10" height="12" fill="#16a34a" />
+              <rect x="91" y="10" width="10" height="12" fill="#16a34a" />
+              <rect x="70" y="8" width="46" height="12" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="0.8" />
+              <text x="93" y="17" fill="#ffffff" font-size="7.5" font-weight="800" text-anchor="middle">SPD DC</text>
+              <text x="120" y="28" fill="#475569" font-size="8" font-weight="700">SPD DC</text>
+              <use href="#ground-symbol" x="93" y="70" />
+            </g>
 
-            {/* DC SPD Box */}
-            <rect x="345" y="175" width="36" height="55" rx="4" fill="#ea580c" stroke="#c2410c" stroke-width="1" />
-            <rect x="351" y="185" width="10" height="15" fill="#16a34a" />
-            <rect x="361" y="185" width="10" height="15" fill="#16a34a" />
-            <text x="387" y="195" fill="#0f172a" font-size="8.5" font-weight="700">SPD DC</text>
-            <text x="387" y="206" fill="#475569" font-size="7.5" font-weight="600">1000VDC</text>
-            <text x="387" y="217" fill="#475569" font-size="7.5" font-weight="600">Type 2</text>
+            {/* 3. INVERTER HYBRID */}
+            <g transform="translate(60, 275)">
+              <rect x="0" y="0" width="180" height="120" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" />
+              <rect x="0" y="0" width="180" height="20" rx="2" fill="#cbd5e1" />
+              <text x="90" y="14" fill="#0f172a" font-size="9" font-weight="800" text-anchor="middle">INVERTER HYBRID</text>
+              
+              {/* Screen Display */}
+              <rect x="35" y="32" width="110" height="42" rx="3" fill="#0f172a" />
+              <text x="90" y="47" fill="#38bdf8" font-size="8" font-weight="700" text-anchor="middle">
+                {cleanProductName(inverterName)}
+              </text>
+              <text x="90" y="62" fill="#4ade80" font-size="7.5" font-weight="600" text-anchor="middle">
+                ONLINE - HYBRID
+              </text>
+              
+              {/* LEDs */}
+              <circle cx="35" cy="90" r="3" fill="#16a34a" />
+              <text x="35" y="102" fill="#475569" font-size="6.5" text-anchor="middle">RUN</text>
+              <circle cx="90" cy="90" r="3" fill="#2563eb" />
+              <text x="90" y="102" fill="#475569" font-size="6.5" text-anchor="middle">BMS</text>
+              <circle cx="145" cy="90" r="3" fill="#ea580c" />
+              <text x="145" y="102" fill="#475569" font-size="6.5" text-anchor="middle">GRID</text>
 
-            {/* Ground for DC SPD */}
-            <path d="M 363 230 L 363 250 L 390 250" className="line-pe" />
-            <use href="#ground-symbol" x="390" y="250" />
+              {/* Ports */}
+              <rect x="15" y="117" width="14" height="6" fill="#334155" />
+              <text x="22" y="113" fill="#475569" font-size="6.5" text-anchor="middle">DC</text>
+              
+              <rect x="75" y="117" width="14" height="6" fill="#334155" />
+              <text x="82" y="113" fill="#475569" font-size="6.5" text-anchor="middle">BAT</text>
 
-            {/* 3. INVERTER BLOCK (MIDDLE LEFT) */}
-            <rect x="180" y="275" width="180" height="105" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
-            <rect x="180" y="275" width="180" height="16" rx="2" fill="#e2e8f0" />
-            <text x="188" y="287" fill="#475569" font-size="8" font-weight="800">INVERTER</text>
-            
-            {/* Screen */}
-            <rect x="205" y="305" width="130" height="40" rx="3" fill="#0f172a" />
-            <text x="270" y="322" fill="#38bdf8" font-size="8.5" font-weight="700" text-anchor="middle">
-              {cleanProductName(inverterName)}
-            </text>
-            <text x="270" y="337" fill="#10b981" font-size="8" font-weight="600" text-anchor="middle">
-              SYSTEM ONLINE
-            </text>
-            
-            {/* Status indicators */}
-            <circle cx="200" cy="360" r="3" fill="#10b981" /> {/* Run */}
-            <circle cx="212" cy="360" r="3" fill="#f59e0b" /> {/* Comm */}
-            <circle cx="224" cy="360" r="3" fill="#dc2626" opacity="0.2" /> {/* Fault */}
+              <rect x="110" y="117" width="16" height="6" fill="#334155" />
+              <text x="118" y="113" fill="#475569" font-size="6.5" text-anchor="middle">GRID</text>
 
-            {/* Inverter Label */}
-            <text x="270" y="260" fill="#0f172a" font-size="11" font-weight="800" text-anchor="middle">
-              BIẾN TẦN: {cleanProductName(inverterName).toUpperCase()}
-            </text>
+              {/* Backup Port highlight */}
+              <rect x="145" y="117" width="20" height="6" fill="#2563eb" />
+              <text x="155" y="113" fill="#2563eb" font-size="7" font-weight="700" text-anchor="middle">BACK UP</text>
+            </g>
 
-            {/* 4. BATTERY STORAGE (BOTTOM LEFT - HYBRID ONLY) */}
-            {hasBattery ? (
-              <>
-                {/* Battery Breaker */}
-                <rect x="90" y="390" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-                <line x1="100" y1="400" x2="100" y2="435" stroke="#0f172a" stroke-width="1.5" />
-                <line x1="120" y1="400" x2="120" y2="435" stroke="#0f172a" stroke-width="1.5" />
-                <rect x="105" y="410" width="10" height="15" rx="1" fill="#0f172a" />
-                <text x="42" y="415" fill="#0f172a" font-size="8.5" font-weight="700">CB DC PIN</text>
-                <text x="58" y="426" fill="#475569" font-size="7.5" font-weight="600">125A</text>
-
-                {/* Battery Cabinet */}
-                <rect x="130" y="460" width="80" height="110" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="2" />
-                <rect x="130" y="460" width="80" height="12" fill="#cbd5e1" />
-                <rect x="145" y="482" width="50" height="15" rx="2" fill="#0f172a" />
-                <text x="170" y="493" fill="#38bdf8" font-size="8.5" font-weight="700" text-anchor="middle">
-                  {batteryCapacity} kWh
-                </text>
-                
-                {/* Horizontal cabinet lines */}
-                <line x1="140" y1="515" x2="200" y2="515" stroke="#94a3b8" stroke-width="1.5" />
-                <line x1="140" y1="535" x2="200" y2="535" stroke="#94a3b8" stroke-width="1.5" />
-                <line x1="140" y1="555" x2="200" y2="555" stroke="#94a3b8" stroke-width="1.5" />
-                
-                {/* Brand Logo */}
-                <text x="170" y="565" fill="#16a34a" font-size="10" font-weight="800" text-anchor="middle">
-                  {batteryBrand}
-                </text>
-
-                <text x="220" y="515" fill="#0f172a" font-size="10.5" font-weight="700">PIN LƯU TRỮ</text>
-                <text x="220" y="528" fill="#475569" font-size="9" font-weight="600">{cleanProductName(batteryName)}</text>
-              </>
-            ) : (
-              /* If no battery, we draw a blank block or placeholder note */
-              <>
-                <rect x="130" y="460" width="80" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4" />
-                <text x="170" y="515" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="middle">KHÔNG CÓ</text>
-                <text x="170" y="530" fill="#94a3b8" font-size="8.5" font-weight="700" text-anchor="middle">LƯU TRỮ</text>
-              </>
+            {/* 4. CB DC BATTERY */}
+            {hasBattery && (
+              <g transform="translate(80, 420)">
+                <rect x="0" y="0" width="36" height="50" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+                <line x1="10" y1="8" x2="10" y2="42" stroke="#0f172a" stroke-width="1.2" />
+                <line x1="26" y1="8" x2="26" y2="42" stroke="#0f172a" stroke-width="1.2" />
+                <rect x="13" y="15" width="10" height="15" rx="1" fill="#0f172a" />
+                <rect x="-5" y="8" width="46" height="12" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+                <text x="18" y="17" fill="#0f172a" font-size="7.5" font-weight="800" text-anchor="middle">CB DC</text>
+                <text x="-40" y="28" fill="#475569" font-size="8" font-weight="700">CB DC PIN</text>
+                <text x="-40" y="38" fill="#64748b" font-size="7" font-weight="600">125A</text>
+              </g>
             )}
 
-            {/* 5. UTILITY GRID & NET METER (CENTER TOP) */}
-            {/* Transmission Tower SVG */}
-            <g transform="translate(560, 20) scale(0.95)">
-              {/* Electric lattice tower */}
-              <line x1="40" y1="70" x2="20" y2="120" stroke="#0f172a" stroke-width="2" />
-              <line x1="40" y1="70" x2="60" y2="120" stroke="#0f172a" stroke-width="2" />
-              <line x1="20" y1="120" x2="60" y2="120" stroke="#0f172a" stroke-width="2" />
-              <line x1="20" y1="120" x2="10" y2="170" stroke="#0f172a" stroke-width="2.2" />
-              <line x1="60" y1="120" x2="70" y2="170" stroke="#0f172a" stroke-width="2.2" />
-              <line x1="10" y1="170" x2="70" y2="170" stroke="#0f172a" stroke-width="2.2" />
-              
-              {/* Crossarms */}
-              <line x1="5" y1="100" x2="75" y2="100" stroke="#0f172a" stroke-width="2" />
-              <line x1="0" y1="130" x2="80" y2="130" stroke="#0f172a" stroke-width="2" />
-              
-              {/* Diagonals */}
-              <line x1="30" y1="100" x2="40" y2="120" stroke="#0f172a" stroke-width="1.2" />
-              <line x1="50" y1="100" x2="40" y2="120" stroke="#0f172a" stroke-width="1.2" />
-              <line x1="20" y1="120" x2="40" y2="170" stroke="#0f172a" stroke-width="1.2" />
-              <line x1="60" y1="120" x2="40" y2="170" stroke="#0f172a" stroke-width="1.2" />
-              
-              <text x="90" y="115" fill="#0f172a" font-size="10.5" font-weight="700">LƯỚI ĐIỆN</text>
-              <text x="90" y="128" fill="#0f172a" font-size="10.5" font-weight="700">EVN</text>
+            {/* 5. BATTERY CABINET */}
+            <g transform="translate(50, 490)">
+              {hasBattery ? (
+                <>
+                  <rect x="0" y="0" width="100" height="110" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="2" />
+                  <rect x="0" y="0" width="100" height="14" fill="#94a3b8" />
+                  <text x="50" y="10" fill="#0f172a" font-size="8" font-weight="800" text-anchor="middle">BATTERY</text>
+                  
+                  <rect x="15" y="22" width="70" height="16" rx="2" fill="#0f172a" />
+                  <text x="50" y="33" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">
+                    {batteryCapacity} kWh
+                  </text>
+                  
+                  <line x1="15" y1="50" x2="85" y2="50" stroke="#94a3b8" stroke-width="1" />
+                  <line x1="15" y1="70" x2="85" y2="70" stroke="#94a3b8" stroke-width="1" />
+                  <line x1="15" y1="90" x2="85" y2="90" stroke="#94a3b8" stroke-width="1" />
+                  
+                  <text x="50" y="102" fill="#16a34a" font-size="9.5" font-weight="800" text-anchor="middle">
+                    {batteryBrand}
+                  </text>
+                  <text x="110" y="55" fill="#2563eb" font-size="9.5" font-weight="700">Pin lưu trữ</text>
+                  <text x="110" y="68" fill="#475569" font-size="8.5" font-weight="600">{cleanProductName(batteryName)}</text>
+                </>
+              ) : (
+                <>
+                  <rect x="0" y="0" width="100" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3" />
+                  <text x="50" y="50" fill="#94a3b8" font-size="9.5" font-weight="700" text-anchor="middle">KHÔNG CÓ</text>
+                  <text x="50" y="64" fill="#94a3b8" font-size="8.5" font-weight="700" text-anchor="middle">PIN LƯU TRỮ</text>
+                </>
+              )}
             </g>
 
-            {/* 2-Way Smart Meter */}
-            <rect x="580" y="215" width="40" height="60" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.5" />
-            <rect x="585" y="222" width="30" height="15" rx="1" fill="#0f172a" />
-            {/* Screen values representation */}
-            <text x="600" y="232" fill="#38bdf8" font-size="7" font-weight="700" text-anchor="middle">220.5 V</text>
-            <circle cx="590" cy="245" r="1.5" fill="#f59e0b" />
-            <circle cx="610" cy="245" r="1.5" fill="#dc2626" />
-            <text x="630" y="240" fill="#0f172a" font-size="9" font-weight="700">CÔNG TƠ ĐIỆN</text>
-            <text x="630" y="252" fill="#0f172a" font-size="9" font-weight="700">2 CHIỀU</text>
 
-            {/* Grid AC Breaker */}
-            <rect x="580" y="295" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <line x1="590" y1="305" x2="590" y2="340" stroke="#0f172a" stroke-width="1.5" />
-            <line x1="610" y1="305" x2="610" y2="340" stroke="#0f172a" stroke-width="1.5" />
-            <rect x="595" y="315" width="10" height="15" rx="1" fill="#dc2626" />
-            <text x="630" y="320" fill="#0f172a" font-size="8.5" font-weight="700">CB AC</text>
-            <text x="630" y="331" fill="#475569" font-size="7.5" font-weight="600">2P 63A</text>
+            {/* ==================== COLUMN 2: UTILITY GRID & ATS & LOADS (CENTER-RIGHT) ==================== */}
 
-            {/* 6. AC COMBINER BOX DETAILS (INSIDE DASHED BOX) */}
-            {/* Main AC Breaker */}
-            <rect x="710" y="315" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <line x1="720" y1="325" x2="720" y2="360" stroke="#0f172a" stroke-width="1.5" />
-            <line x1="740" y1="325" x2="740" y2="360" stroke="#0f172a" stroke-width="1.5" />
-            <rect x="725" y="335" width="10" height="15" rx="1" fill="#0f172a" />
-            <text x="704" y="385" fill="#0f172a" font-size="8.5" font-weight="700" text-anchor="middle">MAIN CB</text>
-            <text x="704" y="396" fill="#475569" font-size="7.5" font-weight="600" text-anchor="middle">2P 63A</text>
-
-            {/* RCBO */}
-            <rect x="780" y="315" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <line x1="790" y1="325" x2="790" y2="360" stroke="#0f172a" stroke-width="1.5" />
-            <line x1="810" y1="325" x2="810" y2="360" stroke="#0f172a" stroke-width="1.5" />
-            <rect x="795" y="330" width="10" height="12" fill="#e2e8f0" stroke="#475569" />
-            <circle cx="800" cy="350" r="2.5" fill="#2563eb" />
-            <text x="800" y="385" fill="#0f172a" font-size="8.5" font-weight="700" text-anchor="middle">RCBO</text>
-            <text x="800" y="396" fill="#475569" font-size="7.5" font-weight="600" text-anchor="middle">2P 63A 30mA</text>
-
-            {/* AC SPD */}
-            <rect x="850" y="315" width="36" height="55" rx="4" fill="#ea580c" stroke="#c2410c" stroke-width="1" />
-            <rect x="856" y="325" width="10" height="15" fill="#16a34a" />
-            <rect x="866" y="325" width="10" height="15" fill="#16a34a" />
-            <text x="868" y="385" fill="#0f172a" font-size="8.5" font-weight="700" text-anchor="middle">SPD AC</text>
-            <text x="868" y="396" fill="#475569" font-size="7.5" font-weight="600" text-anchor="middle">275VAC Type 2</text>
-
-            {/* AC SPD Ground Line */}
-            <path d="M 868 370 L 868 410 L 910 410" className="line-pe" />
-            <use href="#ground-symbol" x="910" y="410" />
-
-            {/* CT Sensor (Current Transformer) */}
-            <circle cx="920" cy="342" r="10" fill="none" stroke="#ea580c" stroke-width="2.5" />
-            <rect x="916" y="337" width="8" height="10" fill="#0f172a" />
-            <text x="920" y="362" fill="#ea580c" font-size="8.5" font-weight="800" text-anchor="middle">CT</text>
-
-            {/* 7. LOADS / FAMILY APPLIANCES (BOTTOM RIGHT) */}
-            {/* Household loads AC Breaker */}
-            <rect x="780" y="440" width="40" height="55" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <line x1="790" y1="450" x2="790" y2="485" stroke="#0f172a" stroke-width="1.5" />
-            <line x1="810" y1="450" x2="810" y2="485" stroke="#0f172a" stroke-width="1.5" />
-            <rect x="795" y="460" width="10" height="15" rx="1" fill="#dc2626" />
-            <text x="832" y="465" fill="#0f172a" font-size="8.5" font-weight="700">CB AC</text>
-            <text x="832" y="476" fill="#475569" font-size="7.5" font-weight="600">2P 63A</text>
-
-            {/* House Icon & appliances */}
-            <g transform="translate(560, 485) scale(1)">
-              {/* House Outer Outline */}
-              <path d="M 0 35 L 50 0 L 100 35 L 100 95 L 0 95 Z" fill="none" stroke="#0f172a" stroke-width="2" />
-              <path d="M -5 35 L 50 -3 L 105 35" fill="none" stroke="#0f172a" stroke-width="2.5" />
-              {/* Door */}
-              <rect x="38" y="60" width="24" height="35" fill="none" stroke="#475569" stroke-width="1.2" />
-              {/* Window */}
-              <rect x="10" y="48" width="16" height="16" fill="none" stroke="#475569" stroke-width="1" />
-              <line x1="18" y1="48" x2="18" y2="64" stroke="#475569" stroke-width="0.8" />
-              <line x1="10" y1="56" x2="26" y2="56" stroke="#475569" stroke-width="0.8" />
+            {/* 1. TRANSMISSION TOWER (EVN GRID) */}
+            <g transform="translate(560, 20) scale(1)">
+              <line x1="40" y1="10" x2="20" y2="60" stroke="#0f172a" stroke-width="2" />
+              <line x1="40" y1="10" x2="60" y2="60" stroke="#0f172a" stroke-width="2" />
+              <line x1="20" y1="60" x2="60" y2="60" stroke="#0f172a" stroke-width="2" />
+              <line x1="20" y1="60" x2="10" y2="110" stroke="#0f172a" stroke-width="2.2" />
+              <line x1="60" y1="60" x2="70" y2="110" stroke="#0f172a" stroke-width="2.2" />
+              <line x1="10" y1="110" x2="70" y2="110" stroke="#0f172a" stroke-width="2.2" />
+              <line x1="5" y1="40" x2="75" y2="40" stroke="#0f172a" stroke-width="2" />
+              <line x1="0" y1="75" x2="80" y2="75" stroke="#0f172a" stroke-width="2" />
               
-              <text x="115" y="45" fill="#0f172a" font-size="11" font-weight="700">PHỤ TẢI</text>
-              <text x="115" y="58" fill="#0f172a" font-size="11" font-weight="700">GIA ĐÌNH</text>
+              <rect x="85" y="45" width="46" height="18" rx="9" fill="#0369a1" />
+              <text x="108" y="57" fill="#ffffff" font-size="9" font-weight="700" text-anchor="middle">Lưới</text>
             </g>
 
-            {/* WIRING CONNECTIONS PATHS */}
-            
-            {/* A. SOLAR TO INVERTER (DC STRING 1) */}
-            {/* String 1 pos (red) */}
-            <path d="M 44 122 L 44 152 L 245 152 L 245 175" className="line-dc-pos" />
-            {/* String 1 neg (black) */}
-            <path d="M 196 122 L 196 160 L 255 160 L 255 175" className="line-dc-neg" />
+            {/* 2. NET METER */}
+            <g transform="translate(580, 150)">
+              <rect x="0" y="0" width="40" height="60" rx="4" fill="#f8fafc" stroke="#475569" stroke-width="1.5" />
+              <rect x="5" y="8" width="30" height="18" rx="1" fill="#0f172a" />
+              <text x="20" y="20" fill="#38bdf8" font-size="7" font-weight="700" text-anchor="middle">0984.8 kWh</text>
+              <circle cx="10" cy="36" r="1.5" fill="#f59e0b" />
+              <circle cx="30" cy="36" r="1.5" fill="#dc2626" />
+              
+              <rect x="50" y="15" width="65" height="18" rx="3" fill="#0369a1" />
+              <text x="82" y="27" fill="#ffffff" font-size="8.5" font-weight="700" text-anchor="middle">NET METER</text>
+            </g>
 
-            {/* B. SOLAR TO INVERTER (DC STRING 2) */}
-            {/* String 2 pos (red) */}
-            <path d="M 264 122 L 264 152 L 245 152" className="line-dc-pos" />
-            {/* String 2 neg (black) */}
-            <path d="M 416 122 L 416 160 L 255 160" className="line-dc-neg" />
+            {/* 3. CB AC (GRID SIDE) */}
+            <g transform="translate(580, 245)">
+              <rect x="0" y="0" width="36" height="50" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+              <line x1="10" y1="8" x2="10" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <line x1="26" y1="8" x2="26" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <rect x="13" y="15" width="10" height="15" rx="1" fill="#dc2626" />
+              <rect x="-5" y="8" width="46" height="12" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+              <text x="18" y="17" fill="#0f172a" font-size="7.5" font-weight="800" text-anchor="middle">CB AC</text>
+              
+              <rect x="-55" y="18" width="45" height="14" rx="2" fill="#fef08a" />
+              <text x="-32" y="28" fill="#854d0e" font-size="8" font-weight="800" text-anchor="middle">CB AC</text>
+            </g>
 
-            {/* C. DC PROTECTION TO INVERTER */}
-            {/* Breaker output to SPD input */}
-            <path d="M 245 230 L 245 264 L 233 264 L 233 275" className="line-dc-pos" />
-            <path d="M 255 230 L 255 268 L 247 268 L 247 275" className="line-dc-neg" />
-            {/* Connect to SPD in parallel */}
-            <path d="M 245 240 L 353 240 L 353 230" className="line-dc-pos" />
-            <path d="M 255 248 L 363 248 L 363 230" className="line-dc-neg" />
+            {/* 4. ATS (AUTOMATIC TRANSFER SWITCH) */}
+            <g transform="translate(560, 335)">
+              <rect x="0" y="0" width="80" height="60" rx="5" fill="#f8fafc" stroke="#475569" stroke-width="1.5" />
+              <rect x="0" y="0" width="80" height="14" fill="#cbd5e1" />
+              <text x="40" y="10" fill="#0f172a" font-size="8.5" font-weight="800" text-anchor="middle">TRANSFER SWITCH</text>
+              
+              {/* ATS switch graphics */}
+              <circle cx="25" cy="35" r="5" fill="#64748b" />
+              <circle cx="55" cy="35" r="5" fill="#64748b" />
+              <line x1="25" y1="35" x2="40" y2="28" stroke="#dc2626" stroke-width="2.5" /> {/* Switch lever */}
+              
+              {/* Label labels */}
+              <rect x="90" y="20" width="30" height="16" rx="3" fill="#0369a1" />
+              <text x="105" y="31" fill="#ffffff" font-size="8.5" font-weight="700" text-anchor="middle">ATS</text>
 
-            {/* D. BATTERY TO INVERTER (DC LƯU TRỮ) */}
+              {/* Nguồn pin terminal label */}
+              <rect x="-62" y="20" width="54" height="16" rx="2" fill="#0284c7" />
+              <text x="-35" y="31" fill="#ffffff" font-size="7.5" font-weight="700" text-anchor="middle">NGUỒN PIN</text>
+            </g>
+
+            {/* 5. CT CLAMP */}
+            <g transform="translate(540, 305)">
+              <circle cx="0" cy="0" r="8" fill="none" stroke="#ea580c" stroke-width="2" />
+              <rect x="-4" y="-4" width="8" height="8" fill="#0f172a" />
+              <rect x="-24" y="-8" width="16" height="14" rx="2" fill="#1e3a8a" />
+              <text x="-16" y="2" fill="#ffffff" font-size="7" font-weight="800" text-anchor="middle">CT</text>
+            </g>
+
+            {/* 6. CB AC & SPD AC (LOAD SIDE PROTECTION) */}
+            <g transform="translate(580, 430)">
+              {/* CB AC */}
+              <rect x="0" y="0" width="36" height="50" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.2" />
+              <line x1="10" y1="8" x2="10" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <line x1="26" y1="8" x2="26" y2="42" stroke="#0f172a" stroke-width="1.2" />
+              <rect x="13" y="15" width="10" height="15" rx="1" fill="#dc2626" />
+              <rect x="-5" y="8" width="46" height="12" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="0.8" />
+              <text x="18" y="17" fill="#0f172a" font-size="7.5" font-weight="800" text-anchor="middle">CB AC</text>
+              
+              <rect x="-50" y="18" width="42" height="14" rx="2" fill="#fef08a" />
+              <text x="-29" y="28" fill="#854d0e" font-size="8" font-weight="800" text-anchor="middle">CB AC</text>
+
+              {/* SPD AC */}
+              <rect x="75" y="0" width="36" height="50" rx="3" fill="#eab308" stroke="#a16207" stroke-width="1" />
+              <rect x="80" y="10" width="10" height="12" fill="#16a34a" />
+              <rect x="91" y="10" width="10" height="12" fill="#16a34a" />
+              <rect x="70" y="8" width="46" height="12" rx="2" fill="#fef08a" stroke="#a16207" stroke-width="0.8" />
+              <text x="93" y="17" fill="#854d0e" font-size="7.5" font-weight="800" text-anchor="middle">SPD AC</text>
+              <text x="120" y="28" fill="#475569" font-size="8" font-weight="700">SPD AC</text>
+              <use href="#ground-symbol" x="93" y="70" />
+            </g>
+
+            {/* 7. HOUSEHOLD LOAD (TẢI) */}
+            <g transform="translate(530, 520)">
+              {/* House roof */}
+              <path d="M 0 35 L 70 0 L 140 35 L 140 90 L 0 90 Z" fill="none" stroke="#0f172a" stroke-width="2" />
+              <path d="M -5 35 L 70 -3 L 145 35" fill="none" stroke="#0f172a" stroke-width="2.5" />
+              
+              {/* Air Conditioner */}
+              <rect x="15" y="32" width="45" height="14" rx="1" fill="none" stroke="#64748b" stroke-width="1" />
+              <line x1="20" y1="41" x2="55" y2="41" stroke="#94a3b8" stroke-width="0.8" />
+              
+              {/* Fridge */}
+              <rect x="75" y="42" width="22" height="44" rx="2" fill="none" stroke="#64748b" stroke-width="1.2" />
+              <line x1="75" y1="60" x2="97" y2="60" stroke="#64748b" stroke-width="1" />
+              <circle cx="92" cy="54" r="1" fill="#64748b" />
+              <circle cx="92" cy="66" r="1" fill="#64748b" />
+              
+              {/* Washer */}
+              <rect x="105" y="55" width="24" height="30" rx="1" fill="none" stroke="#64748b" stroke-width="1.2" />
+              <circle cx="117" cy="72" r="7" fill="none" stroke="#64748b" stroke-width="1" />
+              
+              {/* TV */}
+              <rect x="15" y="55" width="45" height="26" rx="2" fill="none" stroke="#64748b" stroke-width="1.2" />
+              <rect x="25" y="81" width="25" height="4" fill="#64748b" />
+
+              {/* Tải Label */}
+              <rect x="52" y="96" width="36" height="18" rx="3" fill="#0369a1" />
+              <text x="70" y="108" fill="#ffffff" font-size="8.5" font-weight="700" text-anchor="middle">Tải</text>
+            </g>
+
+
+            {/* ==================== CENTER SYSTEM LABEL BOX ==================== */}
+            <g transform="translate(325, 435)">
+              <rect x="0" y="0" width="180" height="70" rx="12" fill="#fef08a" stroke="#ca8a04" stroke-width="2.5" />
+              <text x="90" y="28" fill="#854d0e" font-size="11" font-weight="900" text-anchor="middle">SƠ ĐỒ ĐIỆN</text>
+              <text x="90" y="43" fill="#854d0e" font-size="11" font-weight="900" text-anchor="middle">MẶT TRỜI HYBRID</text>
+              <text x="90" y="58" fill="#ca8a04" font-size="9.5" font-weight="800" text-anchor="middle">KAIDO SOLAR</text>
+            </g>
+
+
+            {/* ==================== WIRING CONNECTIONS (LINES) ==================== */}
+
+            {/* A. SOLAR TO INVERTER DC WIRING */}
+            {/* Pos line String 1 (red) */}
+            <path d="M 65 135 L 65 160 L 80 160 L 80 190" className="line-dc-pos" />
+            {/* Neg line String 1 (black) */}
+            <path d="M 220 135 L 220 168 L 90 168 L 90 190" className="line-dc-neg" />
+
+            {/* Pos line String 2 (red) */}
+            <path d="M 245 135 L 245 160 L 80 160" className="line-dc-pos" />
+            {/* Neg line String 2 (black) */}
+            <path d="M 380 135 L 380 168 L 90 168" className="line-dc-neg" />
+
+            {/* DC Protection output to Inverter input */}
+            <path d="M 80 240 L 80 262 L 75 262 L 75 275" className="line-dc-pos" />
+            <path d="M 96 240 L 96 266 L 85 266 L 85 275" className="line-dc-neg" />
+
+            {/* SPD DC branch connection */}
+            <path d="M 80 160 L 145 160 L 145 190" className="line-dc-pos" />
+            <path d="M 90 168 L 155 168 L 155 190" className="line-dc-neg" />
+
+            {/* B. BATTERY WIRING (HYBRID) */}
             {hasBattery && (
               <>
-                {/* Battery to Breaker */}
-                <path d="M 150 460 L 150 420 L 130 420" className="line-dc-pos" />
-                <path d="M 170 460 L 170 428 L 110 428 L 110 445" className="line-dc-neg" /> {/* Negative loop */}
-                {/* Breaker output to Inverter */}
-                <path d="M 100 390 L 100 365 L 195 365" className="line-dc-pos" />
-                <path d="M 120 390 L 120 372 L 207 372" className="line-dc-neg" />
-                {/* Comm line (blue dashed) from Battery to Inverter */}
-                <path d="M 185 460 L 185 435 L 250 435 L 250 380" className="line-comm" />
-                <rect x="238" y="405" width="24" height="12" rx="2" fill="#2563eb" />
-                <text x="250" y="414" fill="#ffffff" font-size="7" font-weight="700" text-anchor="middle">BMS</text>
+                {/* Battery to CB DC PIN */}
+                <path d="M 90 490 L 90 470" className="line-dc-pos" />
+                <path d="M 106 490 L 106 470" className="line-dc-neg" />
+                
+                {/* CB DC PIN to Inverter BAT port */}
+                <path d="M 90 420 L 90 405 L 135 405 L 135 395" className="line-dc-pos" />
+                <path d="M 106 420 L 106 409 L 142 409 L 142 395" className="line-dc-neg" />
+
+                {/* BMS Communication line (blue dashed) */}
+                <path d="M 75 490 L 75 480 L 50 480 L 50 380 L 110 380 L 110 395" className="line-comm" />
               </>
             )}
 
-            {/* E. GRID TRANSMISSION LINE TO METER & CB */}
-            <path d="M 600 170 L 600 215" className="line-ac-l" />
-            <path d="M 590 170 L 590 200 L 590 215" className="line-ac-n" /> {/* Parallel N */}
+            {/* C. GRID TRANSMISSION LINE WIRING */}
+            {/* Tower out to Net Meter input */}
+            <path d="M 600 130 L 600 150" className="line-ac-l" />
+            <path d="M 590 130 L 590 150" className="line-ac-n" />
 
-            {/* Meter out to AC Breaker */}
-            <path d="M 600 275 L 600 295" className="line-ac-l" />
-            <path d="M 590 275 L 590 295" className="line-ac-n" />
+            {/* Net Meter out to Grid CB */}
+            <path d="M 600 210 L 600 245" className="line-ac-l" />
+            <path d="M 590 210 L 590 245" className="line-ac-n" />
 
-            {/* F. AC BREAKER TO AC COMBINER BOX */}
-            <path d="M 600 350 L 600 390 L 710 390 L 710 370" className="line-ac-l" />
-            <path d="M 590 350 L 590 398 L 730 398 L 730 370" className="line-ac-n" />
-
-            {/* G. INVERTER OUTPUT TO AC COMBINER BOX */}
-            <path d="M 360 350 L 550 350 L 550 405 L 720 405 L 720 370" className="line-ac-l" />
-            <path d="M 360 360 L 542 360 L 542 413 L 740 413 L 740 370" className="line-ac-n" />
-
-            {/* H. COMBINER BOX TO HOUSE LOAD */}
-            {/* Busbar links inside AC panel */}
-            <path d="M 720 315 L 720 290 L 800 290 L 800 315" className="line-ac-l" />
-            <path d="M 740 315 L 740 282 L 810 282 L 810 315" className="line-ac-n" />
-            {/* Connection to AC SPD in parallel */}
-            <path d="M 800 290 L 860 290 L 860 315" className="line-ac-l" />
-            <path d="M 810 282 L 870 282 L 870 315" className="line-ac-n" />
-
-            {/* RCBO output to household CB */}
-            <path d="M 800 370 L 800 440" className="line-ac-l" />
-            <path d="M 810 370 L 810 440" className="line-ac-n" />
+            {/* D. GRID CB TO ATS & INVERTER GRID PORT */}
+            {/* Main AC feed down */}
+            <path d="M 600 295 L 600 335" className="line-ac-l" />
+            <path d="M 590 295 L 590 335" className="line-ac-n" />
             
-            {/* Household CB to House load */}
-            <path d="M 800 495 L 800 520 C 800 530, 640 530, 610 530 L 610 520" className="line-ac-l" />
-            <path d="M 810 495 L 810 526 C 810 536, 648 536, 610 536" className="line-ac-n" />
+            {/* Grid branch tap off to Inverter GRID port */}
+            <path d="M 600 310 L 178 310 L 178 395" className="line-ac-l" />
+            <path d="M 590 316 L 170 316 L 170 395" className="line-ac-n" />
 
-            {/* I. CT CLAMP AND COMMUNICATIONS */}
-            {/* CT Sensor clamp to main feed */}
-            <path d="M 920 332 L 920 300 C 920 300, 740 300, 740 315" className="line-ct" />
-            {/* CT Comm line back to Inverter */}
-            <path d="M 930 342 L 950 342 L 950 200 C 950 200, 310 200, 310 275" className="line-comm" />
-            
-            {/* Ground line PE connections (Green dashed) */}
-            <path d="M 330 380 L 330 440" className="line-pe" />
-            <use href="#ground-symbol" x="330" y="440" />
+            {/* E. INVERTER BACKUP PORT TO ATS */}
+            <path d="M 215 395 L 215 412 L 498 412 L 498 360 L 560 360" className="line-ac-l" /> {/* Red Backup L line */}
+            <path d="M 223 395 L 223 406 L 490 406 L 490 354 L 560 354" className="line-ac-n" /> {/* Blue Backup N line */}
 
-            {/* PE link inside AC box */}
-            <use href="#ground-symbol" x="910" y="410" />
+            {/* F. ATS OUTPUT TO LOAD SIDE CB */}
+            <path d="M 600 395 L 600 430" className="line-ac-l" />
+            <path d="M 590 395 L 590 430" className="line-ac-n" />
 
-            {/* 8. GHI CHÚ / INSTRUCTIONS BOX (BOTTOM MIDDLE) */}
-            <g transform="translate(290, 420)">
-              <rect x="0" y="0" width="250" height="98" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-              <text x="10" y="16" fill="#0f172a" font-size="9" font-weight="700">GHI CHÚ KỸ THUẬT:</text>
-              <text x="10" y="32" fill="#475569" font-size="7.5">- Hệ thống tự động sạc xả lưu trữ và bù lưới.</text>
-              <text x="10" y="44" fill="#475569" font-size="7.5">- Cài đặt chống phát ngược lưới (Zero Export)</text>
-              <text x="10" y="56" fill="#475569" font-size="7.5">  theo yêu cầu kỹ thuật của EVN.</text>
-              <text x="10" y="68" fill="#475569" font-size="7.5">- Dây DC: {cleanProductName(dcCableName)}.</text>
-              <text x="10" y="80" fill="#475569" font-size="7.5">- Dây AC: {cleanProductName(acCableName)}.</text>
+            {/* G. LOAD SIDE CB TO HOUSEHOLD LOAD */}
+            <path d="M 600 480 L 600 555" className="line-ac-l" />
+            <path d="M 590 480 L 590 555" className="line-ac-n" />
+
+            {/* Load Side SPD AC parallel link */}
+            <path d="M 600 495 L 666 495 L 666 480" className="line-ac-l" />
+            <path d="M 590 502 L 676 502 L 676 480" className="line-ac-n" />
+
+            {/* H. CT SENSOR WIRING */}
+            {/* CT Communication cable back to Inverter comm port */}
+            <path d="M 516 297 L 516 260 L 235 260 L 235 375" className="line-ct" />
+
+
+            {/* ==================== 8. GHI CHÚ / INSTRUCTIONS BOX (BOTTOM MIDDLE) ==================== */}
+            <g transform="translate(230, 520)">
+              <rect x="0" y="0" width="280" height="90" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+              <text x="10" y="14" fill="#0f172a" font-size="9" font-weight="700">GHI CHÚ KỸ THUẬT:</text>
+              <text x="10" y="27" fill="#475569" font-size="7.5">- Hệ thống tự động sạc xả lưu trữ và bù lưới bám tải.</text>
+              <text x="10" y="38" fill="#475569" font-size="7.5">- Thiết bị ATS chuyển mạch tự động cấp nguồn Backup khi mất lưới.</text>
+              <text x="10" y="49" fill="#475569" font-size="7.5">- Cài đặt chống phát ngược lưới (Zero Export) qua CT.</text>
+              <text x="10" y="60" fill="#475569" font-size="7.5">- Dây DC: {cleanProductName(dcCableName)}.</text>
+              <text x="10" y="71" fill="#475569" font-size="7.5">- Dây AC: {cleanProductName(acCableName)}.</text>
             </g>
 
-            {/* 9. LEGENDS BOX (TOP RIGHT) */}
-            <g transform="translate(680, 50)">
-              <rect x="0" y="0" width="130" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-              <text x="65" y="18" fill="#0f172a" font-size="9.5" font-weight="700" text-anchor="middle">CHÚ THÍCH</text>
+            {/* ==================== 9. LEGENDS BOX (TOP RIGHT) ==================== */}
+            <g transform="translate(820, 20)">
+              <rect x="0" y="0" width="270" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+              <text x="135" y="16" fill="#0f172a" font-size="9.5" font-weight="700" text-anchor="middle">CHÚ THÍCH KỸ THUẬT</text>
               
-              {/* Legend lines */}
-              <line x1="15" y1="36" x2="45" y2="36" stroke="#dc2626" stroke-width="2.5" />
-              <text x="55" y="39" fill="#0f172a" font-size="8.5">DC + (Đỏ)</text>
+              <line x1="15" y1="34" x2="45" y2="34" stroke="#dc2626" stroke-width="2.5" />
+              <text x="55" y="37" fill="#0f172a" font-size="8.5">DC Cực dương + (Đỏ)</text>
 
-              <line x1="15" y1="56" x2="45" y2="56" stroke="#0f172a" stroke-width="2.5" />
-              <text x="55" y="59" fill="#0f172a" font-size="8.5">DC - (Đen)</text>
+              <line x1="15" y1="54" x2="45" y2="54" stroke="#0f172a" stroke-width="2.5" />
+              <text x="55" y="57" fill="#0f172a" font-size="8.5">DC Cực âm - (Đen)</text>
 
-              <line x1="15" y1="76" x2="45" y2="76" stroke="#dc2626" stroke-width="2" />
-              <text x="55" y="79" fill="#0f172a" font-size="8.5">AC Pha L</text>
+              <line x1="15" y1="74" x2="45" y2="74" stroke="#dc2626" stroke-width="2" />
+              <text x="55" y="77" fill="#0f172a" font-size="8.5">AC Dây Pha L (Đỏ)</text>
 
-              <line x1="15" y1="96" x2="45" y2="96" stroke="#0f172a" stroke-width="2" />
-              <text x="55" y="99" fill="#0f172a" font-size="8.5">AC Trung tính N</text>
+              <line x1="15" y1="94" x2="45" y2="94" stroke="#2563eb" stroke-width="2" />
+              <text x="55" y="97" fill="#0f172a" font-size="8.5">AC Dây trung tính N (Xanh dương)</text>
 
-              <line x1="15" y1="116" x2="45" y2="116" stroke="#16a34a" stroke-dasharray="3,3" stroke-width="1.5" />
-              <text x="55" y="119" fill="#0f172a" font-size="8.5">Dây tiếp địa PE</text>
+              <line x1="15" y1="114" x2="45" y2="114" stroke="#16a34a" stroke-dasharray="3,3" stroke-width="1.5" />
+              <text x="55" y="117" fill="#0f172a" font-size="8.5">Dây tiếp địa chống sét PE (Xanh lá)</text>
 
-              <line x1="15" y1="136" x2="45" y2="136" stroke="#2563eb" stroke-dasharray="3,3" stroke-width="1.5" />
-              <text x="55" y="139" fill="#0f172a" font-size="8.5">Truyền thông BMS</text>
+              <line x1="15" y1="134" x2="45" y2="134" stroke="#ea580c" stroke-dasharray="2,2" stroke-width="1.5" />
+              <text x="55" y="137" fill="#0f172a" font-size="8.5">Dây tín hiệu CT / Sensor cảm biến dòng</text>
             </g>
 
-            {/* 10. SYSTEM SPECIFICATIONS TABLE (TOP RIGHT) */}
-            <g transform="translate(820, 50)">
+            {/* ==================== 10. SYSTEM SPECIFICATIONS TABLE (TOP RIGHT) ==================== */}
+            <g transform="translate(820, 185)">
               <foreignObject x="0" y="0" width="270" height="150">
                 <table className="specs-table">
                   <thead>
@@ -686,8 +716,8 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
                       <td>{hasBattery ? cleanProductName(batteryName) : "Không có"}</td>
                     </tr>
                     <tr>
-                      <td style={{ fontWeight: 600 }}>Điện áp lưới</td>
-                      <td>220V - 1 pha - 50Hz</td>
+                      <td style={{ fontWeight: 600 }}>Thiết bị ATS</td>
+                      <td>Tự động chuyển mạch 63A</td>
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 600 }}>Chế độ hoạt động</td>
