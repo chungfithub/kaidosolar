@@ -133,9 +133,11 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
   const inverterPower = extractInverterPowerKW(inverterName);
 
   const hasBattery = !!batteryItem;
+  const batteryQty = batteryItem?.quantity || 1;
   const batteryName = batteryItem?.product.name || "BSS Lithium 16kWh";
   const batteryBrand = extractBrand(batteryName, "BSS");
-  const batteryCapacity = extractCapacityKWh(batteryName);
+  const batteryUnitCapacity = extractCapacityKWh(batteryName);
+  const batteryCapacity = batteryUnitCapacity * batteryQty;
 
   const cabinetName = cabinetItem?.product.name || "Tủ điện AC bảo vệ 1 pha";
   const dcCableName = dcCableItem ? dcCableItem.product.name : "Dây cáp DC solar 4mm2 chuyên dụng";
@@ -439,7 +441,9 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
                     {batteryBrand}
                   </text>
                   <text x="110" y="55" fill="#2563eb" font-size="9.5" font-weight="700">Pin lưu trữ</text>
-                  <text x="110" y="68" fill="#475569" font-size="8.5" font-weight="600">{cleanProductName(batteryName)}</text>
+                  <text x="110" y="68" fill="#475569" font-size="8.5" font-weight="600">
+                    {batteryQty > 1 ? `${batteryQty} x ` : ""}{cleanProductName(batteryName)} ({batteryCapacity}kWh)
+                  </text>
                 </>
               ) : (
                 <>
