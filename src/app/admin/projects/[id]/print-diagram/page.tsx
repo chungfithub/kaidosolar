@@ -152,24 +152,29 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
         @media print {
           body {
             background: white !important;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           @page {
             size: A4 landscape;
-            margin: 5mm;
+            margin: 0;
           }
           .no-print {
             display: none !important;
           }
           .diagram-container {
             box-shadow: none !important;
+            border: none !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 6mm 10mm !important;
             width: 297mm !important;
             height: 210mm !important;
-            transform: scale(0.97);
-            transform-origin: top left;
+            box-sizing: border-box !important;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
           }
         }
 
