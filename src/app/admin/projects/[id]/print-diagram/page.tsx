@@ -735,30 +735,6 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
 
           </svg>
         </div>
-
-        {/* Footer Technical Block */}
-        <div className="footer-block">
-          <div className="footer-cell">
-            <div className="footer-title">CHỦ ĐẦU TƯ:</div>
-            <div className="footer-value">{project.customer?.name || "..........................................................."}</div>
-          </div>
-          <div className="footer-cell">
-            <div className="footer-title">CÔNG TRÌNH:</div>
-            <div className="footer-value">{project.name}</div>
-          </div>
-          <div className="footer-cell">
-            <div className="footer-title">ĐỊA ĐIỂM:</div>
-            <div className="footer-value">{project.customer?.address || "Hà Nội"}</div>
-          </div>
-          <div className="footer-cell">
-            <div className="footer-title">ĐƠN VỊ THI CÔNG:</div>
-            <div className="footer-value">CÔNG TY TNHH KAIDO SOLAR</div>
-          </div>
-          <div className="footer-cell" style={{ borderRight: 'none' }}>
-            <div className="footer-title">NGÀY THIẾT KẾ:</div>
-            <div className="footer-value">{new Date(project.updatedAt).toLocaleDateString('vi-VN')}</div>
-          </div>
-        </div>
       </div>
     </>
   );
