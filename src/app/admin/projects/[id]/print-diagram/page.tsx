@@ -4,6 +4,24 @@ import PrintTrigger from "@/app/admin/orders/[id]/print/PrintTrigger";
 
 const prisma = new PrismaClient();
 
+// Helper to clean up common prefixes for neat diagram text rendering
+function cleanProductName(name: string): string {
+  return name
+    .replace(/tấm pin năng lượng mặt trời/gi, "")
+    .replace(/tấm pin mặt trời/gi, "")
+    .replace(/tấm pin/gi, "")
+    .replace(/biến tần inverter hybrid/gi, "Hybrid")
+    .replace(/biến tần inverter/gi, "Inverter")
+    .replace(/biến tần/gi, "Inverter")
+    .replace(/inverter hybrid/gi, "Hybrid")
+    .replace(/pin lưu trữ lithium/gi, "Lithium")
+    .replace(/pin lưu trữ/gi, "Lithium")
+    .replace(/tủ điện bảo vệ/gi, "Tủ AC")
+    .replace(/tủ điện ac/gi, "Tủ AC")
+    .replace(/tủ điện/gi, "Tủ điện")
+    .trim();
+}
+
 // Helper to extract numeric values from strings
 function extractCapacityW(name: string): number {
   const match = name.match(/(\d+)\s*(W|Wp)/i);
@@ -80,6 +98,23 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
     i.product.name.toLowerCase().includes("battery")
   );
 
+  const cabinetItem = project.items.find(i => 
+    i.product.name.toLowerCase().includes("tủ điện") || 
+    i.product.name.toLowerCase().includes("tủ ac") || 
+    i.product.name.toLowerCase().includes("tủ bảo vệ") || 
+    i.product.name.toLowerCase().includes("tủ combiner")
+  );
+
+  const dcCableItem = project.items.find(i => 
+    (i.product.name.toLowerCase().includes("dây") || i.product.name.toLowerCase().includes("cáp")) && 
+    i.product.name.toLowerCase().includes("dc")
+  );
+
+  const acCableItem = project.items.find(i => 
+    (i.product.name.toLowerCase().includes("dây") || i.product.name.toLowerCase().includes("cáp")) && 
+    (i.product.name.toLowerCase().includes("ac") || i.product.name.toLowerCase().includes("điện lưới"))
+  );
+
   // Technical Calculations
   const hasPanels = !!panelItem;
   const panelQty = panelItem?.quantity || 16;
@@ -102,6 +137,10 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
   const batteryName = batteryItem?.product.name || "BSS Lithium 16kWh";
   const batteryBrand = extractBrand(batteryName, "BSS");
   const batteryCapacity = extractCapacityKWh(batteryName);
+
+  const cabinetName = cabinetItem?.product.name || "Tủ điện AC bảo vệ 1 pha";
+  const dcCableName = dcCableItem ? dcCableItem.product.name : "Dây cáp DC solar 4mm2 chuyên dụng";
+  const acCableName = acCableItem ? acCableItem.product.name : "Dây cáp điện AC Cadivi 2x10mm2";
 
   const systemType = hasBattery ? "HYBRID" : "HÒA LƯỚI BÁM TẢI";
   const systemMode = hasBattery ? "Hybrid - Có lưu trữ" : "Hòa lưới bám tải";
@@ -257,8 +296,8 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
             {/* GRIDS & BUSBAR BACKGROUND SHAPES */}
             {/* Tủ điện AC Dashed Box */}
             <rect x="680" y="270" width="280" height="150" rx="6" fill="none" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="3,3" />
-            <text x="970" y="320" fill="#2563eb" font-size="11" font-weight="700">TỦ ĐIỆN AC</text>
-            <text x="970" y="335" fill="#2563eb" font-size="9" font-weight="700">({inverterPower}kW)</text>
+            <text x="970" y="320" fill="#2563eb" font-size="10.5" font-weight="700">TỦ ĐIỆN AC:</text>
+            <text x="970" y="335" fill="#475569" font-size="9" font-weight="600">{cleanProductName(cabinetName)}</text>
 
             {/* PE Ground Symbol */}
             <defs>
@@ -279,7 +318,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
 
             {/* 1. SOLAR ARRAY (TOP LEFT) */}
             <text x="40" y="25" fill="#0f172a" font-size="11" font-weight="700">TẤM PIN NĂNG LƯỢNG MẶT TRỜI</text>
-            <text x="40" y="38" fill="#475569" font-size="9.5" font-weight="600">{panelQty} x {panelName} ({totalKWp.toFixed(2)}kWp)</text>
+            <text x="40" y="38" fill="#475569" font-size="9.5" font-weight="600">{panelQty} x {cleanProductName(panelName)} ({totalKWp.toFixed(2)}kWp)</text>
 
             {/* String 1 Box */}
             <rect x="30" y="55" width="200" height="85" rx="6" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
@@ -340,9 +379,9 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
             <text x="188" y="287" fill="#475569" font-size="8" font-weight="800">INVERTER</text>
             
             {/* Screen */}
-            <rect x="215" y="305" width="110" height="40" rx="3" fill="#0f172a" />
-            <text x="270" y="322" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">
-              {inverterBrand.toUpperCase()} {inverterPower}KW
+            <rect x="205" y="305" width="130" height="40" rx="3" fill="#0f172a" />
+            <text x="270" y="322" fill="#38bdf8" font-size="8.5" font-weight="700" text-anchor="middle">
+              {cleanProductName(inverterName)}
             </text>
             <text x="270" y="337" fill="#10b981" font-size="8" font-weight="600" text-anchor="middle">
               SYSTEM ONLINE
@@ -354,8 +393,8 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
             <circle cx="224" cy="360" r="3" fill="#dc2626" opacity="0.2" /> {/* Fault */}
 
             {/* Inverter Label */}
-            <text x="270" y="260" fill="#0f172a" font-size="11.5" font-weight="800" text-anchor="middle">
-              BIẾN TẦN {systemType} {inverterBrand.toUpperCase()}
+            <text x="270" y="260" fill="#0f172a" font-size="11" font-weight="800" text-anchor="middle">
+              BIẾN TẦN: {cleanProductName(inverterName).toUpperCase()}
             </text>
 
             {/* 4. BATTERY STORAGE (BOTTOM LEFT - HYBRID ONLY) */}
@@ -373,7 +412,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
                 <rect x="130" y="460" width="80" height="110" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="2" />
                 <rect x="130" y="460" width="80" height="12" fill="#cbd5e1" />
                 <rect x="145" y="482" width="50" height="15" rx="2" fill="#0f172a" />
-                <text x="170" y="493" fill="#38bdf8" font-size="8" font-weight="700" text-anchor="middle">
+                <text x="170" y="493" fill="#38bdf8" font-size="8.5" font-weight="700" text-anchor="middle">
                   {batteryCapacity} kWh
                 </text>
                 
@@ -388,7 +427,7 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
                 </text>
 
                 <text x="220" y="515" fill="#0f172a" font-size="10.5" font-weight="700">PIN LƯU TRỮ</text>
-                <text x="220" y="528" fill="#475569" font-size="9" font-weight="600">{batteryBrand} {batteryCapacity}kWh</text>
+                <text x="220" y="528" fill="#475569" font-size="9" font-weight="600">{cleanProductName(batteryName)}</text>
               </>
             ) : (
               /* If no battery, we draw a blank block or placeholder note */
@@ -591,8 +630,8 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
               <text x="10" y="32" fill="#475569" font-size="7.5">- Hệ thống tự động sạc xả lưu trữ và bù lưới.</text>
               <text x="10" y="44" fill="#475569" font-size="7.5">- Cài đặt chống phát ngược lưới (Zero Export)</text>
               <text x="10" y="56" fill="#475569" font-size="7.5">  theo yêu cầu kỹ thuật của EVN.</text>
-              <text x="10" y="68" fill="#475569" font-size="7.5">- Dây DC chuyên dụng chống cháy nổ ngoài trời.</text>
-              <text x="10" y="80" fill="#475569" font-size="7.5">- Tiếp địa hệ thống đảm bảo &lt; 4 Ohm.</text>
+              <text x="10" y="68" fill="#475569" font-size="7.5">- Dây DC: {cleanProductName(dcCableName)}.</text>
+              <text x="10" y="80" fill="#475569" font-size="7.5">- Dây AC: {cleanProductName(acCableName)}.</text>
             </g>
 
             {/* 9. LEGENDS BOX (TOP RIGHT) */}
@@ -636,15 +675,15 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 600 }}>Tấm pin</td>
-                      <td>{panelQty} x {panelBrand} {panelUnitCapacity}W</td>
+                      <td>{panelQty} x {cleanProductName(panelName)}</td>
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 600 }}>Biến tần</td>
-                      <td>{inverterBrand} Hybrid {inverterPower}kW</td>
+                      <td>{cleanProductName(inverterName)}</td>
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 600 }}>Pin lưu trữ</td>
-                      <td>{hasBattery ? `${batteryBrand} ${batteryCapacity}kWh` : "Không có"}</td>
+                      <td>{hasBattery ? cleanProductName(batteryName) : "Không có"}</td>
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 600 }}>Điện áp lưới</td>
