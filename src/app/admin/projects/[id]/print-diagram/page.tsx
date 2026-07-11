@@ -22,20 +22,31 @@ function cleanProductName(name: string): string {
     .trim();
 }
 
-// Helper to extract numeric values from strings
+// Helper to extract numeric values from strings (handles float numbers like 16.6, 5.12, 615.5)
 function extractCapacityW(name: string): number {
-  const match = name.match(/(\d+)\s*(W|Wp)/i);
-  return match ? parseInt(match[1], 10) : 550; // Default to 550W if not specified
+  const match = name.match(/(\d+(?:\.\d+)?)\s*(W|Wp)/i);
+  return match ? parseFloat(match[1]) : 550; // Default to 550W if not specified
 }
 
 function extractCapacityKWh(name: string): number {
-  const match = name.match(/(\d+)\s*kWh/i);
-  return match ? parseInt(match[1], 10) : 15; // Default to 15kWh if not specified
+  // Matches floats/integers followed by kWh, kW, or Ah
+  const match = name.match(/(\d+(?:\.\d+)?)\s*(kWh|kW|Ah)/i);
+  if (match) {
+    const value = parseFloat(match[1]);
+    if (match[2].toLowerCase() === 'ah') {
+      // Assuming typical 51.2V lithium pack (e.g. 100Ah = 5.12kWh)
+      return parseFloat(((value * 51.2) / 1000).toFixed(2));
+    }
+    return value;
+  }
+  // Generic fallback: matches the first number in the string
+  const genericMatch = name.match(/(\d+(?:\.\d+)?)/);
+  return genericMatch ? parseFloat(genericMatch[1]) : 15;
 }
 
 function extractInverterPowerKW(name: string): number {
-  const match = name.match(/(\d+)\s*(kW|kWp)/i);
-  return match ? parseInt(match[1], 10) : 8; // Default to 8kW if not specified
+  const match = name.match(/(\d+(?:\.\d+)?)\s*(kW|kWp)/i);
+  return match ? parseFloat(match[1]) : 8; // Default to 8kW if not specified
 }
 
 function extractBrand(name: string, defaultBrand: string): string {
