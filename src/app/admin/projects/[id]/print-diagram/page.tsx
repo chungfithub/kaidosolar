@@ -589,14 +589,6 @@ export default async function ProjectDiagramPage({ params }: { params: Promise<{
             </g>
 
 
-            {/* ==================== CENTER SYSTEM LABEL BOX ==================== */}
-            <g transform="translate(325, 435)">
-              <rect x="0" y="0" width="180" height="70" rx="12" fill="#fef08a" stroke="#ca8a04" stroke-width="2.5" />
-              <text x="90" y="28" fill="#854d0e" font-size="11" font-weight="900" text-anchor="middle">SƠ ĐỒ ĐIỆN</text>
-              <text x="90" y="43" fill="#854d0e" font-size="11" font-weight="900" text-anchor="middle">MẶT TRỜI HYBRID</text>
-              <text x="90" y="58" fill="#ca8a04" font-size="9.5" font-weight="800" text-anchor="middle">KAIDO SOLAR</text>
-            </g>
-
 
             {/* ==================== WIRING CONNECTIONS (LINES) ==================== */}
 
